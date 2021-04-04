@@ -42,12 +42,14 @@ decl_event!(
 		Hash = <T as frame_system::Config>::Hash,
 	{
 		TokenIssued(Hash, AccountId),
+		TokenBurned(Hash, AccountId),
 	}
 );
 
 decl_error! {
 	pub enum Error for Module<T: Config> {
 		AssetAlreadyExists,
+		NoTokenToBurn,
 	}
 }
 
@@ -70,6 +72,22 @@ decl_module! {
 				account_assets.push(asset_id.clone());
 				TokenByAccount::<T>::insert::<T::AccountId, Vec<T::Hash>>(issuer.clone(), account_assets);
 				Self::deposit_event(RawEvent::TokenIssued(asset_id, issuer));
+				Ok(())
+			}
+		}
+
+		#[weight = 10_000 + T::DbWeight::get().writes(1)]
+		pub fn burn_token(origin, asset_hash: T::Hash) -> dispatch::DispatchResult {
+			let issuer = ensure_signed(origin)?;
+			let mut account_tokens = TokenByAccount::<T>::get(&issuer).clone();
+			let tokens_in_account = account_tokens.len();
+			account_tokens.retain(|hash: &T::Hash| *hash != asset_hash);
+			let tokens_left = account_tokens.len();
+			if tokens_in_account == tokens_left {
+				Err(Error::<T>::NoTokenToBurn)?
+			} else {
+				TokenByAccount::<T>::insert::<T::AccountId, Vec<T::Hash>>(issuer.clone(), account_tokens);
+				Self::deposit_event(RawEvent::TokenBurned(asset_hash, issuer));
 				Ok(())
 			}
 		}
