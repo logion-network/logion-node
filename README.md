@@ -2,7 +2,32 @@
 
 A prototype based on the [Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
 
-It includes the prototype of the [Logion NFT pallet](./pallets/pallet-logion-nft/README.md).
+## Chain specifications
+
+Logion nodes expose the following features:
+- [Logion NFT](./pallets/pallet-logion-nft/README.md)
+- [Accounts and balances](https://substrate.dev/rustdocs/v3.0.0/pallet_balances/index.html)
+- [Basic payment module](https://substrate.dev/rustdocs/v3.0.0/pallet_transaction_payment/index.html)
+
+The logion network is permissioned. The list of "well-known" nodes (i.e. nodes that are authorized to
+validate blocks) is managed by the root user (Alice for the moment). The permissioned network was configured by
+following [this tutorial](https://substrate.dev/docs/en/tutorials/build-permission-network/).
+
+New validators have to generate their node key and communicate the peer ID and owner account to a root user in order
+to be added to the
+list of well known nodes and start validating blocks. Node keys may be generated
+using `subkey`, see [here](https://substrate.dev/docs/en/knowledgebase/integrate/subkey#generating-node-keys).
+
+Finally, here are the general parameters of Logion nodes' Runtime:
+- Hash algorithm: Blake2
+- Hash size: 256-bits
+- Block number: 32 bits
+- Account index depth: 32 bits
+- Account balance depth: 128 bits
+- Transaction chain index depth: 32 bits
+- Block authoring: [Aura](https://substrate.dev/docs/en/knowledgebase/advanced/consensus#aura)
+- Block finalization: [GRANDPA](https://substrate.dev/docs/en/knowledgebase/advanced/consensus#grandpa)
+- Database: [RocksDb](https://rocksdb.org/)
 
 ## Getting Started
 
@@ -17,8 +42,13 @@ First, complete the [basic Rust setup instructions](./doc/rust-setup.md).
 Use Rust's native `cargo` command to build and launch the template node:
 
 ```sh
-cargo run --release -- --dev --tmp
+cargo run --release -- --dev --tmp --node-key=c12b6d18942f5ee8528c8e2baf4e147b5c5c18710926ea492d09cbd9f6c9f82a
 ```
+
+The node key is linked to the peer ID used in the Genesis config.
+
+Logion nodes are not on the same local network,so we don't need mDNS and should use --no-mdns to disable it.
+Reachable nodes should be provded with --reserved-nodes flag.
 
 ### Build
 
