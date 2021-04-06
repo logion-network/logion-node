@@ -3568,6 +3568,7 @@ dependencies = [
  "pallet-balances",
  "pallet-grandpa",
  "pallet-logion-nft",
+ "pallet-multisig",
  "pallet-node-authorization",
  "pallet-randomness-collective-flip",
  "pallet-sudo",
@@ -3810,6 +3811,22 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
+]
+
+[[package]]
+name = "pallet-multisig"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "775556e56d1b9ab9a2437b8ea281bb16d7aadda8f309213d6d72d0a6a4c6fec4"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
