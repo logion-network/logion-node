@@ -279,6 +279,22 @@ impl pallet_node_authorization::Config for Runtime {
     type WeightInfo = ();
 }
 
+parameter_types! {
+	pub const DepositBase: Balance = 500;
+	pub const DepositFactor: Balance = 100;
+	pub const MaxSignatories: u16 = 20;
+}
+
+impl pallet_multisig::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type Currency = pallet_balances::Module<Runtime>;
+	type DepositBase = DepositBase;
+	type DepositFactor = DepositFactor;
+	type MaxSignatories = MaxSignatories;
+	type WeightInfo = pallet_multisig::weights::SubstrateWeight<Runtime>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -296,6 +312,7 @@ construct_runtime!(
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		NodeAuthorization: pallet_node_authorization::{Module, Call, Storage, Event<T>, Config<T>},
 		LogionNft: pallet_logion_nft::{Module, Call, Storage, Event<T>},
+		MultiSig:  pallet_multisig::{Module, Call, Storage, Event<T>},
 	}
 );
 

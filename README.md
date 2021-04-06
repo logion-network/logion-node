@@ -7,7 +7,7 @@ A prototype based on the [Substrate Node Template v3.0](https://github.com/subst
 Logion nodes expose the following features:
 - [Logion NFT](./pallets/pallet-logion-nft/README.md)
 - [Accounts and balances](https://substrate.dev/rustdocs/v3.0.0/pallet_balances/index.html)
-- [Basic payment module](https://substrate.dev/rustdocs/v3.0.0/pallet_transaction_payment/index.html)
+- [Multi-signature of transactions](https://substrate.dev/rustdocs/v3.0.0/pallet_multisig/index.html)
 
 The logion network is permissioned. The list of "well-known" nodes (i.e. nodes that are authorized to
 validate blocks) is managed by the root user (Alice for the moment). The permissioned network was configured by
@@ -19,6 +19,7 @@ list of well known nodes and start validating blocks. Node keys may be generated
 using `subkey`, see [here](https://substrate.dev/docs/en/knowledgebase/integrate/subkey#generating-node-keys).
 
 Finally, here are the general parameters of Logion nodes' Runtime:
+- Block time: 6s
 - Hash algorithm: Blake2
 - Hash size: 256-bits
 - Block number: 32 bits
