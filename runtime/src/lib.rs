@@ -257,12 +257,6 @@ impl pallet_sudo::Config for Runtime {
 	type Call = Call;
 }
 
-pub use pallet_logion_nft;
-
-impl pallet_logion_nft::Config for Runtime {
-	type Event = Event;
-}
-
 parameter_types! {
     pub const MaxWellKnownNodes: u32 = 10;
     pub const MaxPeerIdLength: u32 = 128;
@@ -311,7 +305,6 @@ construct_runtime!(
 		TransactionPayment: pallet_transaction_payment::{Module, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		NodeAuthorization: pallet_node_authorization::{Module, Call, Storage, Event<T>, Config<T>},
-		LogionNft: pallet_logion_nft::{Module, Call, Storage, Event<T>},
 		MultiSig:  pallet_multisig::{Module, Call, Storage, Event<T>},
 	}
 );

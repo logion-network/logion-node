@@ -1,11 +1,11 @@
 # Logion node prototype
 
-A prototype based on the [Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
+A prototype based on the
+[Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
 
 ## Chain specifications
 
 Logion nodes expose the following features:
-- [Logion NFT](./pallets/pallet-logion-nft/README.md)
 - [Accounts and balances](https://substrate.dev/rustdocs/v3.0.0/pallet_balances/index.html)
 - [Multi-signature of transactions](https://substrate.dev/rustdocs/v3.0.0/pallet_multisig/index.html)
 

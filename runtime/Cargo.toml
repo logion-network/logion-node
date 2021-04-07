@@ -1,10 +1,9 @@
 [package]
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+authors = ['Gerard Dethier <gerard@logion.network>']
 edition = '2018'
-homepage = 'https://substrate.dev'
+homepage = 'https://logion.network'
 license = 'Unlicense'
 name = 'node-template-runtime'
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
 version = '3.0.0'
 
 [package.metadata.docs.rs]
@@ -23,9 +22,6 @@ version = '2.0.0'
 [dependencies]
 hex-literal = { optional = true, version = '0.3.1' }
 serde = { features = ['derive'], optional = true, version = '1.0.119' }
-
-# local dependencies
-pallet-logion-nft = { path = '../pallets/pallet-logion-nft', default-features = false, version = '3.0.0' }
 
 # Substrate dependencies
 frame-benchmarking = { default-features = false, optional = true, version = '3.0.0' }
@@ -82,7 +78,6 @@ std = [
     'pallet-multisig/std',
     'pallet-randomness-collective-flip/std',
     'pallet-sudo/std',
-    'pallet-logion-nft/std',
     'pallet-timestamp/std',
     'pallet-transaction-payment/std',
     'pallet-transaction-payment-rpc-runtime-api/std',
