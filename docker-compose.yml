@@ -4,14 +4,14 @@ services:
   dev:
     container_name: logion-node-prototype
     image: paritytech/ci-linux:974ba3ac-20201006
-    working_dir: /var/www/node-template
+    working_dir: /var/www/logion-node
     ports:
       - "9944:9944"
     environment:
-      - CARGO_HOME=/var/www/node-template/.cargo
+      - CARGO_HOME=/var/www/logion-node/.cargo
     volumes:
-      - .:/var/www/node-template
+      - .:/var/www/logion-node
       - type: bind
         source: ./.local
         target: /root/.local
-    command: bash -c "cargo build --release && ./target/release/node-template --dev --ws-external"
+    command: bash -c "cargo build --release && ./target/release/logion-node --dev --ws-external"

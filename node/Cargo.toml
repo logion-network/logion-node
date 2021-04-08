@@ -1,16 +1,16 @@
 [package]
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+authors = ['Logion Team <https://github.com/logion-network>']
 build = 'build.rs'
-description = 'A fresh FRAME-based Substrate node, ready for hacking.'
+description = 'A Logion network node.'
 edition = '2018'
-homepage = 'https://substrate.dev'
+homepage = 'https://logion.network'
 license = 'Unlicense'
-name = 'node-template'
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+name = 'logion-node'
+repository = 'https://github.com/logion-network/logion-node-prototype'
 version = '3.0.0'
 
 [[bin]]
-name = 'node-template'
+name = 'logion-node'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -24,7 +24,7 @@ structopt = '0.3.8'
 bs58 = '0.4.0'
 
 # local dependencies
-node-template-runtime = { path = '../runtime', version = '3.0.0' }
+logion-node-runtime = { path = '../runtime', version = '3.0.0' }
 
 # Substrate dependencies
 frame-benchmarking = '3.0.0'
@@ -56,4 +56,4 @@ substrate-frame-rpc-system = '3.0.0'
 
 [features]
 default = []
-runtime-benchmarks = ['node-template-runtime/runtime-benchmarks']
+runtime-benchmarks = ['logion-node-runtime/runtime-benchmarks']

@@ -1,13 +1,13 @@
 # Logion node prototype
 
-A prototype based on the
-[Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
+This project exposes the prototype of Logion network's nodes.
 
-## Chain specifications
+## Chain specification
 
 Logion nodes expose the following features:
 - [Accounts and balances](https://substrate.dev/rustdocs/v3.0.0/pallet_balances/index.html)
-- [Multi-signature of transactions](https://substrate.dev/rustdocs/v3.0.0/pallet_multisig/index.html)
+- [Multi-signature](https://substrate.dev/rustdocs/v3.0.0/pallet_multisig/index.html)
+- [Proxying](https://substrate.dev/rustdocs/v3.0.0/pallet_proxy/index.html)
 
 The logion network is permissioned. The list of "well-known" nodes (i.e. nodes that are authorized to
 validate blocks) is managed by the root user (Alice for the moment). The permissioned network was configured by
@@ -66,7 +66,7 @@ Once the project has been built, the following command can be used to explore al
 subcommands:
 
 ```sh
-./target/release/node-template -h
+./target/release/logion-node -h
 ```
 
 ## Run
@@ -80,19 +80,19 @@ node.
 This command will start the single-node development chain with persistent state:
 
 ```bash
-./target/release/node-template --dev
+./target/release/logion-node --dev
 ```
 
 Purge the development chain's state:
 
 ```bash
-./target/release/node-template purge-chain --dev
+./target/release/logion-node purge-chain --dev
 ```
 
 Start the development chain with detailed logging:
 
 ```bash
-RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/node-template -lruntime=debug --dev
+RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/logion-node -lruntime=debug --dev
 ```
 
 ### Run in Docker
@@ -107,16 +107,21 @@ Then run the following command to start a single node development chain.
 ```
 
 This command will firstly compile your code, and then start a local development network. You can
-also replace the default command (`cargo build --release && ./target/release/node-template --dev --ws-external`)
+also replace the default command (`cargo build --release && ./target/release/logion-node --dev --ws-external`)
 by appending your own. A few useful ones are as follow.
 
 ```bash
 # Run Substrate node without re-compiling
-./scripts/docker_run.sh ./target/release/node-template --dev --ws-external
+./scripts/docker_run.sh ./target/release/logion-node --dev --ws-external
 
 # Purge the local dev chain
-./scripts/docker_run.sh ./target/release/node-template purge-chain --dev
+./scripts/docker_run.sh ./target/release/logion-node purge-chain --dev
 
 # Check whether the code is compilable
 ./scripts/docker_run.sh cargo check
 ```
+
+## Substrate
+
+Logion nodes are based on
+[Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
