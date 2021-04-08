@@ -30,12 +30,13 @@ pub use pallet_timestamp::Call as TimestampCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use sp_runtime::{Permill, Perbill};
 pub use frame_support::{
-	construct_runtime, parameter_types, StorageValue,
-	traits::{KeyOwnerProofSystem, Randomness},
+	construct_runtime, parameter_types, StorageValue, RuntimeDebug,
+	traits::{KeyOwnerProofSystem, Randomness, InstanceFilter},
 	weights::{
 		Weight, IdentityFee,
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 	},
+	codec::{Encode, Decode},
 };
 use pallet_transaction_payment::CurrencyAdapter;
 use frame_system::EnsureRoot;
@@ -238,7 +239,7 @@ impl pallet_balances::Config for Runtime {
 	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = System;
-	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -274,8 +275,8 @@ impl pallet_node_authorization::Config for Runtime {
 }
 
 parameter_types! {
-	pub const DepositBase: Balance = 500;
-	pub const DepositFactor: Balance = 100;
+	pub const MultiSigDepositBase: Balance = 500;
+	pub const MultiSigDepositFactor: Balance = 100;
 	pub const MaxSignatories: u16 = 20;
 }
 
@@ -283,10 +284,48 @@ impl pallet_multisig::Config for Runtime {
 	type Event = Event;
 	type Call = Call;
 	type Currency = pallet_balances::Module<Runtime>;
-	type DepositBase = DepositBase;
-	type DepositFactor = DepositFactor;
+	type DepositBase = MultiSigDepositBase;
+	type DepositFactor = MultiSigDepositFactor;
 	type MaxSignatories = MaxSignatories;
-	type WeightInfo = pallet_multisig::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = ();
+}
+
+// Proxy config inspired by https://github.com/paritytech/substrate/blob/master/frame/proxy/src/tests.rs
+parameter_types! {
+	pub const ProxyDepositBase: Balance = 1;
+	pub const ProxyDepositFactor: Balance = 1;
+	pub const AnnouncementDepositBase: Balance = 1;
+	pub const AnnouncementDepositFactor: Balance = 1;
+	pub const MaxProxies: u16 = 4;
+	pub const MaxPending: u16 = 2;
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
+pub enum ProxyType {
+	Any
+}
+
+impl Default for ProxyType { fn default() -> Self { Self::Any } }
+
+impl InstanceFilter<Call> for ProxyType {
+	fn filter(&self, _c: &Call) -> bool {
+		true
+	}
+}
+
+impl pallet_proxy::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type CallHasher = BlakeTwo256;
+	type Currency = pallet_balances::Module<Runtime>;
+	type ProxyDepositBase = ProxyDepositBase;
+	type ProxyDepositFactor = ProxyDepositFactor;
+	type MaxProxies = MaxProxies;
+	type MaxPending = MaxPending;
+	type AnnouncementDepositBase = AnnouncementDepositBase;
+	type AnnouncementDepositFactor = AnnouncementDepositFactor;
+	type ProxyType = ProxyType;
+	type WeightInfo = ();
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -305,7 +344,8 @@ construct_runtime!(
 		TransactionPayment: pallet_transaction_payment::{Module, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		NodeAuthorization: pallet_node_authorization::{Module, Call, Storage, Event<T>, Config<T>},
-		MultiSig:  pallet_multisig::{Module, Call, Storage, Event<T>},
+		Multisig:  pallet_multisig::{Module, Call, Storage, Event<T>},
+		Proxy:  pallet_proxy::{Module, Call, Storage, Event<T>},
 	}
 );
 

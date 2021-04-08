@@ -3569,6 +3569,7 @@ dependencies = [
  "pallet-grandpa",
  "pallet-multisig",
  "pallet-node-authorization",
+ "pallet-proxy",
  "pallet-randomness-collective-flip",
  "pallet-sudo",
  "pallet-timestamp",
@@ -3820,6 +3821,22 @@ name = "pallet-node-authorization"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40338264aeaa8927153af5ac21b738a9f1463b4db2362a0f181a335fc1da873"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-proxy"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82b3aeaa4977795fce9a1b19d0bd0f0819602b18eb262fdaea1be620f0efe55c"
 dependencies = [
  "frame-support",
  "frame-system",
