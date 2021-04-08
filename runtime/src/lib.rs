@@ -67,6 +67,9 @@ pub type Hash = sp_core::H256;
 /// Digest item type.
 pub type DigestItem = generic::DigestItem<Hash>;
 
+/// The currency
+pub type Currency = pallet_balances::Module<Runtime>;
+
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -283,7 +286,7 @@ parameter_types! {
 impl pallet_multisig::Config for Runtime {
 	type Event = Event;
 	type Call = Call;
-	type Currency = pallet_balances::Module<Runtime>;
+	type Currency = Currency;
 	type DepositBase = MultiSigDepositBase;
 	type DepositFactor = MultiSigDepositFactor;
 	type MaxSignatories = MaxSignatories;
@@ -317,7 +320,7 @@ impl pallet_proxy::Config for Runtime {
 	type Event = Event;
 	type Call = Call;
 	type CallHasher = BlakeTwo256;
-	type Currency = pallet_balances::Module<Runtime>;
+	type Currency = Currency;
 	type ProxyDepositBase = ProxyDepositBase;
 	type ProxyDepositFactor = ProxyDepositFactor;
 	type MaxProxies = MaxProxies;
@@ -326,6 +329,23 @@ impl pallet_proxy::Config for Runtime {
 	type AnnouncementDepositFactor = AnnouncementDepositFactor;
 	type ProxyType = ProxyType;
 	type WeightInfo = ();
+}
+
+parameter_types! {
+	pub const RecoveryConfigDepositBase: u64 = 10;
+	pub const RecoveryFrieldDepositFactor: u64 = 1;
+	pub const MaxFriends: u16 = 3;
+	pub const RecoveryDeposit: u64 = 10;
+}
+
+impl pallet_recovery::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type Currency = Currency;
+	type ConfigDepositBase = RecoveryConfigDepositBase;
+	type FriendDepositFactor = RecoveryFrieldDepositFactor;
+	type MaxFriends = MaxFriends;
+	type RecoveryDeposit = RecoveryDeposit;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -346,6 +366,7 @@ construct_runtime!(
 		NodeAuthorization: pallet_node_authorization::{Module, Call, Storage, Event<T>, Config<T>},
 		Multisig:  pallet_multisig::{Module, Call, Storage, Event<T>},
 		Proxy:  pallet_proxy::{Module, Call, Storage, Event<T>},
+		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 	}
 );
 

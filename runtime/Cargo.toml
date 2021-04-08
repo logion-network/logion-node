@@ -37,6 +37,7 @@ pallet-grandpa = { default-features = false, version = '3.0.0' }
 pallet-multisig = {default-features = false, version='3.0.0'}
 pallet-proxy = {default-features = false, version='3.0.0'}
 pallet-randomness-collective-flip = { default-features = false, version = '3.0.0' }
+pallet-recovery = { default-features = false, version = '3.0.0' }
 pallet-sudo = { default-features = false, version = '3.0.0' }
 pallet-timestamp = { default-features = false, version = '3.0.0' }
 pallet-transaction-payment = { default-features = false, version = '3.0.0' }
@@ -79,6 +80,7 @@ std = [
     'pallet-multisig/std',
     'pallet-proxy/std',
     'pallet-randomness-collective-flip/std',
+    'pallet-recovery/std',
     'pallet-sudo/std',
     'pallet-timestamp/std',
     'pallet-transaction-payment/std',
