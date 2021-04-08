@@ -11,6 +11,7 @@ The logion chain exposes the following features:
 - [Accounts and balances](https://substrate.dev/rustdocs/v3.0.0/pallet_balances/index.html)
 - [Multi-signature](https://substrate.dev/rustdocs/v3.0.0/pallet_multisig/index.html)
 - [Proxying](https://substrate.dev/rustdocs/v3.0.0/pallet_proxy/index.html)
+- [Social recovery](https://substrate.dev/rustdocs/v3.0.0/pallet_recovery/index.html)
 
 The logion network is permissioned. The list of "well-known" nodes (i.e. nodes that are authorized to
 validate blocks) is managed by the root user (Alice for the moment). The permissioned network was configured by
