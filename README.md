@@ -4,7 +4,10 @@ This project exposes the prototype of Logion network's nodes.
 
 ## Chain specification
 
-Logion nodes expose the following features:
+Logion nodes implementation is based on
+[Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
+
+The logion chain exposes the following features:
 - [Accounts and balances](https://substrate.dev/rustdocs/v3.0.0/pallet_balances/index.html)
 - [Multi-signature](https://substrate.dev/rustdocs/v3.0.0/pallet_multisig/index.html)
 - [Proxying](https://substrate.dev/rustdocs/v3.0.0/pallet_proxy/index.html)
@@ -32,8 +35,6 @@ Finally, here are the general parameters of Logion nodes' Runtime:
 
 ## Getting Started
 
-Follow these steps to get started :hammer_and_wrench:
-
 ### Rust Setup
 
 First, complete the [basic Rust setup instructions](./doc/rust-setup.md).
@@ -48,13 +49,12 @@ cargo run --release -- --dev --tmp --node-key=c12b6d18942f5ee8528c8e2baf4e147b5c
 
 The node key is linked to the peer ID used in the Genesis config.
 
-Logion nodes are not on the same local network,so we don't need mDNS and should use --no-mdns to disable it.
-Reachable nodes should be provded with --reserved-nodes flag.
+Logion nodes are not on the same local network, so we don't need mDNS and should use --no-mdns to disable it.
+Reachable nodes should be provided with the --reserved-nodes flag.
 
 ### Build
 
-The `cargo run` command will perform an initial build. Use the following command to build the node
-without launching it:
+Use the following command to build the node without launching it:
 
 ```sh
 cargo build --release
@@ -120,8 +120,3 @@ by appending your own. A few useful ones are as follow.
 # Check whether the code is compilable
 ./scripts/docker_run.sh cargo check
 ```
-
-## Substrate
-
-Logion nodes are based on
-[Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
