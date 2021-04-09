@@ -7,6 +7,7 @@ use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{Verify, IdentifyAccount};
 use sc_service::ChainType;
+use serde_json::json;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -43,9 +44,9 @@ pub fn development_config() -> Result<ChainSpec, String> {
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Development",
+		"Logion Development",
 		// ID
-		"dev",
+		"logion_dev",
 		ChainType::Development,
 		move || testnet_genesis(
 			wasm_binary,
@@ -69,9 +70,9 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		// Telemetry
 		None,
 		// Protocol ID
-		None,
+		Some("logion_dev"),
 		// Properties
-		None,
+		Some(default_properties()),
 		// Extensions
 		None,
 	))
@@ -82,9 +83,9 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Local Testnet",
+		"Logion Testnet",
 		// ID
-		"local_testnet",
+		"logion_testnet",
 		ChainType::Local,
 		move || testnet_genesis(
 			wasm_binary,
@@ -117,9 +118,9 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		// Telemetry
 		None,
 		// Protocol ID
-		None,
+		Some("logion_test"),
 		// Properties
-		None,
+		Some(default_properties()),
 		// Extensions
 		None,
 	))
@@ -162,4 +163,11 @@ fn testnet_genesis(
 			],
 		}),
 	}
+}
+
+fn default_properties() -> sc_service::Properties {
+	let mut props : sc_service::Properties = sc_service::Properties::new();
+	props.insert("tokenSymbol".to_string(), json!("LOG"));
+	props.insert("tokenDecimals".to_string(), json!(18));
+	return props;
 }
