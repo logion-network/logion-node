@@ -70,7 +70,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		// Telemetry
 		None,
 		// Protocol ID
-		Some("logion_dev"),
+		None,
 		// Properties
 		Some(default_properties()),
 		// Extensions
@@ -83,9 +83,9 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Logion Testnet",
+		"Logion Local Testnet",
 		// ID
-		"logion_testnet",
+		"logion_local_testnet",
 		ChainType::Local,
 		move || testnet_genesis(
 			wasm_binary,
@@ -118,7 +118,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		// Telemetry
 		None,
 		// Protocol ID
-		Some("logion_test"),
+		None,
 		// Properties
 		Some(default_properties()),
 		// Extensions
