@@ -124,25 +124,4 @@ by appending your own. A few useful ones are as follow.
 
 ## Logion UI
 
-There is not custom UI yet for the Logion network. However, [Polkadot{.js}](https://polkadot.js.org/apps/) can be used to
-explore and interact with a Logion node. The procedure is as follows:
-
-1. Launch the node locally (see above)
-2. Launch the web app with [this link](https://polkadot.js.org/apps)
-3. Select the local node by clicking on the top-left icon and selecting "Development > Local node"
-4. Configure below custom data in "Settings > Developer" screen and click "Save"
-5. You should now be able to interact with the locally running node
-
-```
-{
-	"Address": "MultiAddress",
-	"LookupSource": "MultiAddress",
-	"AssetOf": {
-		"name": "Vec<u8>"
-	},
-	"NewAsset": {
-		"name": "Vec<u8>"
-	},
-	"PeerId": "(Vec<u8>)"
-}
-```
+See [here](https://github.com/logion-network/logion-frontend-prototype).
