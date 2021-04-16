@@ -40,19 +40,6 @@ Finally, here are the general parameters of Logion nodes' Runtime:
 
 First, complete the [basic Rust setup instructions](./doc/rust-setup.md).
 
-### Run
-
-Use Rust's native `cargo` command to build and launch the template node:
-
-```sh
-cargo run --release -- --dev --tmp --node-key=c12b6d18942f5ee8528c8e2baf4e147b5c5c18710926ea492d09cbd9f6c9f82a
-```
-
-The node key is linked to the peer ID used in the Genesis config.
-
-Logion nodes are not on the same local network, so we don't need mDNS and should use --no-mdns to disable it.
-Reachable nodes should be provided with the --reserved-nodes flag.
-
 ### Build
 
 Use the following command to build the node without launching it:
@@ -61,66 +48,15 @@ Use the following command to build the node without launching it:
 cargo build --release
 ```
 
-### Embedded Docs
+### Run for development
 
-Once the project has been built, the following command can be used to explore all parameters and
-subcommands:
+Below command will run the node in development mode with a temporary storage.
 
 ```sh
-./target/release/logion-node -h
+./scripts/dev_run.sh
 ```
 
-## Run
-
-The provided `cargo run` command will launch a temporary node and its state will be discarded after
-you terminate the process. After the project has been built, there are other ways to launch the
-node.
-
-### Single-Node Development Chain
-
-This command will start the single-node development chain with persistent state:
-
-```bash
-./target/release/logion-node --dev
-```
-
-Purge the development chain's state:
-
-```bash
-./target/release/logion-node purge-chain --dev
-```
-
-Start the development chain with detailed logging:
-
-```bash
-RUST_LOG=debug RUST_BACKTRACE=1 ./target/release/logion-node -lruntime=debug --dev
-```
-
-### Run in Docker
-
-First, install [Docker](https://docs.docker.com/get-docker/) and
-[Docker Compose](https://docs.docker.com/compose/install/).
-
-Then run the following command to start a single node development chain.
-
-```bash
-./scripts/docker_run.sh
-```
-
-This command will firstly compile your code, and then start a local development network. You can
-also replace the default command (`cargo build --release && ./target/release/logion-node --dev --ws-external`)
-by appending your own. A few useful ones are as follow.
-
-```bash
-# Run Substrate node without re-compiling
-./scripts/docker_run.sh ./target/release/logion-node --dev --ws-external
-
-# Purge the local dev chain
-./scripts/docker_run.sh ./target/release/logion-node purge-chain --dev
-
-# Check whether the code is compilable
-./scripts/docker_run.sh cargo check
-```
+See script for details.
 
 ## Logion UI
 
