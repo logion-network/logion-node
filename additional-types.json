@@ -1,0 +1,6 @@
+{
+  "Address": "MultiAddress",
+  "LookupSource": "MultiAddress",
+  "AccountInfo": "AccountInfoWithDualRefCount",
+  "PeerId": "(Vec<u8>)"
+}

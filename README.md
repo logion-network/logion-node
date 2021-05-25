@@ -5,7 +5,7 @@ This project exposes the prototype of Logion network's nodes.
 ## Chain specification
 
 Logion nodes implementation is based on
-[Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0).
+[Substrate Node Template v3.0](https://github.com/substrate-developer-hub/substrate-node-template/releases/tag/v3.0.0%2B1).
 
 The logion chain exposes the following features:
 - [Accounts and balances](https://substrate.dev/rustdocs/v3.0.0/pallet_balances/index.html)
