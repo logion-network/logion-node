@@ -4,9 +4,9 @@ build = 'build.rs'
 description = 'A Logion network node.'
 edition = '2018'
 homepage = 'https://logion.network'
-license = 'Unlicense'
+license = 'Apache 2.0'
 name = 'logion-node'
-repository = 'https://github.com/logion-network/logion-node-prototype'
+repository = 'https://github.com/logion-network/logion-node'
 version = '3.0.0'
 
 [[bin]]

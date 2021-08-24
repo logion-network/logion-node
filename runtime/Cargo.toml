@@ -2,7 +2,7 @@
 authors = ['Logion Team <https://github.com/logion-network>']
 edition = '2018'
 homepage = 'https://logion.network'
-license = 'Unlicense'
+license = 'Apache 2.0'
 name = 'logion-node-runtime'
 version = '3.0.0'
 

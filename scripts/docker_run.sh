@@ -2,7 +2,7 @@
 
 set -e
 
-echo "*** Start Logion node prototype ***"
+echo "*** Start Logion node ***"
 
 cd $(dirname ${BASH_SOURCE[0]})/..
 

@@ -1,6 +1,6 @@
-# Logion node prototype
+# Logion node
 
-This project exposes the prototype of Logion network's nodes.
+This project exposes the Logion network's nodes.
 
 ## Chain specification
 
@@ -58,6 +58,9 @@ Below command will run the node in development mode with a temporary storage.
 
 See script for details.
 
-## Logion UI
+## Logion Components
 
-See [here](https://github.com/logion-network/logion-frontend-prototype).
+* The [Node](https://github.com/logion-network/logion-node) is the implementation of the chain.
+* The [Substrate API Sidecar](https://github.com/logion-network/substrate-api-sidecar) is a REST connector to access the chain.
+* The [Java backend](https://github.com/logion-network/logion-backend) stores data which cannot be exposed publicly, or which wait legal officer's approval.
+* The [Wallet](https://github.com/logion-network/logion-wallet) is the user application.
