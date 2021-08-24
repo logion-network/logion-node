@@ -12,6 +12,8 @@
 # The cache for chain data in container
 .local
 
-# Eclipse
+# IDE
 .project
+.idea
+
 
