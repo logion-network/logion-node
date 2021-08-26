@@ -17,10 +17,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Check Cargo version
-      run: cargo --version --verbose
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v2
+      - name: Check Cargo version
+        run: cargo --version --verbose
+      - name: Update Rust
+        run: rustup update ; rustup update nightly ; rustup target add wasm32-unknown-unknown --toolchain nightly
+      - name: Check Rust version
+        run: rustup show
+      - name: Build
+        run: cargo build --verbose
+      - name: Run tests
+        run: cargo test --verbose
