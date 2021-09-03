@@ -61,6 +61,5 @@ See script for details.
 ## Logion Components
 
 * The [Node](https://github.com/logion-network/logion-node) is the implementation of the chain.
-* The [Substrate API Sidecar](https://github.com/logion-network/substrate-api-sidecar) is a REST connector to access the chain.
-* The [Java backend](https://github.com/logion-network/logion-backend) stores data which cannot be exposed publicly, or which wait legal officer's approval.
+* The [Typescript backend](https://github.com/logion-network/logion-backend-ts) stores data which cannot be exposed publicly, or which wait legal officer's approval.
 * The [Wallet](https://github.com/logion-network/logion-wallet) is the user application.
