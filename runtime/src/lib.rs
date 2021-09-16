@@ -376,6 +376,12 @@ impl pallet_assets::Config for Runtime {
 	type WeightInfo = ();
 }
 
+impl pallet_logion_loc::Config for Runtime {
+	type LocId = u128;
+	type Event = Event;
+	type WeightInfo = ();
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -396,6 +402,7 @@ construct_runtime!(
 		Proxy:  pallet_proxy::{Module, Call, Storage, Event<T>},
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
+		LogionLoc: pallet_logion_loc::{Module, Call, Storage, Event<T>},
 	}
 );
 
@@ -591,6 +598,7 @@ impl_runtime_apis! {
 			add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
 			add_benchmark!(params, batches, pallet_balances, Balances);
 			add_benchmark!(params, batches, pallet_timestamp, Timestamp);
+			add_benchmark!(params, batches, pallet_logion_loc, LogionLoc);
 
 			if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
 			Ok(batches)
