@@ -377,7 +377,7 @@ impl pallet_assets::Config for Runtime {
 }
 
 impl pallet_logion_loc::Config for Runtime {
-	type LocId = u128;
+	type LocId = pallet_logion_loc::uuid::UUID;
 	type Event = Event;
 	type WeightInfo = ();
 }

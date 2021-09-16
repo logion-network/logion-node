@@ -24,7 +24,7 @@
       "symbol": "Vec<u8>",
       "decimals": "u8"
   },
-  "LocId": "u128",
+  "LocId": "[u8; 32]",
   "LegalOfficerCaseOf": {
     "owner": "AccountId"
   }

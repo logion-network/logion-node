@@ -51,7 +51,7 @@ impl system::Config for Test {
 }
 
 impl pallet_loc::Config for Test {
-	type LocId = u128;
+	type LocId = pallet_loc::uuid::UUID;
 	type Event = Event;
 	type WeightInfo = ();
 }

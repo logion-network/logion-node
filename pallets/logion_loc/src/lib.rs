@@ -11,6 +11,8 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
+pub mod uuid;
+
 use frame_support::codec::{Decode, Encode};
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
@@ -29,14 +31,13 @@ pub mod pallet {
 		dispatch::DispatchResultWithPostInfo,
 		pallet_prelude::*,
 	};
-	use codec::HasCompact;
 	use super::*;
 	pub use crate::weights::WeightInfo;
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		/// LOC identifier
-		type LocId: Member + Parameter + Default + Copy + HasCompact;
+		type LocId: Member + Parameter + Default + Copy;
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
@@ -78,7 +79,7 @@ pub mod pallet {
 		#[pallet::weight(T::WeightInfo::create_loc())]
 		pub fn create_loc(
 			origin: OriginFor<T>,
-			#[pallet::compact] loc_id: T::LocId
+			loc_id: T::LocId
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 
