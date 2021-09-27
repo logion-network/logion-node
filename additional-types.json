@@ -26,6 +26,12 @@
   },
   "LocId": "u128",
   "LegalOfficerCaseOf": {
-    "owner": "AccountId"
+    "owner": "AccountId",
+    "requester": "AccountId",
+    "metadata": "Vec<MetadataItem>"
+  },
+  "MetadataItem": {
+    "name": "Vec<u8>",
+    "value": "Vec<u8>"
   }
 }
