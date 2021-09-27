@@ -12,10 +12,19 @@ mod tests;
 mod benchmarking;
 
 use frame_support::codec::{Decode, Encode};
+use frame_support::traits::Vec;
+
+#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
+pub struct MetadataItem {
+	name: Vec<u8>,
+	value: Vec<u8>,
+}
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
 pub struct LegalOfficerCase<AccountId> {
 	owner: AccountId,
+	requester: AccountId,
+	metadata: Vec<MetadataItem>,
 }
 
 pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId>;
@@ -64,8 +73,12 @@ pub mod pallet {
 
 	#[pallet::error]
 	pub enum Error<T> {
-		/// The LOC ID has already used been used.
+		/// The LOC ID has already been used.
 		AlreadyExists,
+		/// Target LOC does not exist
+		NotFound,
+		/// Unauthorized LOC operation
+		Unauthorized,
 	}
 
 	#[pallet::hooks]
@@ -78,7 +91,8 @@ pub mod pallet {
 		#[pallet::weight(T::WeightInfo::create_loc())]
 		pub fn create_loc(
 			origin: OriginFor<T>,
-			#[pallet::compact] loc_id: T::LocId
+			#[pallet::compact] loc_id: T::LocId,
+			requester: T::AccountId
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 
@@ -86,12 +100,39 @@ pub mod pallet {
 				Err(Error::<T>::AlreadyExists)?
 			} else {
 				let loc = LegalOfficerCaseOf::<T> {
-					owner: who.clone()
+					owner: who.clone(),
+					requester: requester.clone(),
+					metadata: Vec::new()
 				};
 				<LocMap<T>>::insert(loc_id, loc);
-	
+
 				Self::deposit_event(Event::LocCreated(loc_id));
 				Ok(().into())
+			}
+		}
+
+		/// Set LOC metadata
+		#[pallet::weight(T::WeightInfo::add_metadata())]
+		pub fn add_metadata(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			item: MetadataItem
+		) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin)?;
+
+			if ! <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::NotFound)?
+			} else {
+				let loc = <LocMap<T>>::get(&loc_id).unwrap();
+				if loc.owner != who {
+					Err(Error::<T>::Unauthorized)?
+				} else {
+					<LocMap<T>>::mutate(loc_id, |loc| {
+						let mutable_loc = loc.as_mut().unwrap();
+						mutable_loc.metadata.push(item);
+					});
+					Ok(().into())
+				}
 			}
 		}
 	}
