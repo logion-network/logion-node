@@ -28,7 +28,8 @@
   "LegalOfficerCaseOf": {
     "owner": "AccountId",
     "requester": "AccountId",
-    "metadata": "Vec<MetadataItem>"
+    "metadata": "Vec<MetadataItem>",
+    "hashes": "Vec<Hash>"
   },
   "MetadataItem": {
     "name": "Vec<u8>",
