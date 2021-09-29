@@ -21,13 +21,14 @@ pub struct MetadataItem {
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
-pub struct LegalOfficerCase<AccountId> {
+pub struct LegalOfficerCase<AccountId, Hash> {
 	owner: AccountId,
 	requester: AccountId,
 	metadata: Vec<MetadataItem>,
+	hashes: Vec<Hash>,
 }
 
-pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId>;
+pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash>;
 
 pub mod weights;
 
@@ -46,6 +47,9 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// LOC identifier
 		type LocId: Member + Parameter + Default + Copy + HasCompact;
+
+		/// Type for hashes stored in LOCs
+		type Hash: Member + Parameter + Default + Copy;
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
@@ -102,7 +106,8 @@ pub mod pallet {
 				let loc = LegalOfficerCaseOf::<T> {
 					owner: who.clone(),
 					requester: requester.clone(),
-					metadata: Vec::new()
+					metadata: Vec::new(),
+					hashes: Vec::new()
 				};
 				<LocMap<T>>::insert(loc_id, loc);
 
@@ -111,7 +116,7 @@ pub mod pallet {
 			}
 		}
 
-		/// Set LOC metadata
+		/// Add LOC metadata
 		#[pallet::weight(T::WeightInfo::add_metadata())]
 		pub fn add_metadata(
 			origin: OriginFor<T>,
@@ -130,6 +135,31 @@ pub mod pallet {
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
 						mutable_loc.metadata.push(item);
+					});
+					Ok(().into())
+				}
+			}
+		}
+
+		/// Add hash to LOC
+		#[pallet::weight(T::WeightInfo::add_hash())]
+		pub fn add_hash(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			hash: <T as pallet::Config>::Hash
+		) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin)?;
+
+			if ! <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::NotFound)?
+			} else {
+				let loc = <LocMap<T>>::get(&loc_id).unwrap();
+				if loc.owner != who {
+					Err(Error::<T>::Unauthorized)?
+				} else {
+					<LocMap<T>>::mutate(loc_id, |loc| {
+						let mutable_loc = loc.as_mut().unwrap();
+						mutable_loc.hashes.push(hash);
 					});
 					Ok(().into())
 				}

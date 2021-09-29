@@ -53,6 +53,7 @@ impl system::Config for Test {
 impl pallet_loc::Config for Test {
 	type LocId = u32;
 	type Event = Event;
+	type Hash = H256;
 	type WeightInfo = ();
 }
 

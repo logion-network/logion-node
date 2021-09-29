@@ -4,7 +4,7 @@
 //! was disclosed under [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
 //!
 //! THIS FILE WAS AUTO-GENERATED USING THE SUBSTRATE BENCHMARK CLI VERSION 3.0.0
-//! DATE: 2021-09-27, STEPS: `[20, ]`, REPEAT: 10, LOW RANGE: `[]`, HIGH RANGE: `[]`
+//! DATE: 2021-09-29, STEPS: `[20, ]`, REPEAT: 10, LOW RANGE: `[]`, HIGH RANGE: `[]`
 //! EXECUTION: Some(Wasm), WASM-EXECUTION: Compiled, CHAIN: None, DB CACHE: 128
 
 // Executed Command:
@@ -39,18 +39,24 @@ use sp_std::marker::PhantomData;
 pub trait WeightInfo {
 	fn create_loc() -> Weight;
 	fn add_metadata() -> Weight;
+	fn add_hash() -> Weight;
 }
 
 /// Weights for pallet_logion_loc using the Substrate node and recommended hardware.
 pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 	fn create_loc() -> Weight {
-		(34_442_000 as Weight)
+		(35_254_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
 	fn add_metadata() -> Weight {
-		(23_816_000 as Weight)
+		(22_189_000 as Weight)
+			.saturating_add(T::DbWeight::get().reads(1 as Weight))
+			.saturating_add(T::DbWeight::get().writes(1 as Weight))
+	}
+	fn add_hash() -> Weight {
+		(22_024_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
@@ -59,12 +65,17 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 // For backwards compatibility and tests
 impl WeightInfo for () {
   fn create_loc() -> Weight {
-    (34_442_000 as Weight)
+    (35_254_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn add_metadata() -> Weight {
-    (23_816_000 as Weight)
+    (22_189_000 as Weight)
+      .saturating_add(RocksDbWeight::get().reads(1 as Weight))
+      .saturating_add(RocksDbWeight::get().writes(1 as Weight))
+  }
+  fn add_hash() -> Weight {
+    (22_024_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
