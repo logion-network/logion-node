@@ -2,8 +2,8 @@ use super::*;
 
 use frame_system::RawOrigin;
 use frame_benchmarking::{benchmarks, whitelisted_caller, impl_benchmark_test_suite};
-use sp_std::{vec, vec::Vec, boxed::Box};
 use frame_support::assert_ok;
+use sp_std::{vec, vec::Vec, boxed::Box};
 
 use crate::Pallet as LogionLoc;
 
@@ -21,6 +21,13 @@ benchmarks! {
 		};
 		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default()));
 	}: _(RawOrigin::Signed(caller), loc_id, item)
+
+	add_hash {
+		let caller: T::AccountId = whitelisted_caller();
+		let loc_id = Default::default();
+		let hash = Default::default();
+		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default()));
+	}: _(RawOrigin::Signed(caller), loc_id, hash)
 }
 
 impl_benchmark_test_suite!(
