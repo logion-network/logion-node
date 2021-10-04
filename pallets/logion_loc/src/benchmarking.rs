@@ -28,6 +28,12 @@ benchmarks! {
 		let hash = Default::default();
 		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default()));
 	}: _(RawOrigin::Signed(caller), loc_id, hash)
+
+	close {
+		let caller: T::AccountId = whitelisted_caller();
+		let loc_id = Default::default();
+		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default()));
+	}: _(RawOrigin::Signed(caller), loc_id)
 }
 
 impl_benchmark_test_suite!(
