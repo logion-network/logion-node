@@ -26,6 +26,7 @@ pub struct LegalOfficerCase<AccountId, Hash> {
 	requester: AccountId,
 	metadata: Vec<MetadataItem>,
 	hashes: Vec<Hash>,
+	closed: bool,
 }
 
 pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash>;
@@ -73,6 +74,8 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		/// Issued upon LOC creation. [locId]
 		LocCreated(T::LocId),
+		/// Issued when LOC is closed. [locId]
+		LocClosed(T::LocId),
 	}
 
 	#[pallet::error]
@@ -83,6 +86,10 @@ pub mod pallet {
 		NotFound,
 		/// Unauthorized LOC operation
 		Unauthorized,
+		/// Occurs when trying to mutate a closed LOC
+		CannotMutate,
+		/// Occurs when trying to close an already closed LOC
+		AlreadyClosed,
 	}
 
 	#[pallet::hooks]
@@ -107,7 +114,8 @@ pub mod pallet {
 					owner: who.clone(),
 					requester: requester.clone(),
 					metadata: Vec::new(),
-					hashes: Vec::new()
+					hashes: Vec::new(),
+					closed: false,
 				};
 				<LocMap<T>>::insert(loc_id, loc);
 
@@ -131,6 +139,8 @@ pub mod pallet {
 				let loc = <LocMap<T>>::get(&loc_id).unwrap();
 				if loc.owner != who {
 					Err(Error::<T>::Unauthorized)?
+				} else if loc.closed {
+					Err(Error::<T>::CannotMutate)?
 				} else {
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
@@ -156,11 +166,41 @@ pub mod pallet {
 				let loc = <LocMap<T>>::get(&loc_id).unwrap();
 				if loc.owner != who {
 					Err(Error::<T>::Unauthorized)?
+				} else if loc.closed {
+					Err(Error::<T>::CannotMutate)?
 				} else {
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
 						mutable_loc.hashes.push(hash);
 					});
+					Ok(().into())
+				}
+			}
+		}
+
+		/// Close LOC.
+		#[pallet::weight(T::WeightInfo::close())]
+		pub fn close(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+		) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin)?;
+
+			if ! <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::NotFound)?
+			} else {
+				let loc = <LocMap<T>>::get(&loc_id).unwrap();
+				if loc.owner != who {
+					Err(Error::<T>::Unauthorized)?
+				} else if loc.closed {
+					Err(Error::<T>::AlreadyClosed)?
+				} else {
+					<LocMap<T>>::mutate(loc_id, |loc| {
+						let mutable_loc = loc.as_mut().unwrap();
+						mutable_loc.closed = true;
+					});
+
+					Self::deposit_event(Event::LocClosed(loc_id));
 					Ok(().into())
 				}
 			}
