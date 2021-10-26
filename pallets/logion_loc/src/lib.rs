@@ -14,6 +14,18 @@ mod benchmarking;
 use frame_support::codec::{Decode, Encode};
 use frame_support::traits::Vec;
 
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
+pub enum LocType {
+	Transaction,
+	Identity
+}
+
+impl Default for LocType {
+	fn default() -> LocType {
+		return LocType::Transaction;
+	}
+}
+
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
 pub struct MetadataItem {
 	name: Vec<u8>,
@@ -27,6 +39,7 @@ pub struct LegalOfficerCase<AccountId, Hash> {
 	metadata: Vec<MetadataItem>,
 	hashes: Vec<Hash>,
 	closed: bool,
+	loc_type: LocType,
 }
 
 pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash>;
@@ -68,6 +81,11 @@ pub mod pallet {
 	#[pallet::getter(fn loc)]
 	pub type LocMap<T> = StorageMap<_, Blake2_128Concat, <T as Config>::LocId, LegalOfficerCaseOf<T>>;
 
+	/// Requested LOCs by account ID.
+	#[pallet::storage]
+	#[pallet::getter(fn account_locs)]
+	pub type AccountLocsMap<T> = StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::AccountId, Vec<<T as Config>::LocId>>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	#[pallet::metadata(T::LocId = "LocId")]
@@ -103,7 +121,8 @@ pub mod pallet {
 		pub fn create_loc(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			requester: T::AccountId
+			requester: T::AccountId,
+			loc_type: LocType,
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 
@@ -116,8 +135,18 @@ pub mod pallet {
 					metadata: Vec::new(),
 					hashes: Vec::new(),
 					closed: false,
+					loc_type: loc_type.clone(),
 				};
 				<LocMap<T>>::insert(loc_id, loc);
+
+				if <AccountLocsMap<T>>::contains_key(requester.clone()) {
+					<AccountLocsMap<T>>::mutate(requester.clone(), |accounts| {
+						let list = accounts.as_mut().unwrap();
+						list.push(loc_id.clone());
+					});
+				} else {
+					<AccountLocsMap<T>>::insert(requester.clone(), Vec::from([loc_id.clone()]));
+				}
 
 				Self::deposit_event(Event::LocCreated(loc_id));
 				Ok(().into())
