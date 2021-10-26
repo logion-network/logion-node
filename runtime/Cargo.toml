@@ -50,6 +50,7 @@ sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
 # local dependencies
+pallet-lo-authority-list = { default-features = false, path = '../pallets/lo_authority_list', version = '0.1.0' }
 pallet-logion-loc = { default-features = false, path = '../pallets/logion_loc', version = '0.1.0' }
 
 [features]

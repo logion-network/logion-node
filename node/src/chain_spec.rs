@@ -2,6 +2,7 @@ use sp_core::{Pair, Public, sr25519, OpaquePeerId};
 use logion_node_runtime::{
 	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig,
 	SudoConfig, SystemConfig, WASM_BINARY, Signature, NodeAuthorizationConfig,
+	LoAuthorityListConfig,
 };
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_finality_grandpa::AuthorityId as GrandpaId;
@@ -69,7 +70,12 @@ pub fn development_config() -> Result<ChainSpec, String> {
 					OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
 					get_account_id_from_seed::<sr25519::Public>("Alice")
 				),
-			]
+			],
+			vec![ // Initial set of Logion Legal Officers
+				get_account_id_from_seed::<sr25519::Public>("Alice"),
+				get_account_id_from_seed::<sr25519::Public>("Bob"),
+				get_account_id_from_seed::<sr25519::Public>("Charlie"),
+			],
 		),
 		// Bootnodes
 		vec![],
@@ -132,7 +138,12 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 					OpaquePeerId(bs58::decode("12D3KooWJvyP3VJYymTqG7eH4PM5rN4T2agk5cdNCfNymAqwqcvZ").into_vec().unwrap()),
 					get_account_id_from_seed::<sr25519::Public>("Charlie")
 				),
-			]
+			],
+			vec![ // Initial set of Logion Legal Officers
+				get_account_id_from_seed::<sr25519::Public>("Alice"),
+				get_account_id_from_seed::<sr25519::Public>("Bob"),
+				get_account_id_from_seed::<sr25519::Public>("Charlie"),
+			],
 		),
 		// Bootnodes
 		vec![],
@@ -154,6 +165,7 @@ fn testnet_genesis(
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
 	initial_authorized_nodes: Vec<(OpaquePeerId, AccountId)>,
+	legal_officers: Vec<AccountId>,
 ) -> GenesisConfig {
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
@@ -178,6 +190,9 @@ fn testnet_genesis(
 		pallet_node_authorization: Some(NodeAuthorizationConfig {
 			nodes: initial_authorized_nodes.iter().map(|x| (x.0.clone(), x.1.clone())).collect(),
 		}),
+		pallet_lo_authority_list: Some(LoAuthorityListConfig {
+			legal_officers: legal_officers.iter().map(|x| x.clone()).collect(),
+		})
 	}
 }
 
