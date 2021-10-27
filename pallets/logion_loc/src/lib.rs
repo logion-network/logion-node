@@ -65,6 +65,9 @@ pub mod pallet {
 		/// Type for hashes stored in LOCs
 		type Hash: Member + Parameter + Default + Copy;
 
+		/// The origin (must be signed) which can create a LOC.
+		type CreateOrigin: EnsureOrigin<Self::Origin>;
+
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
 
@@ -124,6 +127,7 @@ pub mod pallet {
 			requester: T::AccountId,
 			loc_type: LocType,
 		) -> DispatchResultWithPostInfo {
+			T::CreateOrigin::ensure_origin(origin.clone())?;
 			let who = ensure_signed(origin)?;
 
 			if <LocMap<T>>::contains_key(&loc_id) {

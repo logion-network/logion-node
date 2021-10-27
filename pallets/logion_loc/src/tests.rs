@@ -1,11 +1,11 @@
 use crate::{mock::*, LegalOfficerCase, LocType, MetadataItem};
+use frame_support::error::BadOrigin;
 use frame_support::{assert_ok, assert_err};
 use crate::Error;
 use sp_runtime::traits::BlakeTwo256;
 use sp_runtime::traits::Hash;
 
 const LOC_ID: u32 = 0;
-const LOC_OWNER: u64 = 1;
 const LOC_REQUESTER: u64 = 2;
 const OTHER_LOC_ID: u32 = 1;
 
@@ -131,5 +131,12 @@ fn it_links_locs_to_account() {
 		assert!(LogionLoc::account_locs(LOC_REQUESTER).unwrap().len() == 2);
 		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER).unwrap()[0], LOC_ID);
 		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER).unwrap()[1], OTHER_LOC_ID);
+	});
+}
+
+#[test]
+fn it_fails_creating_loc_for_unauthorized_caller() {
+	new_test_ext().execute_with(|| {
+		assert_err!(LogionLoc::create_loc(Origin::signed(LOC_REQUESTER), LOC_ID, LOC_REQUESTER, LocType::Transaction), BadOrigin);
 	});
 }

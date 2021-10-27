@@ -1,4 +1,4 @@
-use crate as pallet_loc;
+use crate as pallet_lo_authority_list;
 use sp_core::hash::H256;
 use frame_support::{parameter_types, traits::EnsureOrigin};
 use sp_runtime::{
@@ -17,7 +17,7 @@ frame_support::construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic,
 	{
 		System: frame_system::{Module, Call, Config, Storage, Event<T>},
-		LogionLoc: pallet_loc::{Module, Call, Storage, Event<T>},
+		LoAuthorityList: pallet_lo_authority_list::{Module, Call, Storage, Event<T>},
 	}
 );
 
@@ -51,17 +51,17 @@ impl system::Config for Test {
 	type SS58Prefix = SS58Prefix;
 }
 
-pub const LOC_OWNER: u64 = 1;
+pub const MANAGER: u64 = 1;
 
-pub struct LoAuthorityListMock;
-impl EnsureOrigin<Origin> for LoAuthorityListMock {
+pub struct EnsureManagerOriginMock;
+impl EnsureOrigin<Origin> for EnsureManagerOriginMock {
     type Success = ();
 
     fn try_origin(o: Origin) -> std::result::Result<Self::Success, Origin> {
 		let result = ensure_signed(o.clone());
         match result {
 			Ok(who) => {
-				if who == LOC_OWNER {
+				if who == MANAGER {
 					Ok(())
 				} else {
 					Err(o)
@@ -72,12 +72,10 @@ impl EnsureOrigin<Origin> for LoAuthorityListMock {
     }
 }
 
-impl pallet_loc::Config for Test {
-	type LocId = u32;
+impl pallet_lo_authority_list::Config for Test {
+	type AddOrigin = EnsureManagerOriginMock;
+	type RemoveOrigin = EnsureManagerOriginMock;
 	type Event = Event;
-	type Hash = H256;
-	type CreateOrigin = LoAuthorityListMock;
-	type WeightInfo = ();
 }
 
 // Build genesis storage according to the mock runtime.

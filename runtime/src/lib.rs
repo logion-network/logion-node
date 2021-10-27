@@ -376,10 +376,17 @@ impl pallet_assets::Config for Runtime {
 	type WeightInfo = ();
 }
 
+impl pallet_lo_authority_list::Config for Runtime {
+	type AddOrigin = EnsureRoot<AccountId>;
+    type RemoveOrigin = EnsureRoot<AccountId>;
+	type Event = Event;
+}
+
 impl pallet_logion_loc::Config for Runtime {
 	type LocId = u128;
 	type Event = Event;
 	type Hash = Hash;
+	type CreateOrigin = LoAuthorityList;
 	type WeightInfo = ();
 }
 
@@ -403,6 +410,7 @@ construct_runtime!(
 		Proxy:  pallet_proxy::{Module, Call, Storage, Event<T>},
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
+		LoAuthorityList: pallet_lo_authority_list::{Module, Call, Storage, Event<T>, Config<T>},
 		LogionLoc: pallet_logion_loc::{Module, Call, Storage, Event<T>},
 	}
 );
