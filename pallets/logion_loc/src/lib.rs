@@ -54,6 +54,7 @@ pub mod pallet {
 		pallet_prelude::*,
 	};
 	use codec::HasCompact;
+	use logion_shared::LocQuery;
 	use super::*;
 	pub use crate::weights::WeightInfo;
 
@@ -236,6 +237,35 @@ pub mod pallet {
 					Self::deposit_event(Event::LocClosed(loc_id));
 					Ok(().into())
 				}
+			}
+		}
+	}
+
+	impl<T: Config> LocQuery<<T as frame_system::Config>::AccountId> for Pallet<T> {
+		fn has_closed_identity_locs(
+			account: &<T as frame_system::Config>::AccountId,
+			legal_officers: &Vec<<T as frame_system::Config>::AccountId>
+		) -> bool {
+			Self::has_closed_identity_loc(account, &legal_officers[0]) && Self::has_closed_identity_loc(account, &legal_officers[1])
+		}
+	}
+
+	impl<T: Config> Pallet<T> {
+
+		fn has_closed_identity_loc(
+			account: &<T as frame_system::Config>::AccountId,
+			legal_officer: &<T as frame_system::Config>::AccountId
+		) -> bool {
+			let value = <AccountLocsMap<T>>::get(account);
+			match value {
+				Some(loc_ids) => {
+					return loc_ids.iter().map(|id| <LocMap<T>>::get(id))
+						.filter(|option| option.is_some())
+						.map(|some| some.unwrap())
+						.find(|loc| loc.owner == *legal_officer && loc.loc_type == LocType::Identity && loc.closed)
+						.is_some();
+				}
+				None => false
 			}
 		}
 	}

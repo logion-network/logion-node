@@ -3250,6 +3250,7 @@ dependencies = [
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
  "hex-literal",
+ "logion-shared",
  "pallet-assets",
  "pallet-aura",
  "pallet-balances",
@@ -3265,6 +3266,7 @@ dependencies = [
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-verified-recovery",
  "parity-scale-codec",
  "serde",
  "sp-api",
@@ -3279,6 +3281,13 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "logion-shared"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
 ]
 
 [[package]]
@@ -3862,6 +3871,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "logion-shared",
  "parity-scale-codec",
  "serde",
  "sp-core",
@@ -4048,6 +4058,22 @@ dependencies = [
  "parity-scale-codec",
  "sp-api",
  "sp-runtime",
+]
+
+[[package]]
+name = "pallet-verified-recovery"
+version = "0.1.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "logion-shared",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
