@@ -51,7 +51,9 @@ impl system::Config for Test {
 	type SS58Prefix = SS58Prefix;
 }
 
-pub const LOC_OWNER: u64 = 1;
+pub const LOC_OWNER1: u64 = 1;
+pub const LOC_OWNER2: u64 = 2;
+pub const LOC_REQUESTER: u64 = 3;
 
 pub struct LoAuthorityListMock;
 impl EnsureOrigin<Origin> for LoAuthorityListMock {
@@ -61,7 +63,7 @@ impl EnsureOrigin<Origin> for LoAuthorityListMock {
 		let result = ensure_signed(o.clone());
         match result {
 			Ok(who) => {
-				if who == LOC_OWNER {
+				if who == LOC_OWNER1 || who == LOC_OWNER2 {
 					Ok(())
 				} else {
 					Err(o)

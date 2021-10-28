@@ -31,7 +31,7 @@ pub use pallet_balances::Call as BalancesCall;
 pub use sp_runtime::{Permill, Perbill};
 pub use frame_support::{
 	construct_runtime, parameter_types, StorageValue, RuntimeDebug,
-	traits::{KeyOwnerProofSystem, Randomness, InstanceFilter},
+	traits::{KeyOwnerProofSystem, Randomness, InstanceFilter, Filter},
 	weights::{
 		Weight, IdentityFee,
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -40,6 +40,7 @@ pub use frame_support::{
 };
 use pallet_transaction_payment::CurrencyAdapter;
 use frame_system::EnsureRoot;
+use logion_shared::CreateRecoveryCallFactory;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -150,9 +151,19 @@ parameter_types! {
 
 // Configure FRAME pallets to include in runtime.
 
+pub struct BaseCallFilter;
+impl Filter<Call> for BaseCallFilter {
+	fn filter(call: &Call) -> bool {
+		match call {
+			Call::Recovery(pallet_recovery::Call::create_recovery(..)) => false,
+			_ => true
+		}
+	}
+}
+
 impl frame_system::Config for Runtime {
 	/// The basic call filter to use in dispatchable.
-	type BaseCallFilter = ();
+	type BaseCallFilter = BaseCallFilter;
 	/// Block & extrinsics weights: base values and limits.
 	type BlockWeights = BlockWeights;
 	/// The maximum length of a block (in bytes).
@@ -390,6 +401,22 @@ impl pallet_logion_loc::Config for Runtime {
 	type WeightInfo = ();
 }
 
+pub struct PalletRecoveryCreateRecoveryCallFactory;
+impl CreateRecoveryCallFactory<Origin, AccountId, BlockNumber> for PalletRecoveryCreateRecoveryCallFactory {
+	type Call = Call;
+
+	fn build_create_recovery_call(legal_officers: Vec<AccountId>, threshold: u16, delay_period: BlockNumber) -> Call {
+		Call::Recovery(pallet_recovery::Call::create_recovery(legal_officers, threshold, delay_period))
+	}
+}
+
+impl pallet_verified_recovery::Config for Runtime {
+	type CreateRecoveryCallFactory = PalletRecoveryCreateRecoveryCallFactory;
+	type LocQuery = LogionLoc;
+	type Event = Event;
+	type WeightInfo = ();
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -412,6 +439,7 @@ construct_runtime!(
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
 		LoAuthorityList: pallet_lo_authority_list::{Module, Call, Storage, Event<T>, Config<T>},
 		LogionLoc: pallet_logion_loc::{Module, Call, Storage, Event<T>},
+		VerifiedRecovery: pallet_verified_recovery::{Module, Call, Event<T>}
 	}
 );
 
