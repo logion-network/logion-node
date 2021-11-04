@@ -29,9 +29,10 @@
     "owner": "AccountId",
     "requester": "AccountId",
     "metadata": "Vec<MetadataItem>",
-    "hashes": "Vec<Hash>",
+    "files": "Vec<File<Hash>>",
     "closed": "bool",
-    "loc_type": "LocType"
+    "loc_type": "LocType",
+    "links": "Vec<LocLink<LocId>>"
   },
   "MetadataItem": {
     "name": "Vec<u8>",
@@ -42,5 +43,13 @@
       "Transaction",
       "Identity"
     ]
+  },
+  "LocLink": {
+    "id": "LocId",
+    "nature": "Vec<u8>"
+  },
+  "File": {
+    "hash": "Hash",
+    "nature": "Vec<u8>"
   }
 }

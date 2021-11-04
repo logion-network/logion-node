@@ -5,7 +5,7 @@ use sp_runtime::traits::Hash;
 
 use logion_shared::LocQuery;
 
-use crate::{File, LegalOfficerCase, LocType, MetadataItem, mock::*};
+use crate::{File, LegalOfficerCase, LocLink, LocType, MetadataItem, mock::*};
 use crate::Error;
 
 const LOC_ID: u32 = 0;
@@ -97,7 +97,7 @@ fn it_fails_adding_file_for_unauthorized_caller() {
 }
 
 #[test]
-fn it_fails_adding_hash_for_when_closed() {
+fn it_fails_adding_file_when_closed() {
 	new_test_ext().execute_with(|| {
 		create_closed_loc();
 		let file = File {
@@ -105,6 +105,59 @@ fn it_fails_adding_hash_for_when_closed() {
 			nature: "test-file-nature".as_bytes().to_vec()
 		};
 		assert_err!(LogionLoc::add_file(Origin::signed(LOC_OWNER1), LOC_ID, file.clone()), Error::<Test>::CannotMutate);
+	});
+}
+
+#[test]
+fn it_adds_link() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		let link = LocLink {
+			id: OTHER_LOC_ID,
+			nature: "test-link-nature".as_bytes().to_vec()
+		};
+		assert_ok!(LogionLoc::add_link(Origin::signed(LOC_OWNER1), LOC_ID, link.clone()));
+		let loc = LogionLoc::loc(LOC_ID).unwrap();
+		assert_eq!(loc.links[0], link);
+	});
+}
+
+#[test]
+fn it_fails_adding_link_for_unauthorized_caller() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		let link = LocLink {
+			id: OTHER_LOC_ID,
+			nature: "test-link-nature".as_bytes().to_vec()
+		};
+		assert_err!(LogionLoc::add_link(Origin::signed(LOC_REQUESTER), LOC_ID, link.clone()), Error::<Test>::Unauthorized);
+	});
+}
+
+#[test]
+fn it_fails_adding_link_when_closed() {
+	new_test_ext().execute_with(|| {
+		create_closed_loc();
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		let link = LocLink {
+			id: OTHER_LOC_ID,
+			nature: "test-link-nature".as_bytes().to_vec()
+		};
+		assert_err!(LogionLoc::add_link(Origin::signed(LOC_OWNER1), LOC_ID, link.clone()), Error::<Test>::CannotMutate);
+	});
+}
+
+#[test]
+fn it_fails_adding_wrong_link() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		let link = LocLink {
+			id: OTHER_LOC_ID,
+			nature: "test-link-nature".as_bytes().to_vec()
+		};
+		assert_err!(LogionLoc::add_link(Origin::signed(LOC_OWNER1), LOC_ID, link.clone()), Error::<Test>::LinkedLocNotFound);
 	});
 }
 

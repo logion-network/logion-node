@@ -125,6 +125,8 @@ pub mod pallet {
 		CannotMutate,
 		/// Occurs when trying to close an already closed LOC
 		AlreadyClosed,
+		/// Occurs when trying to link to a non-existent LOC
+		LinkedLocNotFound
 	}
 
 	#[pallet::hooks]
@@ -243,6 +245,8 @@ pub mod pallet {
 					Err(Error::<T>::Unauthorized)?
 				} else if loc.closed {
 					Err(Error::<T>::CannotMutate)?
+				} else if ! <LocMap<T>>::contains_key(&link.id) {
+					Err(Error::<T>::LinkedLocNotFound)?
 				} else {
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
