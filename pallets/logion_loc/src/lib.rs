@@ -33,16 +33,29 @@ pub struct MetadataItem {
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
-pub struct LegalOfficerCase<AccountId, Hash> {
+pub struct LocLink<LocId> {
+	id: LocId,
+	nature: Vec<u8>,
+}
+
+#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
+pub struct File<Hash> {
+	hash: Hash,
+	nature: Vec<u8>,
+}
+
+#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
+pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	owner: AccountId,
 	requester: AccountId,
 	metadata: Vec<MetadataItem>,
-	hashes: Vec<Hash>,
+	files: Vec<File<Hash>>,
 	closed: bool,
 	loc_type: LocType,
+	links: Vec<LocLink<LocId>>,
 }
 
-pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash>;
+pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
 
 pub mod weights;
 
@@ -112,6 +125,8 @@ pub mod pallet {
 		CannotMutate,
 		/// Occurs when trying to close an already closed LOC
 		AlreadyClosed,
+		/// Occurs when trying to link to a non-existent LOC
+		LinkedLocNotFound
 	}
 
 	#[pallet::hooks]
@@ -138,9 +153,10 @@ pub mod pallet {
 					owner: who.clone(),
 					requester: requester.clone(),
 					metadata: Vec::new(),
-					hashes: Vec::new(),
+					files: Vec::new(),
 					closed: false,
 					loc_type: loc_type.clone(),
+					links: Vec::new(),
 				};
 				<LocMap<T>>::insert(loc_id, loc);
 
@@ -185,12 +201,12 @@ pub mod pallet {
 			}
 		}
 
-		/// Add hash to LOC
-		#[pallet::weight(T::WeightInfo::add_hash())]
-		pub fn add_hash(
+		/// Add file to LOC
+		#[pallet::weight(T::WeightInfo::add_file())]
+		pub fn add_file(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			hash: <T as pallet::Config>::Hash
+			file: File<<T as pallet::Config>::Hash>
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 
@@ -205,7 +221,36 @@ pub mod pallet {
 				} else {
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
-						mutable_loc.hashes.push(hash);
+						mutable_loc.files.push(file);
+					});
+					Ok(().into())
+				}
+			}
+		}
+
+		/// Add a link to LOC
+		#[pallet::weight(T::WeightInfo::add_link())]
+		pub fn add_link(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			link: LocLink<T::LocId>
+		) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin)?;
+
+			if ! <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::NotFound)?
+			} else {
+				let loc = <LocMap<T>>::get(&loc_id).unwrap();
+				if loc.owner != who {
+					Err(Error::<T>::Unauthorized)?
+				} else if loc.closed {
+					Err(Error::<T>::CannotMutate)?
+				} else if ! <LocMap<T>>::contains_key(&link.id) {
+					Err(Error::<T>::LinkedLocNotFound)?
+				} else {
+					<LocMap<T>>::mutate(loc_id, |loc| {
+						let mutable_loc = loc.as_mut().unwrap();
+						mutable_loc.links.push(link);
 					});
 					Ok(().into())
 				}

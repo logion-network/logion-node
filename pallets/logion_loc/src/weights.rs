@@ -39,7 +39,8 @@ use sp_std::marker::PhantomData;
 pub trait WeightInfo {
 	fn create_loc() -> Weight;
 	fn add_metadata() -> Weight;
-	fn add_hash() -> Weight;
+	fn add_file() -> Weight;
+	fn add_link() -> Weight;
 	fn close() -> Weight;
 }
 
@@ -56,7 +57,12 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
-	fn add_hash() -> Weight {
+	fn add_file() -> Weight {
+		(24_795_000 as Weight)
+			.saturating_add(T::DbWeight::get().reads(1 as Weight))
+			.saturating_add(T::DbWeight::get().writes(1 as Weight))
+	}
+	fn add_link() -> Weight {
 		(24_795_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
@@ -80,7 +86,12 @@ impl WeightInfo for () {
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
-  fn add_hash() -> Weight {
+  fn add_file() -> Weight {
+    (24_795_000 as Weight)
+      .saturating_add(RocksDbWeight::get().reads(1 as Weight))
+      .saturating_add(RocksDbWeight::get().writes(1 as Weight))
+  }
+  fn add_link() -> Weight {
     (24_795_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
