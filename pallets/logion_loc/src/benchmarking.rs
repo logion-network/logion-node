@@ -10,7 +10,7 @@ use crate::Pallet as LogionLoc;
 benchmarks! {
 	create_loc {
 		let caller: T::AccountId = whitelisted_caller();
-	}: _(RawOrigin::Signed(caller), Default::default(), Default::default())
+	}: _(RawOrigin::Signed(caller), Default::default(), Default::default(), Default::default())
 
 	add_metadata {
 		let caller: T::AccountId = whitelisted_caller();
@@ -19,20 +19,23 @@ benchmarks! {
 			name: vec![1u8, 2u8, 3u8],
 			value: vec![4u8, 5u8, 6u8],
 		};
-		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default()));
+		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default(), Default::default()));
 	}: _(RawOrigin::Signed(caller), loc_id, item)
 
-	add_hash {
+	add_file {
 		let caller: T::AccountId = whitelisted_caller();
 		let loc_id = Default::default();
-		let hash = Default::default();
-		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default()));
-	}: _(RawOrigin::Signed(caller), loc_id, hash)
+		let file = File {
+			hash: Default::default(),
+			nature: vec![1u8, 2u8, 3u8],
+		};
+		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default(), Default::default()));
+	}: _(RawOrigin::Signed(caller), loc_id, file)
 
 	close {
 		let caller: T::AccountId = whitelisted_caller();
 		let loc_id = Default::default();
-		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default()));
+		assert_ok!(LogionLoc::<T>::create_loc(RawOrigin::Signed(caller.clone()).into(), loc_id, Default::default(), Default::default()));
 	}: _(RawOrigin::Signed(caller), loc_id)
 }
 

@@ -1,10 +1,12 @@
-use crate::{mock::*, LegalOfficerCase, LocType, MetadataItem};
-use crate::Error;
+use frame_support::{assert_err, assert_ok};
 use frame_support::error::BadOrigin;
-use frame_support::{assert_ok, assert_err};
-use logion_shared::LocQuery;
 use sp_runtime::traits::BlakeTwo256;
 use sp_runtime::traits::Hash;
+
+use logion_shared::LocQuery;
+
+use crate::{File, LegalOfficerCase, LocType, MetadataItem, mock::*};
+use crate::Error;
 
 const LOC_ID: u32 = 0;
 const OTHER_LOC_ID: u32 = 1;
@@ -13,13 +15,14 @@ const OTHER_LOC_ID: u32 = 1;
 fn it_creates_loc() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_eq!(LogionLoc::loc(LOC_ID), Some(LegalOfficerCase::<<Test as frame_system::Config>::AccountId, <Test as crate::Config>::Hash> {
+		assert_eq!(LogionLoc::loc(LOC_ID), Some(LegalOfficerCase::<<Test as frame_system::Config>::AccountId, <Test as crate::Config>::Hash, <Test as crate::Config>::LocId> {
 			owner: LOC_OWNER1,
 			requester: LOC_REQUESTER,
 			metadata: vec![],
-			hashes: vec![],
+			files: vec![],
 			closed: false,
 			loc_type: LocType::Transaction,
+			links: vec![]
 		}));
 	});
 }
@@ -68,22 +71,28 @@ fn create_closed_loc() {
 }
 
 #[test]
-fn it_adds_hash() {
+fn it_adds_file() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		let hash = BlakeTwo256::hash_of(&"test".as_bytes().to_vec());
-		assert_ok!(LogionLoc::add_hash(Origin::signed(LOC_OWNER1), LOC_ID, hash.clone()));
+		let file = File {
+			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
+			nature: "test-file-nature".as_bytes().to_vec()
+		};
+		assert_ok!(LogionLoc::add_file(Origin::signed(LOC_OWNER1), LOC_ID, file.clone()));
 		let loc = LogionLoc::loc(LOC_ID).unwrap();
-		assert_eq!(loc.hashes[0], hash);
+		assert_eq!(loc.files[0], file);
 	});
 }
 
 #[test]
-fn it_fails_adding_hash_for_unauthorized_caller() {
+fn it_fails_adding_file_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		let hash = BlakeTwo256::hash_of(&"test".as_bytes().to_vec());
-		assert_err!(LogionLoc::add_hash(Origin::signed(LOC_REQUESTER), LOC_ID, hash.clone()), Error::<Test>::Unauthorized);
+		let file = File {
+			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
+			nature: "test-file-nature".as_bytes().to_vec()
+		};
+		assert_err!(LogionLoc::add_file(Origin::signed(LOC_REQUESTER), LOC_ID, file.clone()), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -91,8 +100,11 @@ fn it_fails_adding_hash_for_unauthorized_caller() {
 fn it_fails_adding_hash_for_when_closed() {
 	new_test_ext().execute_with(|| {
 		create_closed_loc();
-		let hash = BlakeTwo256::hash_of(&"test".as_bytes().to_vec());
-		assert_err!(LogionLoc::add_hash(Origin::signed(LOC_OWNER1), LOC_ID, hash.clone()), Error::<Test>::CannotMutate);
+		let file = File {
+			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
+			nature: "test-file-nature".as_bytes().to_vec()
+		};
+		assert_err!(LogionLoc::add_file(Origin::signed(LOC_OWNER1), LOC_ID, file.clone()), Error::<Test>::CannotMutate);
 	});
 }
 
@@ -146,10 +158,10 @@ fn it_detects_existing_identity_loc() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Identity));
 		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOC_ID));
-		
+
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER2), OTHER_LOC_ID, LOC_REQUESTER, LocType::Identity));
 		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER2), OTHER_LOC_ID));
-		
+
 		let legal_officers = Vec::from([LOC_OWNER1, LOC_OWNER2]);
 		assert!(LogionLoc::has_closed_identity_locs(&LOC_REQUESTER, &legal_officers));
 	});
