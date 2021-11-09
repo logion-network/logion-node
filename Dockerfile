@@ -27,8 +27,7 @@ $CUSTOM_OPTIONS \
 --ws-port $WS_PORT \
 --ws-external \
 --rpc-port $RPC_PORT \
---rpc-cors all \
---rpc-methods Unsafe
+--rpc-cors all
 
 EXPOSE ${WS_PORT}
 EXPOSE ${P2P_PORT}
