@@ -32,7 +32,8 @@
     "files": "Vec<File<Hash>>",
     "closed": "bool",
     "loc_type": "LocType",
-    "links": "Vec<LocLink<LocId>>"
+    "links": "Vec<LocLink<LocId>>",
+    "void_info": "Option<LocVoidInfo<LocId>>"
   },
   "MetadataItem": {
     "name": "Vec<u8>",
@@ -51,5 +52,13 @@
   "File": {
     "hash": "Hash",
     "nature": "Vec<u8>"
+  },
+  "LocVoidInfo": {
+    "_enum": {
+      "V1": {
+        "reason": "Vec<u8>",
+        "replacer": "Option<LocId>"
+      }
+    }
   }
 }

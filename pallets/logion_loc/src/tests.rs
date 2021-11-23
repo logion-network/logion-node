@@ -5,7 +5,7 @@ use sp_runtime::traits::Hash;
 
 use logion_shared::LocQuery;
 
-use crate::{File, LegalOfficerCase, LocLink, LocType, MetadataItem, mock::*};
+use crate::{File, LegalOfficerCase, LocLink, LocType, LocVoidInfo, MetadataItem, mock::*};
 use crate::Error;
 
 const LOC_ID: u32 = 0;
@@ -22,8 +22,26 @@ fn it_creates_loc() {
 			files: vec![],
 			closed: false,
 			loc_type: LocType::Transaction,
-			links: vec![]
+			links: vec![],
+			void_info: None
 		}));
+	});
+}
+
+#[test]
+fn it_makes_existing_loc_void() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID, "reason".as_bytes().to_vec(), None));
+
+		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
+		assert!(void_info.is_some());
+		match void_info.unwrap() {
+			LocVoidInfo::V1 { reason: _reason, replacer: _replacer } => {
+				assert_eq!(_reason, "reason".as_bytes().to_vec());
+				assert_eq!(_replacer, None)
+			}
+		}
 	});
 }
 
