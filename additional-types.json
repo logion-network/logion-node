@@ -51,5 +51,13 @@
   "File": {
     "hash": "Hash",
     "nature": "Vec<u8>"
+  },
+  "LocVoidInfo": {
+    "_enum": {
+      "V1": {
+        "reason": "Vec<u8>",
+        "replacer": "Option<LocLink<LocId>>"
+      }
+    }
   }
 }

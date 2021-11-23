@@ -42,6 +42,7 @@ pub trait WeightInfo {
 	fn add_file() -> Weight;
 	fn add_link() -> Weight;
 	fn close() -> Weight;
+	fn make_void() -> Weight;
 }
 
 /// Weights for pallet_logion_loc using the Substrate node and recommended hardware.
@@ -72,6 +73,11 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
+	fn make_void() -> Weight {
+		(42_251_000 as Weight)
+			.saturating_add(T::DbWeight::get().reads(1 as Weight))
+			.saturating_add(T::DbWeight::get().writes(1 as Weight))
+	}
 }
 
 // For backwards compatibility and tests
@@ -97,6 +103,11 @@ impl WeightInfo for () {
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn close() -> Weight {
+    (42_251_000 as Weight)
+      .saturating_add(RocksDbWeight::get().reads(1 as Weight))
+      .saturating_add(RocksDbWeight::get().writes(1 as Weight))
+  }
+  fn make_void() -> Weight {
     (42_251_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))

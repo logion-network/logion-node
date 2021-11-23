@@ -111,6 +111,8 @@ pub mod pallet {
 		LocCreated(T::LocId),
 		/// Issued when LOC is closed. [locId]
 		LocClosed(T::LocId),
+		/// Issued when LOC is made void. [locId]
+		LocVoid(T::LocId),
 	}
 
 	#[pallet::error]
@@ -126,7 +128,11 @@ pub mod pallet {
 		/// Occurs when trying to close an already closed LOC
 		AlreadyClosed,
 		/// Occurs when trying to link to a non-existent LOC
-		LinkedLocNotFound
+		LinkedLocNotFound,
+		/// Occurs when trying to replace void LOC with a non-existent LOC
+		ReplacerLocNotFound,
+		/// Occurs when trying to void a LOC already void
+		AlreadyVoid
 	}
 
 	#[pallet::hooks]
@@ -284,6 +290,50 @@ pub mod pallet {
 				}
 			}
 		}
+
+		/// Make a LOC void.
+		#[pallet::weight(T::WeightInfo::make_void())]
+		pub fn make_void(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			reason: Vec<u8>,
+			replacer_loc_id: Option<T::LocId>
+		) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin)?;
+
+			if !<LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::NotFound)?
+			} else {
+				let loc = <LocMap<T>>::get(&loc_id).unwrap();
+				if loc.owner != who {
+					Err(Error::<T>::Unauthorized)?
+				}
+			}
+
+			if replacer_loc_id.is_some() {
+				let replacer = replacer_loc_id.unwrap();
+				if !<LocMap<T>>::contains_key(&replacer) {
+					Err(Error::<T>::ReplacerLocNotFound)?
+				} else {
+					let replacer_loc = <LocMap<T>>::get(&replacer).unwrap();
+					if replacer_loc.owner != who {
+						Err(Error::<T>::Unauthorized)?
+					}
+				}
+			}
+			let replacer = replacer_loc_id.map(|id| LocLink { id, nature: "replacer".as_bytes().to_vec() });
+			let loc_void_info = LocVoidInfo::V1 {
+				reason,
+				replacer,
+			};
+			if <LocVoidInfoMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::AlreadyVoid)?
+			} else {
+				<LocVoidInfoMap<T>>::insert(loc_id, loc_void_info);
+				Self::deposit_event(Event::LocVoid(loc_id));
+				Ok(().into())
+			}
+		}
 	}
 
 	impl<T: Config> LocQuery<<T as frame_system::Config>::AccountId> for Pallet<T> {
@@ -296,7 +346,6 @@ pub mod pallet {
 	}
 
 	impl<T: Config> Pallet<T> {
-
 		fn has_closed_identity_loc(
 			account: &<T as frame_system::Config>::AccountId,
 			legal_officer: &<T as frame_system::Config>::AccountId
@@ -314,4 +363,17 @@ pub mod pallet {
 			}
 		}
 	}
+
+	#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
+	pub enum LocVoidInfo<LocId> {
+		V1 {
+			reason: Vec<u8>,
+			replacer: Option<LocLink<LocId>>,
+		}
+	}
+
+	/// All LOC void infos, indexed by LOC ID.
+	#[pallet::storage]
+	#[pallet::getter(fn loc_void_info)]
+	pub type LocVoidInfoMap<T> = StorageMap<_, Blake2_128Concat, <T as Config>::LocId, LocVoidInfo<<T as Config>::LocId>>;
 }
