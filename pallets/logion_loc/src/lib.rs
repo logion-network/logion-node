@@ -62,6 +62,7 @@ pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	loc_type: LocType,
 	links: Vec<LocLink<LocId>>,
 	void_info: Option<LocVoidInfo<LocId>>,
+	replacer_of: Option<LocId>
 }
 
 pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
@@ -141,7 +142,9 @@ pub mod pallet {
 		/// Occurs when trying to replace void LOC with a non-existent LOC
 		ReplacerLocNotFound,
 		/// Occurs when trying to void a LOC already void
-		AlreadyVoid
+		AlreadyVoid,
+		/// Occurs when trying to void a LOC by replacing it with an already void LOC
+		ReplacerLocAlreadyVoid,
 	}
 
 	#[pallet::hooks]
@@ -183,7 +186,8 @@ pub mod pallet {
 					closed: false,
 					loc_type: loc_type.clone(),
 					links: Vec::new(),
-					void_info: None
+					void_info: None,
+					replacer_of: None
 				};
 				<LocMap<T>>::insert(loc_id, loc);
 
@@ -328,8 +332,8 @@ pub mod pallet {
 					Err(Error::<T>::ReplacerLocNotFound)?
 				} else {
 					let replacer_loc = <LocMap<T>>::get(&replacer).unwrap();
-					if replacer_loc.owner != who {
-						Err(Error::<T>::Unauthorized)?
+					if replacer_loc.void_info.is_some() {
+						Err(Error::<T>::ReplacerLocAlreadyVoid)?
 					}
 				}
 			}
@@ -354,6 +358,12 @@ pub mod pallet {
 				let mutable_loc = loc.as_mut().unwrap();
 				mutable_loc.void_info = Some(loc_void_info);
 			});
+			if replacer_loc_id.is_some() {
+				<LocMap<T>>::mutate(replacer_loc_id.unwrap(), |replacer_loc| {
+					let mutable_replacer_loc = replacer_loc.as_mut().unwrap();
+					mutable_replacer_loc.replacer_of = Some(loc_id);
+				});
+			}
 			Self::deposit_event(Event::LocVoid(loc_id));
 			Ok(().into())
 		}
@@ -428,7 +438,8 @@ pub mod pallet {
 						closed: loc.closed.clone(),
 						loc_type: loc.loc_type.clone(),
 						links: loc.links.clone(),
-						void_info: None
+						void_info: None,
+						replacer_of: None
 					};
 					Some(new_loc)
 				}

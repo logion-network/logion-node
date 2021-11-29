@@ -23,7 +23,8 @@ fn it_creates_loc() {
 			closed: false,
 			loc_type: LocType::Transaction,
 			links: vec![],
-			void_info: None
+			void_info: None,
+			replacer_of: None
 		}));
 	});
 }
@@ -42,6 +43,32 @@ fn it_makes_existing_loc_void() {
 				assert_eq!(_replacer, None)
 			}
 		}
+	});
+}
+
+#[test]
+fn it_makes_existing_loc_void_and_replace_it() {
+	new_test_ext().execute_with(|| {
+		create_closed_loc();
+
+		const REPLACER_LOC_ID: u32 = OTHER_LOC_ID;
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+
+		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID, "reason".as_bytes().to_vec(), Some(REPLACER_LOC_ID)));
+
+		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
+		assert!(void_info.is_some());
+		match void_info.unwrap() {
+			LocVoidInfo::V1 { reason: _reason, replacer: _replacer } => {
+				assert_eq!(_reason, "reason".as_bytes().to_vec());
+				assert!(_replacer.is_some());
+				assert_eq!(_replacer.unwrap(), REPLACER_LOC_ID)
+			}
+		}
+
+		let replacer_loc = LogionLoc::loc(REPLACER_LOC_ID).unwrap();
+		assert!(replacer_loc.replacer_of.is_some());
+		assert_eq!(replacer_loc.replacer_of.unwrap(), LOC_ID)
 	});
 }
 

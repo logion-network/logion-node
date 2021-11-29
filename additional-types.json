@@ -33,7 +33,8 @@
     "closed": "bool",
     "loc_type": "LocType",
     "links": "Vec<LocLink<LocId>>",
-    "void_info": "Option<LocVoidInfo<LocId>>"
+    "void_info": "Option<LocVoidInfo<LocId>>",
+    "replacer_of": "Option<LocId>"
   },
   "MetadataItem": {
     "name": "Vec<u8>",
