@@ -156,10 +156,16 @@ pub mod pallet {
 		V2MakeLocVoid,
 	}
 
-	// /// Storage version
-	// #[pallet::storage]
-	// #[pallet::getter(fn pallet_storage_version)]
-	// pub type PalletStorageVersion = StorageVersion::V1;
+	impl Default for StorageVersion {
+		fn default() -> StorageVersion {
+			return StorageVersion::V1;
+		}
+	}
+
+	/// Storage version
+	#[pallet::storage]
+	#[pallet::getter(fn pallet_storage_version)]
+	pub type PalletStorageVersion<T> = StorageValue<_, StorageVersion, ValueQuery>;
 
 	#[pallet::call]
 	impl<T:Config> Pallet<T> {
@@ -427,26 +433,33 @@ pub mod pallet {
 			use crate::migration::v1::LegalOfficerCaseOfV1;
 			debug::RuntimeLogger::init();
 			debug::info!("Starting migration...");
-			<LocMap<T>>::translate::<LegalOfficerCaseOfV1<T>, _>(
-				|_loc_id: T::LocId, loc: LegalOfficerCaseOfV1<T>|{
-					debug::info!("Migrating LOC");
-					let new_loc = LegalOfficerCaseOf::<T> {
-						owner: loc.owner.clone(),
-						requester: loc.requester.clone(),
-						metadata: loc.metadata.clone(),
-						files: loc.files.clone(),
-						closed: loc.closed.clone(),
-						loc_type: loc.loc_type.clone(),
-						links: loc.links.clone(),
-						void_info: None,
-						replacer_of: None
-					};
-					Some(new_loc)
-				}
-			);
-			debug::info!("Migration ended.");
-			let count = <LocMap<T>>::iter().count();
-			T::DbWeight::get().reads_writes(count as Weight + 1, count as Weight + 1)
+			if <PalletStorageVersion<T>>::get() == StorageVersion::V1 {
+				<LocMap<T>>::translate::<LegalOfficerCaseOfV1<T>, _>(
+					|_loc_id: T::LocId, loc: LegalOfficerCaseOfV1<T>| {
+						debug::info!("Migrating LOC");
+						let new_loc = LegalOfficerCaseOf::<T> {
+							owner: loc.owner.clone(),
+							requester: loc.requester.clone(),
+							metadata: loc.metadata.clone(),
+							files: loc.files.clone(),
+							closed: loc.closed.clone(),
+							loc_type: loc.loc_type.clone(),
+							links: loc.links.clone(),
+							void_info: None,
+							replacer_of: None
+						};
+						Some(new_loc)
+					}
+				);
+				debug::info!("Migration ended.");
+				<PalletStorageVersion<T>>::put(StorageVersion::V2MakeLocVoid);
+				let count = <LocMap<T>>::iter().count();
+				T::DbWeight::get().reads_writes(count as Weight + 1, count as Weight + 1)
+			}
+			else {
+				debug::info!("No Migrating needed.");
+				0
+			}
 		}
 	}
 }

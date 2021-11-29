@@ -61,5 +61,11 @@
         "replacer": "Option<LocId>"
       }
     }
+  },
+  "StorageVersion": {
+    "_enum": [
+      "V1",
+      "V2MakeLocVoid"
+    ]
   }
 }
