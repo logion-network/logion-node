@@ -501,13 +501,13 @@ pub type Executive = frame_executive::Executive<
 mod migration {
 	use super::*;
 	use frame_support::traits::OnRuntimeUpgrade;
-	use pallet_logion_loc::migration as pallet_logion_loc_migration;
+	use pallet_logion_loc;
 
 	pub struct Upgrade;
 
 	impl OnRuntimeUpgrade for Upgrade {
 		fn on_runtime_upgrade() -> Weight {
-			pallet_logion_loc_migration::migrate_to_v2::<Runtime>()
+			pallet_logion_loc::migrate::<Runtime>()
 		}
 	}
 }

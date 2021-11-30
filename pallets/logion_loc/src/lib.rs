@@ -2,6 +2,9 @@
 
 pub use pallet::*;
 
+#[macro_use]
+mod migration;
+
 #[cfg(test)]
 mod mock;
 
@@ -149,7 +152,7 @@ pub mod pallet {
 	#[pallet::hooks]
 	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
 
-	#[derive(Encode, Decode, Eq, PartialEq)]
+	#[derive(Encode, Decode, Eq, PartialEq, Debug)]
 	pub enum StorageVersion {
 		V1,
 		V2MakeLocVoid,
@@ -421,61 +424,7 @@ pub mod pallet {
 		}
 	}
 
-	pub mod migration {
-		use super::*;
-
-		pub mod v1 {
-			use frame_support::codec::{Decode, Encode};
-			use frame_support::traits::Vec;
-
-			use crate::{File, LocLink, LocType, MetadataItem, pallet};
-
-			#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
-			pub struct LegalOfficerCaseV1<AccountId, Hash, LocId> {
-				pub owner: AccountId,
-				pub requester: AccountId,
-				pub metadata: Vec<MetadataItem>,
-				pub files: Vec<File<Hash>>,
-				pub closed: bool,
-				pub loc_type: LocType,
-				pub links: Vec<LocLink<LocId>>
-			}
-
-			pub type LegalOfficerCaseOfV1<T> = LegalOfficerCaseV1<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
-
-		}
-
-		pub fn migrate_to_v2<T: Config>() -> frame_support::weights::Weight {
-			use crate::migration::v1::LegalOfficerCaseOfV1;
-			debug::RuntimeLogger::init();
-			debug::info!("Starting migration...");
-			if <PalletStorageVersion<T>>::get() == StorageVersion::V1 {
-				<LocMap<T>>::translate::<LegalOfficerCaseOfV1<T>, _>(
-					|_loc_id: T::LocId, loc: LegalOfficerCaseOfV1<T>| {
-						debug::info!("Migrating LOC");
-						let new_loc = LegalOfficerCaseOf::<T> {
-							owner: loc.owner.clone(),
-							requester: loc.requester.clone(),
-							metadata: loc.metadata.clone(),
-							files: loc.files.clone(),
-							closed: loc.closed.clone(),
-							loc_type: loc.loc_type.clone(),
-							links: loc.links.clone(),
-							void_info: None,
-							replacer_of: None
-						};
-						Some(new_loc)
-					}
-				);
-				debug::info!("Migration ended.");
-				<PalletStorageVersion<T>>::put(StorageVersion::V2MakeLocVoid);
-				let count = <LocMap<T>>::iter().count();
-				T::DbWeight::get().reads_writes(count as Weight + 1, count as Weight + 1)
-			}
-			else {
-				debug::info!("No Migrating needed.");
-				0
-			}
-		}
+	pub fn migrate<T: Config>() -> Weight {
+		migration::migrate::<T>()
 	}
 }
