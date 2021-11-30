@@ -45,11 +45,8 @@ pub struct File<Hash> {
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
-pub enum LocVoidInfo<LocId> {
-	V1 {
-		reason: Vec<u8>,
-		replacer: Option<LocId>,
-	}
+pub struct LocVoidInfo<LocId> {
+	replacer: Option<LocId>,
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
@@ -145,6 +142,8 @@ pub mod pallet {
 		AlreadyVoid,
 		/// Occurs when trying to void a LOC by replacing it with an already void LOC
 		ReplacerLocAlreadyVoid,
+		/// Occurs when trying to void a LOC by replacing it with a LOC already replacing another LOC
+		ReplacerLocAlreadyReplacing,
 	}
 
 	#[pallet::hooks]
@@ -327,7 +326,35 @@ pub mod pallet {
 		pub fn make_void(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			reason: Vec<u8>,
+		) -> DispatchResultWithPostInfo {
+			Self::do_make_void(origin, loc_id, None)
+		}
+
+		/// Make a LOC void and provide a replacer.
+		#[pallet::weight(T::WeightInfo::make_void_and_replace())]
+		pub fn make_void_and_replace(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			#[pallet::compact] replacer_loc_id: T::LocId,
+		) -> DispatchResultWithPostInfo {
+			Self::do_make_void(origin, loc_id, Some(replacer_loc_id))
+		}
+	}
+
+	impl<T: Config> LocQuery<<T as frame_system::Config>::AccountId> for Pallet<T> {
+		fn has_closed_identity_locs(
+			account: &<T as frame_system::Config>::AccountId,
+			legal_officers: &Vec<<T as frame_system::Config>::AccountId>
+		) -> bool {
+			Self::has_closed_identity_loc(account, &legal_officers[0]) && Self::has_closed_identity_loc(account, &legal_officers[1])
+		}
+	}
+
+	impl<T: Config> Pallet<T> {
+
+		fn do_make_void(
+			origin: OriginFor<T>,
+			loc_id: T::LocId,
 			replacer_loc_id: Option<T::LocId>
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
@@ -340,6 +367,9 @@ pub mod pallet {
 					let replacer_loc = <LocMap<T>>::get(&replacer).unwrap();
 					if replacer_loc.void_info.is_some() {
 						Err(Error::<T>::ReplacerLocAlreadyVoid)?
+					}
+					if replacer_loc.replacer_of.is_some() {
+						Err(Error::<T>::ReplacerLocAlreadyReplacing)?
 					}
 				}
 			}
@@ -356,8 +386,7 @@ pub mod pallet {
 				}
 			}
 
-			let loc_void_info = LocVoidInfo::V1 {
-				reason,
+			let loc_void_info = LocVoidInfo {
 				replacer:replacer_loc_id
 			};
 			<LocMap<T>>::mutate(loc_id, |loc| {
@@ -373,19 +402,6 @@ pub mod pallet {
 			Self::deposit_event(Event::LocVoid(loc_id));
 			Ok(().into())
 		}
-
-	}
-
-	impl<T: Config> LocQuery<<T as frame_system::Config>::AccountId> for Pallet<T> {
-		fn has_closed_identity_locs(
-			account: &<T as frame_system::Config>::AccountId,
-			legal_officers: &Vec<<T as frame_system::Config>::AccountId>
-		) -> bool {
-			Self::has_closed_identity_loc(account, &legal_officers[0]) && Self::has_closed_identity_loc(account, &legal_officers[1])
-		}
-	}
-
-	impl<T: Config> Pallet<T> {
 
 		fn has_closed_identity_loc(
 			account: &<T as frame_system::Config>::AccountId,

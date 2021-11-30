@@ -55,12 +55,7 @@
     "nature": "Vec<u8>"
   },
   "LocVoidInfo": {
-    "_enum": {
-      "V1": {
-        "reason": "Vec<u8>",
-        "replacer": "Option<LocId>"
-      }
-    }
+    "replacer": "Option<LocId>"
   },
   "StorageVersion": {
     "_enum": [

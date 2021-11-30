@@ -5,7 +5,7 @@ use sp_runtime::traits::Hash;
 
 use logion_shared::LocQuery;
 
-use crate::{File, LegalOfficerCase, LocLink, LocType, LocVoidInfo, MetadataItem, mock::*};
+use crate::{File, LegalOfficerCase, LocLink, LocType, MetadataItem, mock::*};
 use crate::Error;
 
 const LOC_ID: u32 = 0;
@@ -33,16 +33,11 @@ fn it_creates_loc() {
 fn it_makes_existing_loc_void() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID, "reason".as_bytes().to_vec(), None));
+		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID));
 
 		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
 		assert!(void_info.is_some());
-		match void_info.unwrap() {
-			LocVoidInfo::V1 { reason: _reason, replacer: _replacer } => {
-				assert_eq!(_reason, "reason".as_bytes().to_vec());
-				assert_eq!(_replacer, None)
-			}
-		}
+		assert!(!void_info.unwrap().replacer.is_some());
 	});
 }
 
@@ -54,17 +49,13 @@ fn it_makes_existing_loc_void_and_replace_it() {
 		const REPLACER_LOC_ID: u32 = OTHER_LOC_ID;
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
 
-		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID, "reason".as_bytes().to_vec(), Some(REPLACER_LOC_ID)));
+		assert_ok!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, REPLACER_LOC_ID));
 
 		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
 		assert!(void_info.is_some());
-		match void_info.unwrap() {
-			LocVoidInfo::V1 { reason: _reason, replacer: _replacer } => {
-				assert_eq!(_reason, "reason".as_bytes().to_vec());
-				assert!(_replacer.is_some());
-				assert_eq!(_replacer.unwrap(), REPLACER_LOC_ID)
-			}
-		}
+		let replacer: Option<u32> = void_info.unwrap().replacer;
+		assert!(replacer.is_some());
+		assert_eq!(replacer.unwrap(), REPLACER_LOC_ID);
 
 		let replacer_loc = LogionLoc::loc(REPLACER_LOC_ID).unwrap();
 		assert!(replacer_loc.replacer_of.is_some());
