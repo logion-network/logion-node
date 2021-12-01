@@ -2,7 +2,6 @@
 
 pub use pallet::*;
 
-#[macro_use]
 mod migration;
 
 #[cfg(test)]
