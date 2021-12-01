@@ -107,10 +107,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 100,
-	impl_version: 1,
+	spec_version: 101,
+	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
-	transaction_version: 1,
+	transaction_version: 2,
 };
 
 /// This determines the average expected block time that we are targeting.
@@ -495,7 +495,22 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllModules,
+	migration::Upgrade
 >;
+
+mod migration {
+	use super::*;
+	use frame_support::traits::OnRuntimeUpgrade;
+	use pallet_logion_loc::migration as pallet_logion_loc_migration;
+
+	pub struct Upgrade;
+
+	impl OnRuntimeUpgrade for Upgrade {
+		fn on_runtime_upgrade() -> Weight {
+			pallet_logion_loc_migration::migrate_to_v2::<Runtime>()
+		}
+	}
+}
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {

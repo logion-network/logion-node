@@ -44,6 +44,11 @@ pub struct File<Hash> {
 	nature: Vec<u8>,
 }
 
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
+pub struct LocVoidInfo<LocId> {
+	replacer: Option<LocId>,
+}
+
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
 pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	owner: AccountId,
@@ -53,6 +58,8 @@ pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	closed: bool,
 	loc_type: LocType,
 	links: Vec<LocLink<LocId>>,
+	void_info: Option<LocVoidInfo<LocId>>,
+	replacer_of: Option<LocId>
 }
 
 pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
@@ -111,6 +118,8 @@ pub mod pallet {
 		LocCreated(T::LocId),
 		/// Issued when LOC is closed. [locId]
 		LocClosed(T::LocId),
+		/// Issued when LOC is made void. [locId]
+		LocVoid(T::LocId),
 	}
 
 	#[pallet::error]
@@ -126,11 +135,36 @@ pub mod pallet {
 		/// Occurs when trying to close an already closed LOC
 		AlreadyClosed,
 		/// Occurs when trying to link to a non-existent LOC
-		LinkedLocNotFound
+		LinkedLocNotFound,
+		/// Occurs when trying to replace void LOC with a non-existent LOC
+		ReplacerLocNotFound,
+		/// Occurs when trying to void a LOC already void
+		AlreadyVoid,
+		/// Occurs when trying to void a LOC by replacing it with an already void LOC
+		ReplacerLocAlreadyVoid,
+		/// Occurs when trying to void a LOC by replacing it with a LOC already replacing another LOC
+		ReplacerLocAlreadyReplacing,
 	}
 
 	#[pallet::hooks]
 	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
+
+	#[derive(Encode, Decode, Eq, PartialEq)]
+	pub enum StorageVersion {
+		V1,
+		V2MakeLocVoid,
+	}
+
+	impl Default for StorageVersion {
+		fn default() -> StorageVersion {
+			return StorageVersion::V1;
+		}
+	}
+
+	/// Storage version
+	#[pallet::storage]
+	#[pallet::getter(fn pallet_storage_version)]
+	pub type PalletStorageVersion<T> = StorageValue<_, StorageVersion, ValueQuery>;
 
 	#[pallet::call]
 	impl<T:Config> Pallet<T> {
@@ -157,6 +191,8 @@ pub mod pallet {
 					closed: false,
 					loc_type: loc_type.clone(),
 					links: Vec::new(),
+					void_info: None,
+					replacer_of: None
 				};
 				<LocMap<T>>::insert(loc_id, loc);
 
@@ -284,6 +320,25 @@ pub mod pallet {
 				}
 			}
 		}
+
+		/// Make a LOC void.
+		#[pallet::weight(T::WeightInfo::make_void())]
+		pub fn make_void(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+		) -> DispatchResultWithPostInfo {
+			Self::do_make_void(origin, loc_id, None)
+		}
+
+		/// Make a LOC void and provide a replacer.
+		#[pallet::weight(T::WeightInfo::make_void_and_replace())]
+		pub fn make_void_and_replace(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			#[pallet::compact] replacer_loc_id: T::LocId,
+		) -> DispatchResultWithPostInfo {
+			Self::do_make_void(origin, loc_id, Some(replacer_loc_id))
+		}
 	}
 
 	impl<T: Config> LocQuery<<T as frame_system::Config>::AccountId> for Pallet<T> {
@@ -296,6 +351,57 @@ pub mod pallet {
 	}
 
 	impl<T: Config> Pallet<T> {
+
+		fn do_make_void(
+			origin: OriginFor<T>,
+			loc_id: T::LocId,
+			replacer_loc_id: Option<T::LocId>
+		) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin)?;
+
+			if replacer_loc_id.is_some() {
+				let replacer = replacer_loc_id.unwrap();
+				if !<LocMap<T>>::contains_key(&replacer) {
+					Err(Error::<T>::ReplacerLocNotFound)?
+				} else {
+					let replacer_loc = <LocMap<T>>::get(&replacer).unwrap();
+					if replacer_loc.void_info.is_some() {
+						Err(Error::<T>::ReplacerLocAlreadyVoid)?
+					}
+					if replacer_loc.replacer_of.is_some() {
+						Err(Error::<T>::ReplacerLocAlreadyReplacing)?
+					}
+				}
+			}
+
+			if !<LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::NotFound)?
+			} else {
+				let loc = <LocMap<T>>::get(&loc_id).unwrap();
+				if loc.owner != who {
+					Err(Error::<T>::Unauthorized)?
+				}
+				if loc.void_info.is_some() {
+					Err(Error::<T>::AlreadyVoid)?
+				}
+			}
+
+			let loc_void_info = LocVoidInfo {
+				replacer:replacer_loc_id
+			};
+			<LocMap<T>>::mutate(loc_id, |loc| {
+				let mutable_loc = loc.as_mut().unwrap();
+				mutable_loc.void_info = Some(loc_void_info);
+			});
+			if replacer_loc_id.is_some() {
+				<LocMap<T>>::mutate(replacer_loc_id.unwrap(), |replacer_loc| {
+					let mutable_replacer_loc = replacer_loc.as_mut().unwrap();
+					mutable_replacer_loc.replacer_of = Some(loc_id);
+				});
+			}
+			Self::deposit_event(Event::LocVoid(loc_id));
+			Ok(().into())
+		}
 
 		fn has_closed_identity_loc(
 			account: &<T as frame_system::Config>::AccountId,
@@ -311,6 +417,64 @@ pub mod pallet {
 						.is_some();
 				}
 				None => false
+			}
+		}
+	}
+
+	pub mod migration {
+		use super::*;
+
+		pub mod v1 {
+			use frame_support::codec::{Decode, Encode};
+			use frame_support::traits::Vec;
+
+			use crate::{File, LocLink, LocType, MetadataItem, pallet};
+
+			#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
+			pub struct LegalOfficerCaseV1<AccountId, Hash, LocId> {
+				pub owner: AccountId,
+				pub requester: AccountId,
+				pub metadata: Vec<MetadataItem>,
+				pub files: Vec<File<Hash>>,
+				pub closed: bool,
+				pub loc_type: LocType,
+				pub links: Vec<LocLink<LocId>>
+			}
+
+			pub type LegalOfficerCaseOfV1<T> = LegalOfficerCaseV1<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
+
+		}
+
+		pub fn migrate_to_v2<T: Config>() -> frame_support::weights::Weight {
+			use crate::migration::v1::LegalOfficerCaseOfV1;
+			debug::RuntimeLogger::init();
+			debug::info!("Starting migration...");
+			if <PalletStorageVersion<T>>::get() == StorageVersion::V1 {
+				<LocMap<T>>::translate::<LegalOfficerCaseOfV1<T>, _>(
+					|_loc_id: T::LocId, loc: LegalOfficerCaseOfV1<T>| {
+						debug::info!("Migrating LOC");
+						let new_loc = LegalOfficerCaseOf::<T> {
+							owner: loc.owner.clone(),
+							requester: loc.requester.clone(),
+							metadata: loc.metadata.clone(),
+							files: loc.files.clone(),
+							closed: loc.closed.clone(),
+							loc_type: loc.loc_type.clone(),
+							links: loc.links.clone(),
+							void_info: None,
+							replacer_of: None
+						};
+						Some(new_loc)
+					}
+				);
+				debug::info!("Migration ended.");
+				<PalletStorageVersion<T>>::put(StorageVersion::V2MakeLocVoid);
+				let count = <LocMap<T>>::iter().count();
+				T::DbWeight::get().reads_writes(count as Weight + 1, count as Weight + 1)
+			}
+			else {
+				debug::info!("No Migrating needed.");
+				0
 			}
 		}
 	}
