@@ -147,6 +147,8 @@ pub mod pallet {
 		ReplacerLocAlreadyVoid,
 		/// Occurs when trying to void a LOC by replacing it with a LOC already replacing another LOC
 		ReplacerLocAlreadyReplacing,
+		/// Occurs when trying to mutate a void LOC
+		CannotMutateVoid,
 	}
 
 	#[pallet::hooks]
@@ -230,6 +232,8 @@ pub mod pallet {
 					Err(Error::<T>::Unauthorized)?
 				} else if loc.closed {
 					Err(Error::<T>::CannotMutate)?
+				} else if loc.void_info.is_some() {
+					Err(Error::<T>::CannotMutateVoid)?
 				} else {
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
@@ -257,6 +261,8 @@ pub mod pallet {
 					Err(Error::<T>::Unauthorized)?
 				} else if loc.closed {
 					Err(Error::<T>::CannotMutate)?
+				} else if loc.void_info.is_some() {
+					Err(Error::<T>::CannotMutateVoid)?
 				} else {
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
@@ -284,6 +290,8 @@ pub mod pallet {
 					Err(Error::<T>::Unauthorized)?
 				} else if loc.closed {
 					Err(Error::<T>::CannotMutate)?
+				} else if loc.void_info.is_some() {
+					Err(Error::<T>::CannotMutateVoid)?
 				} else if ! <LocMap<T>>::contains_key(&link.id) {
 					Err(Error::<T>::LinkedLocNotFound)?
 				} else {
@@ -310,6 +318,8 @@ pub mod pallet {
 				let loc = <LocMap<T>>::get(&loc_id).unwrap();
 				if loc.owner != who {
 					Err(Error::<T>::Unauthorized)?
+				} else if loc.void_info.is_some() {
+					Err(Error::<T>::CannotMutateVoid)?
 				} else if loc.closed {
 					Err(Error::<T>::AlreadyClosed)?
 				} else {
