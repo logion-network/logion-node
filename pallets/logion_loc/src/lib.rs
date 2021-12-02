@@ -161,7 +161,7 @@ pub mod pallet {
 
 	impl Default for StorageVersion {
 		fn default() -> StorageVersion {
-			return StorageVersion::V1;
+			return StorageVersion::V2MakeLocVoid;
 		}
 	}
 
