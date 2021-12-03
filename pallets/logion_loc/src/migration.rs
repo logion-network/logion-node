@@ -13,14 +13,15 @@ pub fn migrate<T: Config>() -> Weight {
 fn do_migrate<T: Config, F>(from: StorageVersion, to:StorageVersion, migration_fn: F) -> Weight
 	where F: FnOnce() -> Weight {
 	debug::RuntimeLogger::init();
-	if <PalletStorageVersion<T>>::get() == from {
+	let stored_version = <PalletStorageVersion<T>>::try_get();
+	if stored_version.is_err() || stored_version.unwrap() == from {
 		debug::info!("Starting to migrate from {:?} to {:?}", from, to);
 		let weight = migration_fn();
 		<PalletStorageVersion<T>>::put(to);
 		debug::info!("Migration ended.");
 		weight
 	} else {
-		debug::info!("No Migrating needed.");
+		debug::info!("The migration {:?} to {:?} was already applied.", from, to);
 		0
 	}
 }
