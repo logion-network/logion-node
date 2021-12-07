@@ -376,13 +376,6 @@ impl pallet_assets::Config for Runtime {
 	type WeightInfo = ();
 }
 
-impl pallet_logion_loc::Config for Runtime {
-	type LocId = u128;
-	type Event = Event;
-	type Hash = Hash;
-	type WeightInfo = ();
-}
-
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -403,7 +396,6 @@ construct_runtime!(
 		Proxy:  pallet_proxy::{Module, Call, Storage, Event<T>},
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
-		LogionLoc: pallet_logion_loc::{Module, Call, Storage, Event<T>},
 	}
 );
 

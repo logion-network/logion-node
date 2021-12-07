@@ -49,9 +49,6 @@ sp-std = { default-features = false, version = '3.0.0' }
 sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
-# local dependencies
-pallet-logion-loc = { default-features = false, path = '../pallets/logion_loc', version = '0.1.0' }
-
 [features]
 default = ['std']
 runtime-benchmarks = [
@@ -61,7 +58,6 @@ runtime-benchmarks = [
     'frame-system/runtime-benchmarks',
     'hex-literal',
     'pallet-balances/runtime-benchmarks',
-    'pallet-logion-loc/runtime-benchmarks',
     'pallet-timestamp/runtime-benchmarks',
     'sp-runtime/runtime-benchmarks',
 ]
@@ -73,7 +69,6 @@ std = [
     'frame-system/std',
     'pallet-aura/std',
     'pallet-balances/std',
-    'pallet-logion-loc/std',
     'pallet-node-authorization/std',
     'pallet-grandpa/std',
     'pallet-multisig/std',

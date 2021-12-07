@@ -166,7 +166,7 @@ fn testnet_genesis(
 
 fn default_properties() -> sc_service::Properties {
 	let mut props : sc_service::Properties = sc_service::Properties::new();
-	props.insert("tokenSymbol".to_string(), json!("LOG"));
+	props.insert("tokenSymbol".to_string(), json!("LGNT"));
 	props.insert("tokenDecimals".to_string(), json!(18));
 	return props;
 }
