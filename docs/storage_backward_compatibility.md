@@ -72,7 +72,7 @@ If the pallet has already been migrated at least once, this section can be skipp
 * Create a [migration source file](../pallets/logion_loc/src/migration.rs). It must expose a public `migrate()` function.
 * In the [pallet source file](../pallets/logion_loc/src/lib.rs), create the following items:
   * a public `migrate()` function that delegates to the one created at the previous step.
-  * a storage to hold the version of the storage:
+  * a storage item to hold the version of the storage:
   ```rust
     #[derive(Encode, Decode, Eq, PartialEq, Debug)]
     pub enum StorageVersion {
@@ -111,7 +111,7 @@ If the pallet has already been migrated at least once, this section can be skipp
 
 ## All migrations of a pallet.
 * In the [runtime](../runtime/src/lib.rs):
-  * Increment he value of `spec_version`.
+  * Increment the value of `spec_version`.
   * If the extrinsics interface is changed, increment also the value of `transaction_version`.
 
   More info about [runtime versioning](https://docs.substrate.io/v3/runtime/upgrades/#runtime-versioning).
