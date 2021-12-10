@@ -64,6 +64,56 @@ fn it_makes_existing_loc_void_and_replace_it() {
 }
 
 #[test]
+fn it_fails_making_existing_loc_void_for_unauthorized_caller() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_err!(LogionLoc::make_void(Origin::signed(LOC_REQUESTER), LOC_ID), Error::<Test>::Unauthorized);
+		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
+		assert!(!void_info.is_some());
+	});
+}
+
+#[test]
+fn it_fails_making_existing_loc_void_for_already_void_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID));
+		assert_err!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID), Error::<Test>::AlreadyVoid);
+	});
+}
+
+#[test]
+fn it_fails_replacing_with_non_existent_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_err!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::ReplacerLocNotFound);
+	});
+}
+
+#[test]
+fn it_fails_replacing_with_void_loc() {
+	new_test_ext().execute_with(|| {
+		const REPLACER_LOC_ID: u32 = OTHER_LOC_ID;
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), OTHER_LOC_ID));
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_err!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, REPLACER_LOC_ID), Error::<Test>::ReplacerLocAlreadyVoid);
+	});
+}
+
+#[test]
+fn it_fails_replacing_with_loc_already_replacing_another_loc() {
+	new_test_ext().execute_with(|| {
+		const REPLACER_LOC_ID: u32 = 2;
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, REPLACER_LOC_ID));
+		assert_err!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, REPLACER_LOC_ID), Error::<Test>::ReplacerLocAlreadyReplacing);
+	});
+}
+
+#[test]
 fn it_adds_metadata() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
