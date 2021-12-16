@@ -10,6 +10,9 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
+#[cfg(feature = "runtime-benchmarks")]
+use frame_system::RawOrigin;
+
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_system::pallet_prelude::*;
@@ -119,10 +122,12 @@ pub mod pallet {
 	}
 }
 
-impl<T: Config> EnsureOrigin<<T as frame_system::Config>::Origin> for Pallet<T> {
+pub type OuterOrigin<T> = <T as frame_system::Config>::Origin;
+
+impl<T: Config> EnsureOrigin<OuterOrigin<T>> for Pallet<T> {
 	type Success = T::AccountId;
 
-	fn try_origin(o: <T as frame_system::Config>::Origin) -> Result<Self::Success, <T as frame_system::Config>::Origin> {
+	fn try_origin(o: OuterOrigin<T>) -> Result<Self::Success, OuterOrigin<T>> {
 		let result = ensure_signed(o.clone());
 		match result {
 			Ok(who) =>
@@ -136,12 +141,12 @@ impl<T: Config> EnsureOrigin<<T as frame_system::Config>::Origin> for Pallet<T> 
 	}
 
 	#[cfg(feature = "runtime-benchmarks")]
-	fn successful_origin() -> <T as frame_system::Config>::Origin {
+	fn successful_origin() -> OuterOrigin<T> {
 		let first_member = match <LegalOfficerSet<T>>::iter().next() {
 			Some(pair) => pair.0.clone(),
 			None => Default::default(),
 		};
-		O::from(RawOrigin::Signed(first_member.clone()))
+		OuterOrigin::<T>::from(RawOrigin::Signed(first_member.clone()))
 	}
 }
 
