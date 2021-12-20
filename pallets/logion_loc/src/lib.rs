@@ -51,10 +51,26 @@ pub struct LocVoidInfo<LocId> {
 	replacer: Option<LocId>,
 }
 
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
+pub enum Requester<AccountId, LocId> {
+	None,
+	Account(AccountId),
+	Loc(LocId)
+}
+
+pub type RequesterOf<T> = Requester<<T as frame_system::Config>::AccountId, <T as Config>::LocId>;
+
+impl<AccountId, LocId> Default for Requester<AccountId, LocId> {
+
+	fn default() -> Requester<AccountId, LocId> {
+		Requester::None
+	}
+}
+
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
 pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	owner: AccountId,
-	requester: AccountId,
+	requester: Requester<AccountId, LocId>,
 	metadata: Vec<MetadataItem>,
 	files: Vec<File<Hash>>,
 	closed: bool,
@@ -112,6 +128,11 @@ pub mod pallet {
 	#[pallet::getter(fn account_locs)]
 	pub type AccountLocsMap<T> = StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::AccountId, Vec<<T as Config>::LocId>>;
 
+	/// Requested LOCs by logion Identity LOC.
+	#[pallet::storage]
+	#[pallet::getter(fn identity_loc_locs)]
+	pub type IdentityLocLocsMap<T> = StorageMap<_, Blake2_128Concat, <T as Config>::LocId, Vec<<T as Config>::LocId>>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	#[pallet::metadata(T::LocId = "LocId")]
@@ -148,6 +169,8 @@ pub mod pallet {
 		ReplacerLocAlreadyReplacing,
 		/// Occurs when trying to mutate a void LOC
 		CannotMutateVoid,
+		/// Unexpected requester given LOC type
+		UnexpectedRequester,
 	}
 
 	#[pallet::hooks]
@@ -157,11 +180,12 @@ pub mod pallet {
 	pub enum StorageVersion {
 		V1,
 		V2MakeLocVoid,
+		V3RequesterEnum,
 	}
 
 	impl Default for StorageVersion {
 		fn default() -> StorageVersion {
-			return StorageVersion::V2MakeLocVoid;
+			return StorageVersion::V3RequesterEnum;
 		}
 	}
 
@@ -178,7 +202,7 @@ pub mod pallet {
 		pub fn create_loc(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			requester: T::AccountId,
+			requester: Requester<T::AccountId, T::LocId>,
 			loc_type: LocType,
 		) -> DispatchResultWithPostInfo {
 			T::CreateOrigin::ensure_origin(origin.clone())?;
@@ -200,13 +224,38 @@ pub mod pallet {
 				};
 				<LocMap<T>>::insert(loc_id, loc);
 
-				if <AccountLocsMap<T>>::contains_key(requester.clone()) {
-					<AccountLocsMap<T>>::mutate(requester.clone(), |accounts| {
-						let list = accounts.as_mut().unwrap();
-						list.push(loc_id.clone());
-					});
-				} else {
-					<AccountLocsMap<T>>::insert(requester.clone(), Vec::from([loc_id.clone()]));
+				match requester {
+					RequesterOf::<T>::None => if loc_type != LocType::Identity {
+						Err(Error::<T>::UnexpectedRequester)?
+					},
+					RequesterOf::<T>::Loc(requester_loc_id) => if loc_type != LocType::Transaction {
+						Err(Error::<T>::UnexpectedRequester)?
+					} else {
+						let requester_loc = <LocMap<T>>::get(&requester_loc_id);
+						match requester_loc {
+							None => Err(Error::<T>::UnexpectedRequester)?,
+							Some(loc) => if loc.loc_type != LocType::Identity {
+								Err(Error::<T>::UnexpectedRequester)?
+							} else {
+								if <IdentityLocLocsMap<T>>::contains_key(&requester_loc_id) {
+									<IdentityLocLocsMap<T>>::mutate(&requester_loc_id, |accounts| {
+										let list = accounts.as_mut().unwrap();
+										list.push(loc_id.clone());
+									});
+								} else {
+									<IdentityLocLocsMap<T>>::insert(requester_loc_id.clone(), Vec::from([loc_id.clone()]));
+								}
+							},
+						}
+					},
+					RequesterOf::<T>::Account(account_id) => if <AccountLocsMap<T>>::contains_key(account_id.clone()) {
+						<AccountLocsMap<T>>::mutate(&account_id, |accounts| {
+							let list = accounts.as_mut().unwrap();
+							list.push(loc_id.clone());
+						});
+					} else {
+						<AccountLocsMap<T>>::insert(&account_id, Vec::from([loc_id.clone()]));
+					},
 				}
 
 				Self::deposit_event(Event::LocCreated(loc_id));

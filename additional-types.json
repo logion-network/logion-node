@@ -27,7 +27,7 @@
   "LocId": "u128",
   "LegalOfficerCaseOf": {
     "owner": "AccountId",
-    "requester": "AccountId",
+    "requester": "Requester",
     "metadata": "Vec<MetadataItem>",
     "files": "Vec<File<Hash>>",
     "closed": "bool",
@@ -60,7 +60,15 @@
   "StorageVersion": {
     "_enum": [
       "V1",
-      "V2MakeLocVoid"
+      "V2MakeLocVoid",
+      "V3RequesterEnum"
     ]
+  },
+  "Requester": {
+    "_enum": {
+      "None": null,
+      "Account": "AccountId",
+      "Loc": "LocId"
+    }
   }
 }

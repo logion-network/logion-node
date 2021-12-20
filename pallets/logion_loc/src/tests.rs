@@ -67,7 +67,7 @@ fn it_makes_existing_loc_void_and_replace_it() {
 fn it_fails_making_existing_loc_void_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_err!(LogionLoc::make_void(Origin::signed(LOC_REQUESTER), LOC_ID), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::make_void(Origin::signed(LOC_REQUESTER_ID), LOC_ID), Error::<Test>::Unauthorized);
 		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
 		assert!(!void_info.is_some());
 	});
@@ -135,7 +135,7 @@ fn it_fails_adding_metadata_for_unauthorized_caller() {
 			name: vec![1, 2, 3],
 			value: vec![4, 5, 6],
 		};
-		assert_err!(LogionLoc::add_metadata(Origin::signed(LOC_REQUESTER), LOC_ID, metadata.clone()), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::add_metadata(Origin::signed(LOC_REQUESTER_ID), LOC_ID, metadata.clone()), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -178,7 +178,7 @@ fn it_fails_adding_file_for_unauthorized_caller() {
 			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
 			nature: "test-file-nature".as_bytes().to_vec()
 		};
-		assert_err!(LogionLoc::add_file(Origin::signed(LOC_REQUESTER), LOC_ID, file.clone()), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::add_file(Origin::signed(LOC_REQUESTER_ID), LOC_ID, file.clone()), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -218,7 +218,7 @@ fn it_fails_adding_link_for_unauthorized_caller() {
 			id: OTHER_LOC_ID,
 			nature: "test-link-nature".as_bytes().to_vec()
 		};
-		assert_err!(LogionLoc::add_link(Origin::signed(LOC_REQUESTER), LOC_ID, link.clone()), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::add_link(Origin::signed(LOC_REQUESTER_ID), LOC_ID, link.clone()), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -261,7 +261,7 @@ fn it_closes_loc() {
 fn it_fails_closing_loc_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_err!(LogionLoc::close(Origin::signed(LOC_REQUESTER), LOC_ID), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::close(Origin::signed(LOC_REQUESTER_ID), LOC_ID), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -278,17 +278,17 @@ fn it_links_locs_to_account() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
 		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Identity));
-		assert!(LogionLoc::account_locs(LOC_REQUESTER).is_some());
-		assert!(LogionLoc::account_locs(LOC_REQUESTER).unwrap().len() == 2);
-		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER).unwrap()[0], LOC_ID);
-		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER).unwrap()[1], OTHER_LOC_ID);
+		assert!(LogionLoc::account_locs(LOC_REQUESTER_ID).is_some());
+		assert!(LogionLoc::account_locs(LOC_REQUESTER_ID).unwrap().len() == 2);
+		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER_ID).unwrap()[0], LOC_ID);
+		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER_ID).unwrap()[1], OTHER_LOC_ID);
 	});
 }
 
 #[test]
 fn it_fails_creating_loc_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
-		assert_err!(LogionLoc::create_loc(Origin::signed(LOC_REQUESTER), LOC_ID, LOC_REQUESTER, LocType::Transaction), BadOrigin);
+		assert_err!(LogionLoc::create_loc(Origin::signed(LOC_REQUESTER_ID), LOC_ID, LOC_REQUESTER, LocType::Transaction), BadOrigin);
 	});
 }
 
@@ -302,6 +302,6 @@ fn it_detects_existing_identity_loc() {
 		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER2), OTHER_LOC_ID));
 
 		let legal_officers = Vec::from([LOC_OWNER1, LOC_OWNER2]);
-		assert!(LogionLoc::has_closed_identity_locs(&LOC_REQUESTER, &legal_officers));
+		assert!(LogionLoc::has_closed_identity_locs(&LOC_REQUESTER_ID, &legal_officers));
 	});
 }
