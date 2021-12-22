@@ -305,3 +305,80 @@ fn it_detects_existing_identity_loc() {
 		assert!(LogionLoc::has_closed_identity_locs(&LOC_REQUESTER_ID, &legal_officers));
 	});
 }
+
+#[test]
+fn it_creates_logion_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		
+		assert!(LogionLoc::loc(LOGION_IDENTITY_LOC_ID).is_some());
+		assert!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).is_none());
+	});
+}
+
+#[test]
+fn it_creates_and_links_logion_locs_to_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+
+		assert_ok!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOGION_IDENTITY_LOC_ID));
+
+		assert!(LogionLoc::loc(LOC_ID).is_some());
+		assert!(LogionLoc::loc(OTHER_LOC_ID).is_some());
+		assert!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).is_some());
+		assert!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).unwrap().len() == 2);
+		assert_eq!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).unwrap()[0], LOC_ID);
+		assert_eq!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).unwrap()[1], OTHER_LOC_ID);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_polkadot_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_polkadot_identity_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_polkadot_transaction_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_logion_transaction_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOGION_IDENTITY_LOC_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_open_logion_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOGION_IDENTITY_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_closed_void_logion_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOGION_IDENTITY_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}

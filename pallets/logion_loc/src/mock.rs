@@ -55,6 +55,7 @@ pub const LOC_OWNER1: u64 = 1;
 pub const LOC_OWNER2: u64 = 2;
 pub const LOC_REQUESTER_ID: u64 = 3;
 pub const LOC_REQUESTER: RequesterOf<Test> = RequesterOf::<Test>::Account(LOC_REQUESTER_ID);
+pub const LOGION_IDENTITY_LOC_ID: u32 = 4;
 
 pub struct LoAuthorityListMock;
 impl EnsureOrigin<Origin> for LoAuthorityListMock {

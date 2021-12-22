@@ -198,11 +198,11 @@ pub mod pallet {
 	impl<T:Config> Pallet<T> {
 
 		/// Creates a new Polkadot Identity LOC i.e. a LOC linking a real identity to an AccountId.
-		#[pallet::weight(T::WeightInfo::create_loc())]
+		#[pallet::weight(T::WeightInfo::create_polkadot_identity_loc())]
 		pub fn create_polkadot_identity_loc(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			requester: T::AccountId,
+			requester_account_id: T::AccountId,
 		) -> DispatchResultWithPostInfo {
 			T::CreateOrigin::ensure_origin(origin.clone())?;
 			let who = ensure_signed(origin)?;
@@ -210,27 +210,11 @@ pub mod pallet {
 			if <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::AlreadyExists)?
 			} else {
-				let loc = LegalOfficerCaseOf::<T> {
-					owner: who.clone(),
-					requester: RequesterOf::<T>::Account(requester.clone()),
-					metadata: Vec::new(),
-					files: Vec::new(),
-					closed: false,
-					loc_type: LocType::Identity,
-					links: Vec::new(),
-					void_info: None,
-					replacer_of: None
-				};
+				let requester = RequesterOf::<T>::Account(requester_account_id.clone());
+				let loc = Self::build_open_loc(&who, &requester, LocType::Identity);
+	
 				<LocMap<T>>::insert(loc_id, loc);
-
-				if <AccountLocsMap<T>>::contains_key(&requester) {
-					<AccountLocsMap<T>>::mutate(&requester, |accounts| {
-						let list = accounts.as_mut().unwrap();
-						list.push(loc_id.clone());
-					});
-				} else {
-					<AccountLocsMap<T>>::insert(&requester, Vec::from([loc_id.clone()]));
-				}
+				Self::link_with_account(&requester_account_id, &loc_id);
 
 				Self::deposit_event(Event::LocCreated(loc_id));
 				Ok(().into())
@@ -238,7 +222,7 @@ pub mod pallet {
 		}
 
 		/// Creates a new logion Identity LOC i.e. a LOC describing a real identity not yet linked to an AccountId
-		#[pallet::weight(T::WeightInfo::create_loc())]
+		#[pallet::weight(T::WeightInfo::create_logion_identity_loc())]
 		pub fn create_logion_identity_loc(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
@@ -249,17 +233,8 @@ pub mod pallet {
 			if <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::AlreadyExists)?
 			} else {
-				let loc = LegalOfficerCaseOf::<T> {
-					owner: who.clone(),
-					requester: RequesterOf::<T>::None,
-					metadata: Vec::new(),
-					files: Vec::new(),
-					closed: false,
-					loc_type: LocType::Identity,
-					links: Vec::new(),
-					void_info: None,
-					replacer_of: None
-				};
+				let requester = RequesterOf::<T>::None;
+				let loc = Self::build_open_loc(&who, &requester, LocType::Identity);
 				<LocMap<T>>::insert(loc_id, loc);
 
 				Self::deposit_event(Event::LocCreated(loc_id));
@@ -268,11 +243,11 @@ pub mod pallet {
 		}
 
 		/// Creates a new Polkadot Transaction LOC i.e. a LOC requested with an AccountId
-		#[pallet::weight(T::WeightInfo::create_loc())]
+		#[pallet::weight(T::WeightInfo::create_polkadot_transaction_loc())]
 		pub fn create_polkadot_transaction_loc(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			requester: T::AccountId,
+			requester_account_id: T::AccountId,
 		) -> DispatchResultWithPostInfo {
 			T::CreateOrigin::ensure_origin(origin.clone())?;
 			let who = ensure_signed(origin)?;
@@ -280,27 +255,11 @@ pub mod pallet {
 			if <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::AlreadyExists)?
 			} else {
-				let loc = LegalOfficerCaseOf::<T> {
-					owner: who.clone(),
-					requester: RequesterOf::<T>::Account(requester.clone()),
-					metadata: Vec::new(),
-					files: Vec::new(),
-					closed: false,
-					loc_type: LocType::Transaction,
-					links: Vec::new(),
-					void_info: None,
-					replacer_of: None
-				};
-				<LocMap<T>>::insert(loc_id, loc);
+				let requester = RequesterOf::<T>::Account(requester_account_id.clone());
+				let loc = Self::build_open_loc(&who, &requester, LocType::Transaction);
 
-				if <AccountLocsMap<T>>::contains_key(&requester) {
-					<AccountLocsMap<T>>::mutate(&requester, |accounts| {
-						let list = accounts.as_mut().unwrap();
-						list.push(loc_id.clone());
-					});
-				} else {
-					<AccountLocsMap<T>>::insert(&requester, Vec::from([loc_id.clone()]));
-				}
+				<LocMap<T>>::insert(loc_id, loc);
+				Self::link_with_account(&requester_account_id, &loc_id);
 
 				Self::deposit_event(Event::LocCreated(loc_id));
 				Ok(().into())
@@ -308,11 +267,11 @@ pub mod pallet {
 		}
 
 		/// Creates a new logion Transaction LOC i.e. a LOC requested with a logion Identity LOC
-		#[pallet::weight(T::WeightInfo::create_loc())]
+		#[pallet::weight(T::WeightInfo::create_logion_transaction_loc())]
 		pub fn create_logion_transaction_loc(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			requester: T::LocId,
+			requester_loc_id: T::LocId,
 		) -> DispatchResultWithPostInfo {
 			T::CreateOrigin::ensure_origin(origin.clone())?;
 			let who = ensure_signed(origin)?;
@@ -320,7 +279,7 @@ pub mod pallet {
 			if <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::AlreadyExists)?
 			} else {
-				let requester_loc = <LocMap<T>>::get(&requester);
+				let requester_loc = <LocMap<T>>::get(&requester_loc_id);
 				match requester_loc {
 					None => Err(Error::<T>::UnexpectedRequester)?,
 					Some(loc) =>
@@ -330,27 +289,10 @@ pub mod pallet {
 							|| loc.void_info.is_some() {
 							Err(Error::<T>::UnexpectedRequester)?
 						} else {
-							let new_loc = LegalOfficerCaseOf::<T> {
-								owner: who.clone(),
-								requester: RequesterOf::<T>::Loc(requester.clone()),
-								metadata: Vec::new(),
-								files: Vec::new(),
-								closed: false,
-								loc_type: LocType::Transaction,
-								links: Vec::new(),
-								void_info: None,
-								replacer_of: None
-							};
+							let requester = RequesterOf::<T>::Loc(requester_loc_id.clone());
+							let new_loc = Self::build_open_loc(&who, &requester, LocType::Transaction);
 							<LocMap<T>>::insert(loc_id, new_loc);
-
-							if <IdentityLocLocsMap<T>>::contains_key(&requester) {
-								<IdentityLocLocsMap<T>>::mutate(&requester, |accounts| {
-									let list = accounts.as_mut().unwrap();
-									list.push(loc_id.clone());
-								});
-							} else {
-								<IdentityLocLocsMap<T>>::insert(requester.clone(), Vec::from([loc_id.clone()]));
-							}
+							Self::link_with_identity_loc(&requester_loc_id, &loc_id);
 						},
 				}
 
@@ -574,6 +516,52 @@ pub mod pallet {
 						.is_some();
 				}
 				None => false
+			}
+		}
+
+		fn link_with_account(
+			account_id: &<T as frame_system::Config>::AccountId,
+			loc_id: &<T as Config>::LocId,
+		) {
+			if <AccountLocsMap<T>>::contains_key(account_id) {
+				<AccountLocsMap<T>>::mutate(account_id, |locs| {
+					let list = locs.as_mut().unwrap();
+					list.push(loc_id.clone());
+				});
+			} else {
+				<AccountLocsMap<T>>::insert(account_id, Vec::from([loc_id.clone()]));
+			}
+		}
+
+		fn link_with_identity_loc(
+			requester_loc_id: &<T as Config>::LocId,
+			loc_id: &<T as Config>::LocId,
+		) {
+			if <IdentityLocLocsMap<T>>::contains_key(requester_loc_id) {
+				<IdentityLocLocsMap<T>>::mutate(requester_loc_id, |locs| {
+					let list = locs.as_mut().unwrap();
+					list.push(loc_id.clone());
+				});
+			} else {
+				<IdentityLocLocsMap<T>>::insert(requester_loc_id, Vec::from([loc_id.clone()]));
+			}
+		}
+
+		fn build_open_loc(
+			who: &T::AccountId,
+			requester: &RequesterOf<T>,
+			loc_type: LocType,
+		) -> LegalOfficerCaseOf<T> {
+			LegalOfficerCaseOf::<T> {
+				owner: who.clone(),
+				requester: requester.clone(),
+				metadata: Vec::new(),
+				files: Vec::new(),
+				closed: false,
+				loc_type: loc_type.clone(),
+				links: Vec::new(),
+				void_info: None,
+				replacer_of: None
 			}
 		}
 	}
