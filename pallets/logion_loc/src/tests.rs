@@ -14,7 +14,7 @@ const OTHER_LOC_ID: u32 = 1;
 #[test]
 fn it_creates_loc() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		assert_eq!(LogionLoc::loc(LOC_ID), Some(LegalOfficerCase::<<Test as frame_system::Config>::AccountId, <Test as crate::Config>::Hash, <Test as crate::Config>::LocId> {
 			owner: LOC_OWNER1,
 			requester: LOC_REQUESTER,
@@ -32,7 +32,7 @@ fn it_creates_loc() {
 #[test]
 fn it_makes_existing_loc_void() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID));
 
 		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
@@ -47,7 +47,7 @@ fn it_makes_existing_loc_void_and_replace_it() {
 		create_closed_loc();
 
 		const REPLACER_LOC_ID: u32 = OTHER_LOC_ID;
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER_ID));
 
 		assert_ok!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, REPLACER_LOC_ID));
 
@@ -66,8 +66,8 @@ fn it_makes_existing_loc_void_and_replace_it() {
 #[test]
 fn it_fails_making_existing_loc_void_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_err!(LogionLoc::make_void(Origin::signed(LOC_REQUESTER), LOC_ID), Error::<Test>::Unauthorized);
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
+		assert_err!(LogionLoc::make_void(Origin::signed(LOC_REQUESTER_ID), LOC_ID), Error::<Test>::Unauthorized);
 		let void_info = LogionLoc::loc(LOC_ID).unwrap().void_info;
 		assert!(!void_info.is_some());
 	});
@@ -76,7 +76,7 @@ fn it_fails_making_existing_loc_void_for_unauthorized_caller() {
 #[test]
 fn it_fails_making_existing_loc_void_for_already_void_loc() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID));
 		assert_err!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOC_ID), Error::<Test>::AlreadyVoid);
 	});
@@ -85,7 +85,7 @@ fn it_fails_making_existing_loc_void_for_already_void_loc() {
 #[test]
 fn it_fails_replacing_with_non_existent_loc() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		assert_err!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::ReplacerLocNotFound);
 	});
 }
@@ -94,9 +94,9 @@ fn it_fails_replacing_with_non_existent_loc() {
 fn it_fails_replacing_with_void_loc() {
 	new_test_ext().execute_with(|| {
 		const REPLACER_LOC_ID: u32 = OTHER_LOC_ID;
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
 		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), OTHER_LOC_ID));
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		assert_err!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, REPLACER_LOC_ID), Error::<Test>::ReplacerLocAlreadyVoid);
 	});
 }
@@ -105,9 +105,9 @@ fn it_fails_replacing_with_void_loc() {
 fn it_fails_replacing_with_loc_already_replacing_another_loc() {
 	new_test_ext().execute_with(|| {
 		const REPLACER_LOC_ID: u32 = 2;
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER_ID));
 		assert_ok!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, REPLACER_LOC_ID));
 		assert_err!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, REPLACER_LOC_ID), Error::<Test>::ReplacerLocAlreadyReplacing);
 	});
@@ -116,7 +116,7 @@ fn it_fails_replacing_with_loc_already_replacing_another_loc() {
 #[test]
 fn it_adds_metadata() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let metadata = MetadataItem {
 			name: vec![1, 2, 3],
 			value: vec![4, 5, 6],
@@ -130,12 +130,12 @@ fn it_adds_metadata() {
 #[test]
 fn it_fails_adding_metadata_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let metadata = MetadataItem {
 			name: vec![1, 2, 3],
 			value: vec![4, 5, 6],
 		};
-		assert_err!(LogionLoc::add_metadata(Origin::signed(LOC_REQUESTER), LOC_ID, metadata.clone()), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::add_metadata(Origin::signed(LOC_REQUESTER_ID), LOC_ID, metadata.clone()), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -152,14 +152,14 @@ fn it_fails_adding_metadata_when_closed() {
 }
 
 fn create_closed_loc() {
-	assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+	assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 	assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOC_ID));
 }
 
 #[test]
 fn it_adds_file() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let file = File {
 			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
 			nature: "test-file-nature".as_bytes().to_vec()
@@ -173,12 +173,12 @@ fn it_adds_file() {
 #[test]
 fn it_fails_adding_file_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let file = File {
 			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
 			nature: "test-file-nature".as_bytes().to_vec()
 		};
-		assert_err!(LogionLoc::add_file(Origin::signed(LOC_REQUESTER), LOC_ID, file.clone()), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::add_file(Origin::signed(LOC_REQUESTER_ID), LOC_ID, file.clone()), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -197,8 +197,8 @@ fn it_fails_adding_file_when_closed() {
 #[test]
 fn it_adds_link() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
 		let link = LocLink {
 			id: OTHER_LOC_ID,
 			nature: "test-link-nature".as_bytes().to_vec()
@@ -212,13 +212,13 @@ fn it_adds_link() {
 #[test]
 fn it_fails_adding_link_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
 		let link = LocLink {
 			id: OTHER_LOC_ID,
 			nature: "test-link-nature".as_bytes().to_vec()
 		};
-		assert_err!(LogionLoc::add_link(Origin::signed(LOC_REQUESTER), LOC_ID, link.clone()), Error::<Test>::Unauthorized);
+		assert_err!(LogionLoc::add_link(Origin::signed(LOC_REQUESTER_ID), LOC_ID, link.clone()), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -226,7 +226,7 @@ fn it_fails_adding_link_for_unauthorized_caller() {
 fn it_fails_adding_link_when_closed() {
 	new_test_ext().execute_with(|| {
 		create_closed_loc();
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
 		let link = LocLink {
 			id: OTHER_LOC_ID,
 			nature: "test-link-nature".as_bytes().to_vec()
@@ -238,7 +238,7 @@ fn it_fails_adding_link_when_closed() {
 #[test]
 fn it_fails_adding_wrong_link() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let link = LocLink {
 			id: OTHER_LOC_ID,
 			nature: "test-link-nature".as_bytes().to_vec()
@@ -250,7 +250,7 @@ fn it_fails_adding_wrong_link() {
 #[test]
 fn it_closes_loc() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOC_ID));
 		let loc = LogionLoc::loc(LOC_ID).unwrap();
 		assert!(loc.closed);
@@ -260,8 +260,8 @@ fn it_closes_loc() {
 #[test]
 fn it_fails_closing_loc_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_err!(LogionLoc::close(Origin::signed(LOC_REQUESTER), LOC_ID), Error::<Test>::Unauthorized);
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
+		assert_err!(LogionLoc::close(Origin::signed(LOC_REQUESTER_ID), LOC_ID), Error::<Test>::Unauthorized);
 	});
 }
 
@@ -276,32 +276,109 @@ fn it_fails_closing_loc_for_already_closed() {
 #[test]
 fn it_links_locs_to_account() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Transaction));
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER, LocType::Identity));
-		assert!(LogionLoc::account_locs(LOC_REQUESTER).is_some());
-		assert!(LogionLoc::account_locs(LOC_REQUESTER).unwrap().len() == 2);
-		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER).unwrap()[0], LOC_ID);
-		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER).unwrap()[1], OTHER_LOC_ID);
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
+		assert_ok!(LogionLoc::create_polkadot_identity_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
+		assert!(LogionLoc::account_locs(LOC_REQUESTER_ID).is_some());
+		assert!(LogionLoc::account_locs(LOC_REQUESTER_ID).unwrap().len() == 2);
+		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER_ID).unwrap()[0], LOC_ID);
+		assert_eq!(LogionLoc::account_locs(LOC_REQUESTER_ID).unwrap()[1], OTHER_LOC_ID);
 	});
 }
 
 #[test]
 fn it_fails_creating_loc_for_unauthorized_caller() {
 	new_test_ext().execute_with(|| {
-		assert_err!(LogionLoc::create_loc(Origin::signed(LOC_REQUESTER), LOC_ID, LOC_REQUESTER, LocType::Transaction), BadOrigin);
+		assert_err!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_REQUESTER_ID), LOC_ID, LOC_REQUESTER_ID), BadOrigin);
 	});
 }
 
 #[test]
 fn it_detects_existing_identity_loc() {
 	new_test_ext().execute_with(|| {
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER, LocType::Identity));
+		assert_ok!(LogionLoc::create_polkadot_identity_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOC_ID));
 
-		assert_ok!(LogionLoc::create_loc(Origin::signed(LOC_OWNER2), OTHER_LOC_ID, LOC_REQUESTER, LocType::Identity));
+		assert_ok!(LogionLoc::create_polkadot_identity_loc(Origin::signed(LOC_OWNER2), OTHER_LOC_ID, LOC_REQUESTER_ID));
 		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER2), OTHER_LOC_ID));
 
 		let legal_officers = Vec::from([LOC_OWNER1, LOC_OWNER2]);
-		assert!(LogionLoc::has_closed_identity_locs(&LOC_REQUESTER, &legal_officers));
+		assert!(LogionLoc::has_closed_identity_locs(&LOC_REQUESTER_ID, &legal_officers));
+	});
+}
+
+#[test]
+fn it_creates_logion_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		
+		assert!(LogionLoc::loc(LOGION_IDENTITY_LOC_ID).is_some());
+		assert!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).is_none());
+	});
+}
+
+#[test]
+fn it_creates_and_links_logion_locs_to_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+
+		assert_ok!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOGION_IDENTITY_LOC_ID));
+
+		assert!(LogionLoc::loc(LOC_ID).is_some());
+		assert!(LogionLoc::loc(OTHER_LOC_ID).is_some());
+		assert!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).is_some());
+		assert!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).unwrap().len() == 2);
+		assert_eq!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).unwrap()[0], LOC_ID);
+		assert_eq!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).unwrap()[1], OTHER_LOC_ID);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_polkadot_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_polkadot_identity_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_polkadot_transaction_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOC_REQUESTER_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_logion_transaction_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), OTHER_LOC_ID, LOGION_IDENTITY_LOC_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, OTHER_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_open_logion_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOGION_IDENTITY_LOC_ID), Error::<Test>::UnexpectedRequester);
+	});
+}
+
+#[test]
+fn it_fails_creating_logion_loc_with_closed_void_logion_identity_loc() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::close(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+		assert_ok!(LogionLoc::make_void(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
+
+		assert_err!(LogionLoc::create_logion_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOGION_IDENTITY_LOC_ID), Error::<Test>::UnexpectedRequester);
 	});
 }

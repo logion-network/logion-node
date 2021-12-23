@@ -51,10 +51,26 @@ pub struct LocVoidInfo<LocId> {
 	replacer: Option<LocId>,
 }
 
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
+pub enum Requester<AccountId, LocId> {
+	None,
+	Account(AccountId),
+	Loc(LocId)
+}
+
+pub type RequesterOf<T> = Requester<<T as frame_system::Config>::AccountId, <T as Config>::LocId>;
+
+impl<AccountId, LocId> Default for Requester<AccountId, LocId> {
+
+	fn default() -> Requester<AccountId, LocId> {
+		Requester::None
+	}
+}
+
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
 pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	owner: AccountId,
-	requester: AccountId,
+	requester: Requester<AccountId, LocId>,
 	metadata: Vec<MetadataItem>,
 	files: Vec<File<Hash>>,
 	closed: bool,
@@ -112,6 +128,11 @@ pub mod pallet {
 	#[pallet::getter(fn account_locs)]
 	pub type AccountLocsMap<T> = StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::AccountId, Vec<<T as Config>::LocId>>;
 
+	/// Requested LOCs by logion Identity LOC.
+	#[pallet::storage]
+	#[pallet::getter(fn identity_loc_locs)]
+	pub type IdentityLocLocsMap<T> = StorageMap<_, Blake2_128Concat, <T as Config>::LocId, Vec<<T as Config>::LocId>>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	#[pallet::metadata(T::LocId = "LocId")]
@@ -148,6 +169,8 @@ pub mod pallet {
 		ReplacerLocAlreadyReplacing,
 		/// Occurs when trying to mutate a void LOC
 		CannotMutateVoid,
+		/// Unexpected requester given LOC type
+		UnexpectedRequester,
 	}
 
 	#[pallet::hooks]
@@ -157,11 +180,12 @@ pub mod pallet {
 	pub enum StorageVersion {
 		V1,
 		V2MakeLocVoid,
+		V3RequesterEnum,
 	}
 
 	impl Default for StorageVersion {
 		fn default() -> StorageVersion {
-			return StorageVersion::V2MakeLocVoid;
+			return StorageVersion::V3RequesterEnum;
 		}
 	}
 
@@ -173,13 +197,12 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T:Config> Pallet<T> {
 
-		/// Creates a new LOC
-		#[pallet::weight(T::WeightInfo::create_loc())]
-		pub fn create_loc(
+		/// Creates a new Polkadot Identity LOC i.e. a LOC linking a real identity to an AccountId.
+		#[pallet::weight(T::WeightInfo::create_polkadot_identity_loc())]
+		pub fn create_polkadot_identity_loc(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			requester: T::AccountId,
-			loc_type: LocType,
+			requester_account_id: T::AccountId,
 		) -> DispatchResultWithPostInfo {
 			T::CreateOrigin::ensure_origin(origin.clone())?;
 			let who = ensure_signed(origin)?;
@@ -187,26 +210,90 @@ pub mod pallet {
 			if <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::AlreadyExists)?
 			} else {
-				let loc = LegalOfficerCaseOf::<T> {
-					owner: who.clone(),
-					requester: requester.clone(),
-					metadata: Vec::new(),
-					files: Vec::new(),
-					closed: false,
-					loc_type: loc_type.clone(),
-					links: Vec::new(),
-					void_info: None,
-					replacer_of: None
-				};
+				let requester = RequesterOf::<T>::Account(requester_account_id.clone());
+				let loc = Self::build_open_loc(&who, &requester, LocType::Identity);
+	
+				<LocMap<T>>::insert(loc_id, loc);
+				Self::link_with_account(&requester_account_id, &loc_id);
+
+				Self::deposit_event(Event::LocCreated(loc_id));
+				Ok(().into())
+			}
+		}
+
+		/// Creates a new logion Identity LOC i.e. a LOC describing a real identity not yet linked to an AccountId
+		#[pallet::weight(T::WeightInfo::create_logion_identity_loc())]
+		pub fn create_logion_identity_loc(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+		) -> DispatchResultWithPostInfo {
+			T::CreateOrigin::ensure_origin(origin.clone())?;
+			let who = ensure_signed(origin)?;
+
+			if <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::AlreadyExists)?
+			} else {
+				let requester = RequesterOf::<T>::None;
+				let loc = Self::build_open_loc(&who, &requester, LocType::Identity);
 				<LocMap<T>>::insert(loc_id, loc);
 
-				if <AccountLocsMap<T>>::contains_key(requester.clone()) {
-					<AccountLocsMap<T>>::mutate(requester.clone(), |accounts| {
-						let list = accounts.as_mut().unwrap();
-						list.push(loc_id.clone());
-					});
-				} else {
-					<AccountLocsMap<T>>::insert(requester.clone(), Vec::from([loc_id.clone()]));
+				Self::deposit_event(Event::LocCreated(loc_id));
+				Ok(().into())
+			}
+		}
+
+		/// Creates a new Polkadot Transaction LOC i.e. a LOC requested with an AccountId
+		#[pallet::weight(T::WeightInfo::create_polkadot_transaction_loc())]
+		pub fn create_polkadot_transaction_loc(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			requester_account_id: T::AccountId,
+		) -> DispatchResultWithPostInfo {
+			T::CreateOrigin::ensure_origin(origin.clone())?;
+			let who = ensure_signed(origin)?;
+
+			if <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::AlreadyExists)?
+			} else {
+				let requester = RequesterOf::<T>::Account(requester_account_id.clone());
+				let loc = Self::build_open_loc(&who, &requester, LocType::Transaction);
+
+				<LocMap<T>>::insert(loc_id, loc);
+				Self::link_with_account(&requester_account_id, &loc_id);
+
+				Self::deposit_event(Event::LocCreated(loc_id));
+				Ok(().into())
+			}
+		}
+
+		/// Creates a new logion Transaction LOC i.e. a LOC requested with a logion Identity LOC
+		#[pallet::weight(T::WeightInfo::create_logion_transaction_loc())]
+		pub fn create_logion_transaction_loc(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			requester_loc_id: T::LocId,
+		) -> DispatchResultWithPostInfo {
+			T::CreateOrigin::ensure_origin(origin.clone())?;
+			let who = ensure_signed(origin)?;
+
+			if <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::AlreadyExists)?
+			} else {
+				let requester_loc = <LocMap<T>>::get(&requester_loc_id);
+				match requester_loc {
+					None => Err(Error::<T>::UnexpectedRequester)?,
+					Some(loc) =>
+						if loc.loc_type != LocType::Identity
+							|| match loc.requester { RequesterOf::<T>::None => false, _ => true }
+							|| !loc.closed
+							|| loc.void_info.is_some() {
+							Err(Error::<T>::UnexpectedRequester)?
+						} else {
+							let requester = RequesterOf::<T>::Loc(requester_loc_id.clone());
+							let new_loc = Self::build_open_loc(&who, &requester, LocType::Transaction);
+							<LocMap<T>>::insert(loc_id, new_loc);
+							Self::link_with_identity_loc(&requester_loc_id, &loc_id);
+						},
 				}
 
 				Self::deposit_event(Event::LocCreated(loc_id));
@@ -429,6 +516,52 @@ pub mod pallet {
 						.is_some();
 				}
 				None => false
+			}
+		}
+
+		fn link_with_account(
+			account_id: &<T as frame_system::Config>::AccountId,
+			loc_id: &<T as Config>::LocId,
+		) {
+			if <AccountLocsMap<T>>::contains_key(account_id) {
+				<AccountLocsMap<T>>::mutate(account_id, |locs| {
+					let list = locs.as_mut().unwrap();
+					list.push(loc_id.clone());
+				});
+			} else {
+				<AccountLocsMap<T>>::insert(account_id, Vec::from([loc_id.clone()]));
+			}
+		}
+
+		fn link_with_identity_loc(
+			requester_loc_id: &<T as Config>::LocId,
+			loc_id: &<T as Config>::LocId,
+		) {
+			if <IdentityLocLocsMap<T>>::contains_key(requester_loc_id) {
+				<IdentityLocLocsMap<T>>::mutate(requester_loc_id, |locs| {
+					let list = locs.as_mut().unwrap();
+					list.push(loc_id.clone());
+				});
+			} else {
+				<IdentityLocLocsMap<T>>::insert(requester_loc_id, Vec::from([loc_id.clone()]));
+			}
+		}
+
+		fn build_open_loc(
+			who: &T::AccountId,
+			requester: &RequesterOf<T>,
+			loc_type: LocType,
+		) -> LegalOfficerCaseOf<T> {
+			LegalOfficerCaseOf::<T> {
+				owner: who.clone(),
+				requester: requester.clone(),
+				metadata: Vec::new(),
+				files: Vec::new(),
+				closed: false,
+				loc_type: loc_type.clone(),
+				links: Vec::new(),
+				void_info: None,
+				replacer_of: None
 			}
 		}
 	}
