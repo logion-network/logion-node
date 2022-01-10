@@ -38,7 +38,8 @@
   },
   "MetadataItem": {
     "name": "Vec<u8>",
-    "value": "Vec<u8>"
+    "value": "Vec<u8>",
+    "submitter": "AccountId"
   },
   "LocType": {
     "_enum": [
@@ -52,7 +53,8 @@
   },
   "File": {
     "hash": "Hash",
-    "nature": "Vec<u8>"
+    "nature": "Vec<u8>",
+    "submitter": "AccountId"
   },
   "LocVoidInfo": {
     "replacer": "Option<LocId>"
@@ -61,7 +63,8 @@
     "_enum": [
       "V1",
       "V2MakeLocVoid",
-      "V3RequesterEnum"
+      "V3RequesterEnum",
+      "V4ItemSubmitter"
     ]
   },
   "Requester": {
