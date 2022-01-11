@@ -64,17 +64,31 @@ mod v3 {
 			|loc_id: T::LocId, loc: LegalOfficerCaseOfV3<T>| {
 				debug::info!("Migrating LOC: {:?}", loc_id);
 				debug::info!("From: {:?}", loc);
-				let new_loc = LegalOfficerCaseOf::<T> {
+				let mut new_loc = LegalOfficerCaseOf::<T> {
 					owner: loc.owner.clone(),
 					requester: loc.requester.clone(),
-					metadata: Vec::new(),    // TODO Change me !!!!
-					files: Vec::new(),       // TODO Change me !!!!
+					metadata: Vec::new(),
+					files: Vec::new(),
 					closed: loc.closed.clone(),
 					loc_type: loc.loc_type.clone(),
 					links: loc.links.clone(),
 					void_info: loc.void_info.clone(),
 					replacer_of: loc.replacer_of.clone(),
 				};
+				new_loc.metadata.extend(loc.metadata.iter().map(|item| {
+					MetadataItem::<<T as frame_system::Config>::AccountId> {
+						name: item.name.clone(),
+						value: item.value.clone(),
+						submitter: loc.owner.clone(),
+					}
+				}));
+				new_loc.files.extend(loc.files.iter().map(|item| {
+					File::<<T as pallet::Config>::Hash, <T as frame_system::Config>::AccountId> {
+						hash: item.hash.clone(),
+						nature: item.nature.clone(),
+						submitter: loc.owner.clone(),
+					}
+				}));
 				debug::info!("To: {:?}", new_loc);
 				Some(new_loc)
 			}
