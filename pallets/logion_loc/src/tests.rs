@@ -114,12 +114,23 @@ fn it_fails_replacing_with_loc_already_replacing_another_loc() {
 }
 
 #[test]
+fn it_fails_replacing_with_wrongly_typed_loc() {
+	new_test_ext().execute_with(|| {
+		const REPLACER_LOC_ID: u32 = 2;
+		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
+		assert_ok!(LogionLoc::create_polkadot_identity_loc(Origin::signed(LOC_OWNER1), REPLACER_LOC_ID, LOC_REQUESTER_ID));
+		assert_err!(LogionLoc::make_void_and_replace(Origin::signed(LOC_OWNER1), LOC_ID, REPLACER_LOC_ID), Error::<Test>::ReplacerLocWrongType);
+	});
+}
+
+#[test]
 fn it_adds_metadata() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let metadata = MetadataItem {
 			name: vec![1, 2, 3],
 			value: vec![4, 5, 6],
+			submitter: LOC_OWNER1,
 		};
 		assert_ok!(LogionLoc::add_metadata(Origin::signed(LOC_OWNER1), LOC_ID, metadata.clone()));
 		let loc = LogionLoc::loc(LOC_ID).unwrap();
@@ -134,6 +145,7 @@ fn it_fails_adding_metadata_for_unauthorized_caller() {
 		let metadata = MetadataItem {
 			name: vec![1, 2, 3],
 			value: vec![4, 5, 6],
+			submitter: LOC_OWNER1,
 		};
 		assert_err!(LogionLoc::add_metadata(Origin::signed(LOC_REQUESTER_ID), LOC_ID, metadata.clone()), Error::<Test>::Unauthorized);
 	});
@@ -146,6 +158,7 @@ fn it_fails_adding_metadata_when_closed() {
 		let metadata = MetadataItem {
 			name: vec![1, 2, 3],
 			value: vec![4, 5, 6],
+			submitter: LOC_OWNER1,
 		};
 		assert_err!(LogionLoc::add_metadata(Origin::signed(LOC_OWNER1), LOC_ID, metadata.clone()), Error::<Test>::CannotMutate);
 	});
@@ -162,7 +175,8 @@ fn it_adds_file() {
 		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let file = File {
 			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
-			nature: "test-file-nature".as_bytes().to_vec()
+			nature: "test-file-nature".as_bytes().to_vec(),
+			submitter: LOC_OWNER1,
 		};
 		assert_ok!(LogionLoc::add_file(Origin::signed(LOC_OWNER1), LOC_ID, file.clone()));
 		let loc = LogionLoc::loc(LOC_ID).unwrap();
@@ -176,7 +190,8 @@ fn it_fails_adding_file_for_unauthorized_caller() {
 		assert_ok!(LogionLoc::create_polkadot_transaction_loc(Origin::signed(LOC_OWNER1), LOC_ID, LOC_REQUESTER_ID));
 		let file = File {
 			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
-			nature: "test-file-nature".as_bytes().to_vec()
+			nature: "test-file-nature".as_bytes().to_vec(),
+			submitter: LOC_OWNER1,
 		};
 		assert_err!(LogionLoc::add_file(Origin::signed(LOC_REQUESTER_ID), LOC_ID, file.clone()), Error::<Test>::Unauthorized);
 	});
@@ -188,7 +203,8 @@ fn it_fails_adding_file_when_closed() {
 		create_closed_loc();
 		let file = File {
 			hash: BlakeTwo256::hash_of(&"test".as_bytes().to_vec()),
-			nature: "test-file-nature".as_bytes().to_vec()
+			nature: "test-file-nature".as_bytes().to_vec(),
+			submitter: LOC_OWNER1,
 		};
 		assert_err!(LogionLoc::add_file(Origin::signed(LOC_OWNER1), LOC_ID, file.clone()), Error::<Test>::CannotMutate);
 	});
@@ -310,7 +326,7 @@ fn it_detects_existing_identity_loc() {
 fn it_creates_logion_identity_loc() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(LogionLoc::create_logion_identity_loc(Origin::signed(LOC_OWNER1), LOGION_IDENTITY_LOC_ID));
-		
+
 		assert!(LogionLoc::loc(LOGION_IDENTITY_LOC_ID).is_some());
 		assert!(LogionLoc::identity_loc_locs(LOGION_IDENTITY_LOC_ID).is_none());
 	});
