@@ -175,6 +175,8 @@ pub mod pallet {
 		UnexpectedRequester,
 		/// Occurs when trying to void a LOC by replacing it with a LOC of a different type
 		ReplacerLocWrongType,
+		/// Submitter must be either LOC owner, either LOC requester (only when requester is a Polkadot account)
+		InvalidSubmitter,
 	}
 
 	#[pallet::hooks]
@@ -326,6 +328,7 @@ pub mod pallet {
 				} else if loc.void_info.is_some() {
 					Err(Error::<T>::CannotMutateVoid)?
 				} else {
+					Self::validate_submitter(&item.submitter, &loc)?;
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
 						mutable_loc.metadata.push(item);
@@ -355,6 +358,7 @@ pub mod pallet {
 				} else if loc.void_info.is_some() {
 					Err(Error::<T>::CannotMutateVoid)?
 				} else {
+					Self::validate_submitter(&file.submitter, &loc)?;
 					<LocMap<T>>::mutate(loc_id, |loc| {
 						let mutable_loc = loc.as_mut().unwrap();
 						mutable_loc.files.push(file);
@@ -455,6 +459,28 @@ pub mod pallet {
 	}
 
 	impl<T: Config> Pallet<T> {
+
+		fn validate_submitter(
+			submitter: &T::AccountId,
+			loc: &LegalOfficerCaseOf<T>
+		) -> DispatchResultWithPostInfo {
+
+			if submitter.eq(&loc.owner) {
+				return Ok(().into());
+			}
+			match &loc.requester {
+				Requester::Account(requester) => {
+					if submitter.eq(&requester) {
+						Ok(().into())
+					} else {
+						Err(Error::<T>::InvalidSubmitter)?
+					}
+				}
+				_ => {
+					Err(Error::<T>::InvalidSubmitter)?
+				}
+			}
+		}
 
 		fn do_make_void(
 			origin: OriginFor<T>,
