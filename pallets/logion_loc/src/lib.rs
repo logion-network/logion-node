@@ -173,6 +173,8 @@ pub mod pallet {
 		CannotMutateVoid,
 		/// Unexpected requester given LOC type
 		UnexpectedRequester,
+		/// Occurs when trying to void a LOC by replacing it with a LOC of a different type
+		ReplacerLocWrongType,
 	}
 
 	#[pallet::hooks]
@@ -461,21 +463,6 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 
-			if replacer_loc_id.is_some() {
-				let replacer = replacer_loc_id.unwrap();
-				if !<LocMap<T>>::contains_key(&replacer) {
-					Err(Error::<T>::ReplacerLocNotFound)?
-				} else {
-					let replacer_loc = <LocMap<T>>::get(&replacer).unwrap();
-					if replacer_loc.void_info.is_some() {
-						Err(Error::<T>::ReplacerLocAlreadyVoid)?
-					}
-					if replacer_loc.replacer_of.is_some() {
-						Err(Error::<T>::ReplacerLocAlreadyReplacing)?
-					}
-				}
-			}
-
 			if !<LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::NotFound)?
 			} else {
@@ -485,6 +472,24 @@ pub mod pallet {
 				}
 				if loc.void_info.is_some() {
 					Err(Error::<T>::AlreadyVoid)?
+				}
+
+				if replacer_loc_id.is_some() {
+					let replacer = replacer_loc_id.unwrap();
+					if !<LocMap<T>>::contains_key(&replacer) {
+						Err(Error::<T>::ReplacerLocNotFound)?
+					} else {
+						let replacer_loc = <LocMap<T>>::get(&replacer).unwrap();
+						if replacer_loc.void_info.is_some() {
+							Err(Error::<T>::ReplacerLocAlreadyVoid)?
+						}
+						if replacer_loc.replacer_of.is_some() {
+							Err(Error::<T>::ReplacerLocAlreadyReplacing)?
+						}
+						if !replacer_loc.loc_type.eq(&loc.loc_type) {
+							Err(Error::<T>::ReplacerLocWrongType)?
+						}
+					}
 				}
 			}
 
