@@ -29,9 +29,10 @@ impl Default for LocType {
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
-pub struct MetadataItem {
+pub struct MetadataItem<AccountId> {
 	name: Vec<u8>,
 	value: Vec<u8>,
+	submitter: AccountId,
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
@@ -41,9 +42,10 @@ pub struct LocLink<LocId> {
 }
 
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
-pub struct File<Hash> {
+pub struct File<Hash, AccountId> {
 	hash: Hash,
 	nature: Vec<u8>,
+	submitter: AccountId,
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
@@ -71,8 +73,8 @@ impl<AccountId, LocId> Default for Requester<AccountId, LocId> {
 pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	owner: AccountId,
 	requester: Requester<AccountId, LocId>,
-	metadata: Vec<MetadataItem>,
-	files: Vec<File<Hash>>,
+	metadata: Vec<MetadataItem<AccountId>>,
+	files: Vec<File<Hash, AccountId>>,
 	closed: bool,
 	loc_type: LocType,
 	links: Vec<LocLink<LocId>>,
@@ -181,11 +183,12 @@ pub mod pallet {
 		V1,
 		V2MakeLocVoid,
 		V3RequesterEnum,
+		V4ItemSubmitter,
 	}
 
 	impl Default for StorageVersion {
 		fn default() -> StorageVersion {
-			return StorageVersion::V3RequesterEnum;
+			return StorageVersion::V4ItemSubmitter;
 		}
 	}
 
@@ -212,7 +215,7 @@ pub mod pallet {
 			} else {
 				let requester = RequesterOf::<T>::Account(requester_account_id.clone());
 				let loc = Self::build_open_loc(&who, &requester, LocType::Identity);
-	
+
 				<LocMap<T>>::insert(loc_id, loc);
 				Self::link_with_account(&requester_account_id, &loc_id);
 
@@ -306,7 +309,7 @@ pub mod pallet {
 		pub fn add_metadata(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			item: MetadataItem
+			item: MetadataItem<T::AccountId>
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 
@@ -335,7 +338,7 @@ pub mod pallet {
 		pub fn add_file(
 			origin: OriginFor<T>,
 			#[pallet::compact] loc_id: T::LocId,
-			file: File<<T as pallet::Config>::Hash>
+			file: File<<T as pallet::Config>::Hash, T::AccountId>
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 

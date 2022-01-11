@@ -7,7 +7,7 @@ use frame_support::weights::Weight;
 use crate::{Config, File, LegalOfficerCaseOf, LocLink, LocMap, LocType, MetadataItem, pallet, PalletStorageVersion, StorageVersion};
 
 pub fn migrate<T: Config>() -> Weight {
-	do_migrate::<T, _>(StorageVersion::V2MakeLocVoid, v2::migrate::<T>)
+	do_migrate::<T, _>(StorageVersion::V3RequesterEnum, v3::migrate::<T>)
 }
 
 fn do_migrate<T: Config, F>(from: StorageVersion, migration_fn: F) -> Weight
@@ -27,16 +27,29 @@ fn do_migrate<T: Config, F>(from: StorageVersion, migration_fn: F) -> Weight
 	}
 }
 
-mod v2 {
-	use crate::LocVoidInfo;
+mod v3 {
+	use crate::{LocVoidInfo, Requester};
+
 	use super::*;
 
 	#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
-	struct LegalOfficerCaseV2<AccountId, Hash, LocId> {
+	pub struct MetadataItemV3 {
+		name: Vec<u8>,
+		value: Vec<u8>,
+	}
+
+	#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
+	pub struct FileV3<Hash> {
+		hash: Hash,
+		nature: Vec<u8>,
+	}
+
+	#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
+	struct LegalOfficerCaseV3<AccountId, Hash, LocId> {
 		owner: AccountId,
-		requester: AccountId,
-		metadata: Vec<MetadataItem>,
-		files: Vec<File<Hash>>,
+		requester: Requester<AccountId, LocId>,
+		metadata: Vec<MetadataItemV3>,
+		files: Vec<FileV3<Hash>>,
 		closed: bool,
 		loc_type: LocType,
 		links: Vec<LocLink<LocId>>,
@@ -44,18 +57,18 @@ mod v2 {
 		replacer_of: Option<LocId>
 	}
 
-	type LegalOfficerCaseOfV2<T> = LegalOfficerCaseV2<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
+	type LegalOfficerCaseOfV3<T> = LegalOfficerCaseV3<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
 
 	pub(crate) fn migrate<T: Config>() -> Weight {
-		<LocMap<T>>::translate::<LegalOfficerCaseOfV2<T>, _>(
-			|loc_id: T::LocId, loc: LegalOfficerCaseOfV2<T>| {
+		<LocMap<T>>::translate::<LegalOfficerCaseOfV3<T>, _>(
+			|loc_id: T::LocId, loc: LegalOfficerCaseOfV3<T>| {
 				debug::info!("Migrating LOC: {:?}", loc_id);
 				debug::info!("From: {:?}", loc);
 				let new_loc = LegalOfficerCaseOf::<T> {
 					owner: loc.owner.clone(),
-					requester: crate::Requester::Account(loc.requester.clone()),
-					metadata: loc.metadata.clone(),
-					files: loc.files.clone(),
+					requester: loc.requester.clone(),
+					metadata: Vec::new(),    // TODO Change me !!!!
+					files: Vec::new(),       // TODO Change me !!!!
 					closed: loc.closed.clone(),
 					loc_type: loc.loc_type.clone(),
 					links: loc.links.clone(),
