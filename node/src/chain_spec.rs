@@ -294,6 +294,10 @@ pub fn test_testnet_config() -> Result<ChainSpec, String> {
 					OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
 					get_account_id_from_seed::<sr25519::Public>("Bob")
 				),
+				(
+					OpaquePeerId(bs58::decode("12D3KooWJvyP3VJYymTqG7eH4PM5rN4T2agk5cdNCfNymAqwqcvZ").into_vec().unwrap()),
+					get_account_id_from_seed::<sr25519::Public>("Charlie")
+				),
 			],
 			vec![ // Initial set of Logion Legal Officers
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
