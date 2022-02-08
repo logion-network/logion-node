@@ -76,15 +76,36 @@ impl EnsureOrigin<Origin> for LoAuthorityListMock {
     }
 }
 
+parameter_types! {
+	pub const MaxMetadataItemNameSize: usize = 40;
+	pub const MaxMetadataItemValueSize: usize = 4096;
+	pub const MaxFileNatureSize: usize = 255;
+	pub const MaxLinkNatureSize: usize = 255;
+	pub const MaxCollectionItemDescriptionSize: usize = 4096;
+}
+
 impl pallet_loc::Config for Test {
 	type LocId = u32;
 	type Event = Event;
 	type Hash = H256;
 	type CreateOrigin = LoAuthorityListMock;
+	type MaxMetadataItemNameSize = MaxMetadataItemNameSize;
+	type MaxMetadataItemValueSize = MaxMetadataItemValueSize;
+	type MaxFileNatureSize = MaxFileNatureSize;
+	type MaxLinkNatureSize = MaxLinkNatureSize;
+	type CollectionItemId = H256;
+	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
 	type WeightInfo = ();
 }
 
 // Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
 	system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
+}
+
+pub fn new_test_ext_at_block(block_number: u64) -> sp_io::TestExternalities {
+	let t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
+	let mut ext = sp_io::TestExternalities::new(t);
+	ext.execute_with(|| System::set_block_number(block_number));
+	ext
 }

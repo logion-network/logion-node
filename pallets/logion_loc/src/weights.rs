@@ -4,7 +4,7 @@
 //! was disclosed under [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
 //!
 //! THIS FILE WAS AUTO-GENERATED USING THE SUBSTRATE BENCHMARK CLI VERSION 3.0.0
-//! DATE: 2021-12-22, STEPS: `[20, ]`, REPEAT: 10, LOW RANGE: `[]`, HIGH RANGE: `[]`
+//! DATE: 2022-02-08, STEPS: `[20, ]`, REPEAT: 10, LOW RANGE: `[]`, HIGH RANGE: `[]`
 //! EXECUTION: Some(Wasm), WASM-EXECUTION: Compiled, CHAIN: None, DB CACHE: 128
 
 // Executed Command:
@@ -47,59 +47,71 @@ pub trait WeightInfo {
 	fn close() -> Weight;
 	fn make_void() -> Weight;
 	fn make_void_and_replace() -> Weight;
+	fn create_collection_loc() -> Weight;
+	fn add_collection_item() -> Weight;
 }
 
 /// Weights for pallet_logion_loc using the Substrate node and recommended hardware.
 pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 	fn create_polkadot_identity_loc() -> Weight {
-		(28_279_000 as Weight)
+		(29_862_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(3 as Weight))
 			.saturating_add(T::DbWeight::get().writes(2 as Weight))
 	}
 	fn create_logion_identity_loc() -> Weight {
-		(21_472_000 as Weight)
+		(20_945_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(2 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
 	fn create_polkadot_transaction_loc() -> Weight {
-		(26_917_000 as Weight)
+		(26_316_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(3 as Weight))
 			.saturating_add(T::DbWeight::get().writes(2 as Weight))
 	}
 	fn create_logion_transaction_loc() -> Weight {
-		(32_249_000 as Weight)
+		(30_288_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(4 as Weight))
 			.saturating_add(T::DbWeight::get().writes(2 as Weight))
 	}
 	fn add_metadata() -> Weight {
-		(12_259_000 as Weight)
+		(11_979_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
 	fn add_file() -> Weight {
-		(12_163_000 as Weight)
+		(11_971_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
 	fn add_link() -> Weight {
-		(16_160_000 as Weight)
+		(16_067_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(2 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
 	fn close() -> Weight {
-		(22_892_000 as Weight)
+		(22_224_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
 	fn make_void() -> Weight {
-		(23_046_000 as Weight)
+		(22_360_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(1 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
 	fn make_void_and_replace() -> Weight {
-		(34_619_000 as Weight)
+		(32_724_000 as Weight)
 			.saturating_add(T::DbWeight::get().reads(2 as Weight))
+			.saturating_add(T::DbWeight::get().writes(2 as Weight))
+	}
+	fn create_collection_loc() -> Weight {
+		(29_219_000 as Weight)
+			.saturating_add(T::DbWeight::get().reads(3 as Weight))
+			.saturating_add(T::DbWeight::get().writes(2 as Weight))
+	}
+	fn add_collection_item() -> Weight {
+		(31_621_000 as Weight)
+			.saturating_add(T::DbWeight::get().reads(3 as Weight))
 			.saturating_add(T::DbWeight::get().writes(2 as Weight))
 	}
 }
@@ -107,53 +119,63 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 // For backwards compatibility and tests
 impl WeightInfo for () {
   fn create_polkadot_identity_loc() -> Weight {
-    (28_279_000 as Weight)
+    (29_862_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(3 as Weight))
       .saturating_add(RocksDbWeight::get().writes(2 as Weight))
   }
   fn create_logion_identity_loc() -> Weight {
-    (21_472_000 as Weight)
+    (20_945_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(2 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn create_polkadot_transaction_loc() -> Weight {
-    (26_917_000 as Weight)
+    (26_316_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(3 as Weight))
       .saturating_add(RocksDbWeight::get().writes(2 as Weight))
   }
   fn create_logion_transaction_loc() -> Weight {
-    (32_249_000 as Weight)
+    (30_288_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(4 as Weight))
       .saturating_add(RocksDbWeight::get().writes(2 as Weight))
   }
   fn add_metadata() -> Weight {
-    (12_259_000 as Weight)
+    (11_979_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn add_file() -> Weight {
-    (12_163_000 as Weight)
+    (11_971_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn add_link() -> Weight {
-    (16_160_000 as Weight)
+    (16_067_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(2 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn close() -> Weight {
-    (22_892_000 as Weight)
+    (22_224_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn make_void() -> Weight {
-    (23_046_000 as Weight)
+    (22_360_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(1 as Weight))
       .saturating_add(RocksDbWeight::get().writes(1 as Weight))
   }
   fn make_void_and_replace() -> Weight {
-    (34_619_000 as Weight)
+    (32_724_000 as Weight)
       .saturating_add(RocksDbWeight::get().reads(2 as Weight))
+      .saturating_add(RocksDbWeight::get().writes(2 as Weight))
+  }
+  fn create_collection_loc() -> Weight {
+    (29_219_000 as Weight)
+      .saturating_add(RocksDbWeight::get().reads(3 as Weight))
+      .saturating_add(RocksDbWeight::get().writes(2 as Weight))
+  }
+  fn add_collection_item() -> Weight {
+    (31_621_000 as Weight)
+      .saturating_add(RocksDbWeight::get().reads(3 as Weight))
       .saturating_add(RocksDbWeight::get().writes(2 as Weight))
   }
 }

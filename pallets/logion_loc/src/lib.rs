@@ -19,7 +19,8 @@ use frame_support::traits::Vec;
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Debug)]
 pub enum LocType {
 	Transaction,
-	Identity
+	Identity,
+	Collection,
 }
 
 impl Default for LocType {
@@ -69,8 +70,10 @@ impl<AccountId, LocId> Default for Requester<AccountId, LocId> {
 	}
 }
 
+pub type CollectionSize = u32;
+
 #[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
-pub struct LegalOfficerCase<AccountId, Hash, LocId> {
+pub struct LegalOfficerCase<AccountId, Hash, LocId, BlockNumber> {
 	owner: AccountId,
 	requester: Requester<AccountId, LocId>,
 	metadata: Vec<MetadataItem<AccountId>>,
@@ -79,10 +82,17 @@ pub struct LegalOfficerCase<AccountId, Hash, LocId> {
 	loc_type: LocType,
 	links: Vec<LocLink<LocId>>,
 	void_info: Option<LocVoidInfo<LocId>>,
-	replacer_of: Option<LocId>
+	replacer_of: Option<LocId>,
+	collection_last_block_submission: Option<BlockNumber>,
+	collection_max_size: Option<CollectionSize>,
 }
 
-pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId>;
+pub type LegalOfficerCaseOf<T> = LegalOfficerCase<<T as frame_system::Config>::AccountId, <T as pallet::Config>::Hash, <T as pallet::Config>::LocId, <T as frame_system::Config>::BlockNumber>;
+
+#[derive(Encode, Decode, Default, Clone, PartialEq, Eq, Debug)]
+pub struct CollectionItem {
+	description: Vec<u8>
+}
 
 pub mod weights;
 
@@ -114,6 +124,24 @@ pub mod pallet {
 
 		/// The overarching event type.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+
+		/// Collection item identifier
+		type CollectionItemId: Member + Parameter + Default + Copy;
+
+		/// The maximum size of a LOC metadata name
+		type MaxMetadataItemNameSize: Get<usize>;
+
+		/// The maximum size of a LOC metadata value
+		type MaxMetadataItemValueSize: Get<usize>;
+
+		/// The maximum size of a LOC file nature
+		type MaxFileNatureSize: Get<usize>;
+
+		/// The maximum size of a LOC link nature
+		type MaxLinkNatureSize: Get<usize>;
+
+		/// The maximum size of a Collection Item description
+		type MaxCollectionItemDescriptionSize: Get<usize>;
 	}
 
 	#[pallet::pallet]
@@ -135,6 +163,16 @@ pub mod pallet {
 	#[pallet::getter(fn identity_loc_locs)]
 	pub type IdentityLocLocsMap<T> = StorageMap<_, Blake2_128Concat, <T as Config>::LocId, Vec<<T as Config>::LocId>>;
 
+	/// Collection items by LOC ID.
+	#[pallet::storage]
+	#[pallet::getter(fn collection_items)]
+	pub type CollectionItemsMap<T> = StorageDoubleMap<_, Blake2_128Concat, <T as Config>::LocId, Blake2_128Concat, <T as Config>::CollectionItemId, CollectionItem>;
+
+	/// Collection size by LOC ID.
+	#[pallet::storage]
+	#[pallet::getter(fn collection_size)]
+	pub type CollectionSizeMap<T> = StorageMap<_, Blake2_128Concat, <T as Config>::LocId, CollectionSize>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	#[pallet::metadata(T::LocId = "LocId")]
@@ -143,8 +181,10 @@ pub mod pallet {
 		LocCreated(T::LocId),
 		/// Issued when LOC is closed. [locId]
 		LocClosed(T::LocId),
-		/// Issued when LOC is made void. [locId]
+		/// Issued when LOC is voided. [locId]
 		LocVoid(T::LocId),
+		/// Issued when an item was added to a collection. [locId, collectionItemId]
+		ItemAdded(T::LocId, T::CollectionItemId),
 	}
 
 	#[pallet::error]
@@ -177,6 +217,22 @@ pub mod pallet {
 		ReplacerLocWrongType,
 		/// Submitter must be either LOC owner, either LOC requester (only when requester is a Polkadot account)
 		InvalidSubmitter,
+		/// A collection LOC must be limited in time and/or quantity of items
+		CollectionHasNoLimit,
+		/// Item cannot be added to given collection, it may be missing or limits are reached
+		WrongCollectionLoc,
+		/// An item with same identifier already exists in the collection
+		CollectionItemAlreadyExists,
+		/// Collection Item cannot be added to given collection because submitted data are invalid
+		CollectionItemInvalid,
+		/// The collection limits have been reached
+		CollectionLimitsReached,
+		/// Metadata Item cannot be added to given LOC because submitted data are invalid
+		MetadataItemInvalid,
+		/// File cannot be added to given LOC because submitted data are invalid
+		FileInvalid,
+		/// Link cannot be added to given LOC because submitted data are invalid
+		LocLinkInvalid,
 	}
 
 	#[pallet::hooks]
@@ -188,11 +244,12 @@ pub mod pallet {
 		V2MakeLocVoid,
 		V3RequesterEnum,
 		V4ItemSubmitter,
+		V5Collection,
 	}
 
 	impl Default for StorageVersion {
 		fn default() -> StorageVersion {
-			return StorageVersion::V4ItemSubmitter;
+			return StorageVersion::V5Collection;
 		}
 	}
 
@@ -290,10 +347,7 @@ pub mod pallet {
 				match requester_loc {
 					None => Err(Error::<T>::UnexpectedRequester)?,
 					Some(loc) =>
-						if loc.loc_type != LocType::Identity
-							|| match loc.requester { RequesterOf::<T>::None => false, _ => true }
-							|| !loc.closed
-							|| loc.void_info.is_some() {
+						if Self::is_valid_logion_id(&loc) {
 							Err(Error::<T>::UnexpectedRequester)?
 						} else {
 							let requester = RequesterOf::<T>::Loc(requester_loc_id.clone());
@@ -308,6 +362,36 @@ pub mod pallet {
 			}
 		}
 
+		/// Creates a new Collection LOC
+		#[pallet::weight(T::WeightInfo::create_collection_loc())]
+		pub fn create_collection_loc(
+			origin: OriginFor<T>,
+			#[pallet::compact] loc_id: T::LocId,
+			requester_account_id: T::AccountId,
+			collection_last_block_submission: Option<T::BlockNumber>,
+			collection_max_size: Option<u32>,
+		) -> DispatchResultWithPostInfo {
+			T::CreateOrigin::ensure_origin(origin.clone())?;
+			let who = ensure_signed(origin)?;
+
+			if collection_last_block_submission.is_none() && collection_max_size.is_none() {
+				Err(Error::<T>::CollectionHasNoLimit)?
+			}
+
+			if <LocMap<T>>::contains_key(&loc_id) {
+				Err(Error::<T>::AlreadyExists)?
+			} else {
+				let requester = RequesterOf::<T>::Account(requester_account_id.clone());
+				let loc = Self::build_open_collection_loc(&who, &requester, collection_last_block_submission, collection_max_size);
+
+				<LocMap<T>>::insert(loc_id, loc);
+				Self::link_with_account(&requester_account_id, &loc_id);
+
+				Self::deposit_event(Event::LocCreated(loc_id));
+				Ok(().into())
+			}
+		}
+
 		/// Add LOC metadata
 		#[pallet::weight(T::WeightInfo::add_metadata())]
 		pub fn add_metadata(
@@ -316,6 +400,13 @@ pub mod pallet {
 			item: MetadataItem<T::AccountId>
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
+
+			if item.name.len() > T::MaxMetadataItemNameSize::get() {
+				Err(Error::<T>::MetadataItemInvalid)?
+			}
+			if item.value.len() > T::MaxMetadataItemValueSize::get() {
+				Err(Error::<T>::MetadataItemInvalid)?
+			}
 
 			if ! <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::NotFound)?
@@ -347,6 +438,10 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
 
+			if file.nature.len() > T::MaxFileNatureSize::get() {
+				Err(Error::<T>::FileInvalid)?
+			}
+
 			if ! <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::NotFound)?
 			} else {
@@ -376,6 +471,10 @@ pub mod pallet {
 			link: LocLink<T::LocId>
 		) -> DispatchResultWithPostInfo {
 			let who = ensure_signed(origin)?;
+
+			if link.nature.len() > T::MaxLinkNatureSize::get() {
+				Err(Error::<T>::LocLinkInvalid)?
+			}
 
 			if ! <LocMap<T>>::contains_key(&loc_id) {
 				Err(Error::<T>::NotFound)?
@@ -446,6 +545,46 @@ pub mod pallet {
 			#[pallet::compact] replacer_loc_id: T::LocId,
 		) -> DispatchResultWithPostInfo {
 			Self::do_make_void(origin, loc_id, Some(replacer_loc_id))
+		}
+
+		/// Adds an item to a collection
+		#[pallet::weight(T::WeightInfo::add_collection_item())]
+		pub fn add_collection_item(
+			origin: OriginFor<T>,
+			#[pallet::compact] collection_loc_id: T::LocId,
+			item_id: T::CollectionItemId,
+			item_description: Vec<u8>,
+		) -> DispatchResultWithPostInfo {
+			let who = ensure_signed(origin)?;
+
+			if item_description.len() > T::MaxCollectionItemDescriptionSize::get() {
+				Err(Error::<T>::CollectionItemInvalid)?
+			}
+
+			let collection_loc_option = <LocMap<T>>::get(&collection_loc_id);
+			match collection_loc_option {
+				None => Err(Error::<T>::WrongCollectionLoc)?,
+				Some(collection_loc) => {
+					if <CollectionItemsMap<T>>::contains_key(&collection_loc_id, &item_id) {
+						Err(Error::<T>::CollectionItemAlreadyExists)?
+					}
+					if ! Self::can_add_item(&who, &collection_loc) {
+						Err(Error::<T>::WrongCollectionLoc)?
+					}
+					if Self::collection_limits_reached(&collection_loc_id, &collection_loc) {
+						Err(Error::<T>::CollectionLimitsReached)?
+					}
+					let item = CollectionItem {
+						description: item_description.clone(),
+					};
+					<CollectionItemsMap<T>>::insert(collection_loc_id, item_id, item);
+					let collection_size = <CollectionSizeMap<T>>::get(&collection_loc_id).unwrap_or(0);
+					<CollectionSizeMap<T>>::insert(&collection_loc_id, collection_size + 1);
+				},
+			}
+
+			Self::deposit_event(Event::ItemAdded(collection_loc_id, item_id));
+			Ok(().into())
 		}
 	}
 
@@ -581,6 +720,13 @@ pub mod pallet {
 			}
 		}
 
+		fn is_valid_logion_id(loc: &LegalOfficerCaseOf<T>) -> bool {
+			loc.loc_type != LocType::Identity
+				|| match loc.requester { RequesterOf::<T>::None => false, _ => true }
+				|| !loc.closed
+				|| loc.void_info.is_some()
+		}
+
 		fn build_open_loc(
 			who: &T::AccountId,
 			requester: &RequesterOf<T>,
@@ -595,8 +741,45 @@ pub mod pallet {
 				loc_type: loc_type.clone(),
 				links: Vec::new(),
 				void_info: None,
-				replacer_of: None
+				replacer_of: None,
+				collection_last_block_submission: Option::None,
+				collection_max_size: Option::None,
 			}
+		}
+
+		fn build_open_collection_loc(
+			who: &T::AccountId,
+			requester: &RequesterOf<T>,
+			collection_last_block_submission: Option<T::BlockNumber>,
+			collection_max_size: Option<CollectionSize>,
+		) -> LegalOfficerCaseOf<T> {
+			LegalOfficerCaseOf::<T> {
+				owner: who.clone(),
+				requester: requester.clone(),
+				metadata: Vec::new(),
+				files: Vec::new(),
+				closed: false,
+				loc_type: LocType::Collection,
+				links: Vec::new(),
+				void_info: None,
+				replacer_of: None,
+				collection_last_block_submission: collection_last_block_submission.clone(),
+				collection_max_size: collection_max_size.clone(),
+			}
+		}
+
+		fn can_add_item(who: &T::AccountId, collection_loc: &LegalOfficerCaseOf<T>) -> bool {
+			collection_loc.loc_type == LocType::Collection
+				&& match &collection_loc.requester { Requester::Account(requester) => requester == who, _ => false }
+				&& collection_loc.closed
+				&& collection_loc.void_info.is_none()
+		}
+
+		fn collection_limits_reached(collection_loc_id: &T::LocId, collection_loc: &LegalOfficerCaseOf<T>) -> bool {
+			let collection_size = <CollectionSizeMap<T>>::get(collection_loc_id).unwrap_or(0);
+			let current_block_number = <frame_system::Pallet<T>>::block_number();
+			return match collection_loc.collection_max_size { None => false, Some(limit) => collection_size >= limit }
+				|| match collection_loc.collection_last_block_submission { None => false, Some(last_block) => current_block_number >= last_block };
 		}
 	}
 
