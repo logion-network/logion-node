@@ -34,7 +34,9 @@
     "loc_type": "LocType",
     "links": "Vec<LocLink<LocId>>",
     "void_info": "Option<LocVoidInfo<LocId>>",
-    "replacer_of": "Option<LocId>"
+    "replacer_of": "Option<LocId>",
+    "collection_last_block_submission": "Option<BlockNumber>",
+    "collection_max_size": "Option<CollectionSize>"
   },
   "MetadataItem": {
     "name": "Vec<u8>",
@@ -44,7 +46,8 @@
   "LocType": {
     "_enum": [
       "Transaction",
-      "Identity"
+      "Identity",
+      "Collection"
     ]
   },
   "LocLink": {
@@ -64,7 +67,8 @@
       "V1",
       "V2MakeLocVoid",
       "V3RequesterEnum",
-      "V4ItemSubmitter"
+      "V4ItemSubmitter",
+      "V5Collection"
     ]
   },
   "Requester": {
@@ -74,5 +78,10 @@
       "Loc": "LocId"
     }
   },
-  "Keys": "SessionKeys2"
+  "Keys": "SessionKeys2",
+  "CollectionSize": "u32",
+  "CollectionItemId": "Hash",
+  "CollectionItem": {
+    "description": "Vec<u8>"
+  }
 }

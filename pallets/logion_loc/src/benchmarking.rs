@@ -1,7 +1,8 @@
 use super::*;
 
-use frame_benchmarking::{benchmarks, impl_benchmark_test_suite};
+use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller};
 use frame_support::{assert_ok, traits::EnsureOrigin};
+use frame_system::RawOrigin;
 use sp_std::{vec, vec::Vec, boxed::Box};
 
 use crate::Pallet as LogionLoc;
@@ -34,6 +35,7 @@ benchmarks! {
 		let item = MetadataItem {
 			name: vec![1u8, 2u8, 3u8],
 			value: vec![4u8, 5u8, 6u8],
+			submitter: Default::default(),
 		};
 		assert_ok!(LogionLoc::<T>::create_polkadot_transaction_loc(caller.clone().into(), loc_id, Default::default()));
 	}: _(caller, loc_id, item)
@@ -44,6 +46,7 @@ benchmarks! {
 		let file = File {
 			hash: Default::default(),
 			nature: vec![1u8, 2u8, 3u8],
+			submitter: Default::default(),
 		};
 		assert_ok!(LogionLoc::<T>::create_polkadot_transaction_loc(caller.clone().into(), loc_id, Default::default()));
 	}: _(caller, loc_id, file)
@@ -79,6 +82,18 @@ benchmarks! {
 		let loc_id = into_loc_id::<T>(1);
 		assert_ok!(LogionLoc::<T>::create_polkadot_transaction_loc(caller.clone().into(), loc_id, Default::default()));
 	}: _(caller, loc_id, replacer_loc_id)
+
+	create_collection_loc {
+		let caller = <T as crate::Config>::CreateOrigin::successful_origin().into().ok().unwrap();
+	}: _(caller, Default::default(), Default::default(), Option::None, Option::Some(1))
+
+	add_collection_item {
+		let caller = <T as crate::Config>::CreateOrigin::successful_origin().into().ok().unwrap();
+		let loc_id = into_loc_id::<T>(0);
+		let requester: T::AccountId = whitelisted_caller();
+		assert_ok!(LogionLoc::<T>::create_collection_loc(caller.clone().into(), loc_id, requester.clone(), Option::None, Option::Some(1)));
+		assert_ok!(LogionLoc::<T>::close(caller.clone().into(), loc_id));
+	}: _(RawOrigin::Signed(requester), loc_id, Default::default(), Default::default())
 }
 
 fn into_loc_id<T: pallet::Config>(value: u128) -> <T as crate::Config>::LocId {

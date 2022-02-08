@@ -394,11 +394,25 @@ impl pallet_lo_authority_list::Config for Runtime {
 	type Event = Event;
 }
 
+parameter_types! {
+	pub const MaxMetadataItemNameSize: usize = 255;
+	pub const MaxMetadataItemValueSize: usize = 4096;
+	pub const MaxFileNatureSize: usize = 255;
+	pub const MaxLinkNatureSize: usize = 255;
+	pub const MaxCollectionItemDescriptionSize: usize = 4096;
+}
+
 impl pallet_logion_loc::Config for Runtime {
 	type LocId = u128;
 	type Event = Event;
 	type Hash = Hash;
 	type CreateOrigin = LoAuthorityList;
+	type MaxMetadataItemNameSize = MaxMetadataItemNameSize;
+	type MaxMetadataItemValueSize = MaxMetadataItemValueSize;
+	type MaxFileNatureSize = MaxFileNatureSize;
+	type MaxLinkNatureSize = MaxLinkNatureSize;
+	type CollectionItemId = Hash;
+	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
 	type WeightInfo = ();
 }
 
