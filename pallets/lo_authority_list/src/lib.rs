@@ -2,6 +2,7 @@
 
 use frame_support::traits::{EnsureOrigin, Vec};
 use frame_system::ensure_signed;
+use logion_shared::IsLegalOfficer;
 pub use pallet::*;
 
 #[cfg(test)]
@@ -156,4 +157,10 @@ impl<T: Config> Pallet<T> {
 			LegalOfficerSet::<T>::insert(legal_officer, true);
 		}
 	}
+}
+
+impl<T: Config> IsLegalOfficer<T::AccountId> for Pallet<T> {
+    fn is_legal_officer(account: &T::AccountId) -> bool {
+        LegalOfficerSet::<T>::contains_key(account)
+    }
 }

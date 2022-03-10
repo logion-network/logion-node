@@ -1,11 +1,10 @@
 [package]
 authors = ['Logion Team <https://github.com/logion-network>']
-description = 'Pallet implements Logion Legal Officer (LO) authority list.'
+description = 'Pallet implements Logion Vault.'
 edition = '2018'
 homepage = 'https://logion.network'
 license = 'Apache 2.0'
-name = 'pallet-lo-authority-list'
-readme = 'README.md'
+name = 'pallet-logion-vault'
 repository = 'https://github.com/logion-network/logion-node'
 version = '0.1.0'
 
@@ -18,6 +17,7 @@ frame-system = { default-features = false, version = '3.0.0' }
 frame-support = { default-features = false, version = '3.0.0' }
 frame-benchmarking = { default-features = false, optional = true, version = '3.1.0' }
 logion-shared = { default-features = false, path = '../shared/', version = '0.1.0' }
+pallet-multisig = { default-features = false, version='3.0.0' }
 serde = { default-features = false, version = "1.0.119" }
 sp-std = { default-features = false, version = '3.0.0' }
 
@@ -33,6 +33,7 @@ std = [
 	'frame-support/std',
 	'frame-system/std',
 	'frame-benchmarking/std',
+	'pallet-multisig/std',
 	'serde/std',
 	'sp-std/std',
 ]
