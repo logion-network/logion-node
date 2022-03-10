@@ -6,6 +6,7 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+use pallet_multisig::Timepoint;
 use sp_std::prelude::*;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
@@ -41,7 +42,7 @@ pub use frame_support::{
 };
 use pallet_transaction_payment::CurrencyAdapter;
 use frame_system::EnsureRoot;
-use logion_shared::CreateRecoveryCallFactory;
+use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -157,6 +158,8 @@ impl Filter<Call> for BaseCallFilter {
 	fn filter(call: &Call) -> bool {
 		match call {
 			Call::Recovery(pallet_recovery::Call::create_recovery(..)) => false,
+			Call::Multisig(pallet_multisig::Call::approve_as_multi(..)) => false,
+			Call::Multisig(pallet_multisig::Call::as_multi(..)) => false,
 			_ => true
 		}
 	}
@@ -311,44 +314,6 @@ impl pallet_multisig::Config for Runtime {
 	type WeightInfo = ();
 }
 
-// Proxy config inspired by https://github.com/paritytech/substrate/blob/master/frame/proxy/src/tests.rs
-parameter_types! {
-	pub const ProxyDepositBase: Balance = 1;
-	pub const ProxyDepositFactor: Balance = 1;
-	pub const AnnouncementDepositBase: Balance = 1;
-	pub const AnnouncementDepositFactor: Balance = 1;
-	pub const MaxProxies: u16 = 4;
-	pub const MaxPending: u16 = 2;
-}
-
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
-pub enum ProxyType {
-	Any
-}
-
-impl Default for ProxyType { fn default() -> Self { Self::Any } }
-
-impl InstanceFilter<Call> for ProxyType {
-	fn filter(&self, _c: &Call) -> bool {
-		true
-	}
-}
-
-impl pallet_proxy::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
-	type CallHasher = BlakeTwo256;
-	type Currency = Currency;
-	type ProxyDepositBase = ProxyDepositBase;
-	type ProxyDepositFactor = ProxyDepositFactor;
-	type MaxProxies = MaxProxies;
-	type MaxPending = MaxPending;
-	type AnnouncementDepositBase = AnnouncementDepositBase;
-	type AnnouncementDepositFactor = AnnouncementDepositFactor;
-	type ProxyType = ProxyType;
-	type WeightInfo = ();
-}
-
 parameter_types! {
 	pub const RecoveryConfigDepositBase: u64 = 10;
 	pub const RecoveryFrieldDepositFactor: u64 = 1;
@@ -450,6 +415,45 @@ impl pallet_session::Config for Runtime {
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
 }
 
+pub struct PalletMultisigApproveAsMultiCallFactory;
+impl MultisigApproveAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>> for PalletMultisigApproveAsMultiCallFactory {
+	type Call = Call;
+
+	fn build_approve_as_multi_call(
+        threshold: u16,
+        other_signatories: Vec<AccountId>,
+        maybe_timepoint: Option<Timepoint<BlockNumber>>,
+        call_hash: [u8; 32],
+        max_weight: Weight
+	) -> Call {
+		Call::Multisig(pallet_multisig::Call::approve_as_multi(threshold, other_signatories, maybe_timepoint, call_hash, max_weight))
+	}
+}
+
+pub struct PalletMultisigAsMultiCallFactory;
+impl MultisigAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>> for PalletMultisigAsMultiCallFactory {
+	type Call = Call;
+
+	fn build_as_multi_call(
+        threshold: u16,
+        other_signatories: Vec<AccountId>,
+        maybe_timepoint: Option<Timepoint<BlockNumber>>,
+        call: Vec<u8>,
+        store_call: bool,
+        max_weight: Weight,
+	) -> Call {
+		Call::Multisig(pallet_multisig::Call::as_multi(threshold, other_signatories, maybe_timepoint, call, store_call, max_weight))
+	}
+}
+
+impl pallet_logion_vault::Config for Runtime {
+	type MultisigApproveAsMultiCallFactory = PalletMultisigApproveAsMultiCallFactory;
+	type MultisigAsMultiCallFactory = PalletMultisigAsMultiCallFactory;
+	type IsLegalOfficer = LoAuthorityList;
+	type Event = Event;
+	type WeightInfo = ();
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -469,12 +473,12 @@ construct_runtime!(
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		NodeAuthorization: pallet_node_authorization::{Module, Call, Storage, Event<T>, Config<T>},
 		Multisig:  pallet_multisig::{Module, Call, Storage, Event<T>},
-		Proxy:  pallet_proxy::{Module, Call, Storage, Event<T>},
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
 		LoAuthorityList: pallet_lo_authority_list::{Module, Call, Storage, Event<T>, Config<T>},
 		LogionLoc: pallet_logion_loc::{Module, Call, Storage, Event<T>},
-		VerifiedRecovery: pallet_verified_recovery::{Module, Call, Event<T>}
+		VerifiedRecovery: pallet_verified_recovery::{Module, Call, Event<T>},
+		Vault: pallet_logion_vault::{Module, Call, Event<T>},
 	}
 );
 

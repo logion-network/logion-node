@@ -1,5 +1,6 @@
 use crate::mock::*;
 use frame_support::{assert_err, assert_ok, error::BadOrigin, traits::EnsureOrigin};
+use logion_shared::IsLegalOfficer;
 
 const LEGAL_OFFICER_ID: u64 = 1;
 const ANOTHER_ID: u64 = 2;
@@ -49,5 +50,21 @@ fn it_ensures_origin_err_as_expected() {
 		assert_ok!(LoAuthorityList::add_legal_officer(Origin::signed(MANAGER), LEGAL_OFFICER_ID));
 		let result = LoAuthorityList::try_origin(Origin::signed(ANOTHER_ID));
 		assert!(result.err().is_some());
+	});
+}
+
+#[test]
+fn it_detects_legal_officer() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LoAuthorityList::add_legal_officer(Origin::signed(MANAGER), LEGAL_OFFICER_ID));
+		assert!(LoAuthorityList::is_legal_officer(&LEGAL_OFFICER_ID));
+	});
+}
+
+#[test]
+fn it_detects_regular_user() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(LoAuthorityList::add_legal_officer(Origin::signed(MANAGER), LEGAL_OFFICER_ID));
+		assert!(!LoAuthorityList::is_legal_officer(&ANOTHER_ID));
 	});
 }
