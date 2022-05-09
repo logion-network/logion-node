@@ -50,12 +50,12 @@ sp-std = { default-features = false, version = '3.0.0' }
 sp-transaction-pool = { default-features = false, version = '3.0.0' }
 sp-version = { default-features = false, version = '3.0.0' }
 
-# local dependencies
-pallet-lo-authority-list = { default-features = false, path = '../pallets/lo_authority_list', version = '0.1.0' }
-pallet-logion-loc = { default-features = false, path = '../pallets/logion_loc', version = '0.1.0' }
-logion-shared = { default-features = false, path = '../pallets/shared', version = '0.1.0' }
-pallet-verified-recovery = { default-features = false, path = '../pallets/verified_recovery', version = '0.1.0' }
-pallet-logion-vault = { default-features = false, path = '../pallets/vault', version = '0.1.0' }
+# logion dependencies
+pallet-lo-authority-list = { default-features = false, version = '0.1.0' }
+pallet-logion-loc = { default-features = false, version = '0.1.0' }
+logion-shared = { default-features = false, version = '0.1.0' }
+pallet-verified-recovery = { default-features = false, version = '0.1.0' }
+pallet-logion-vault = { default-features = false, version = '0.1.0' }
 
 [features]
 default = ['std']
