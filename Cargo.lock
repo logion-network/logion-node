@@ -3295,6 +3295,8 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8cc9ed378241f1ed9e2a0d07fc04da0e951f567ebd0748ae77441e0441aa9f0"
 dependencies = [
  "frame-support",
 ]
@@ -3881,6 +3883,8 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09b852b597d3f0c28252d1c57613503b64950aac67b54a989883d60d52290065"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3888,42 +3892,35 @@ dependencies = [
  "logion-shared",
  "parity-scale-codec",
  "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
  "sp-std",
 ]
 
 [[package]]
 name = "pallet-logion-loc"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c16a36baa0b2f07d5097a348b6959227023ca8aab9f717bdc6be95d52fb19943"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
  "logion-shared",
  "parity-scale-codec",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
  "sp-std",
 ]
 
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5036a2b0e2b0ca2cb790a8b5acce87970672ae252a7d8ecf0bfb32d607676d10"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "logion-shared",
  "pallet-multisig",
  "parity-scale-codec",
  "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
  "sp-std",
 ]
 
@@ -4094,16 +4091,14 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1e2a7e934981e322c5f77c98d7840029c1a7428e08cd9b6f3d90283a33526f7"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "logion-shared",
  "parity-scale-codec",
  "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
  "sp-std",
 ]
 
