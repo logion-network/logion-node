@@ -108,7 +108,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 106,
+	spec_version: 107,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -283,7 +283,7 @@ impl pallet_sudo::Config for Runtime {
 }
 
 parameter_types! {
-    pub const MaxWellKnownNodes: u32 = 10;
+    pub const MaxWellKnownNodes: u32 = 100;
     pub const MaxPeerIdLength: u32 = 128;
 }
 
