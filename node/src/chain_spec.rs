@@ -16,7 +16,7 @@ use logion_node_runtime::{
 	SudoConfig,
 	SystemConfig,
 	ValidatorSetConfig,
-	WASM_BINARY
+	WASM_BINARY,
 };
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_finality_grandpa::AuthorityId as GrandpaId;
@@ -102,6 +102,8 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		None,
 		// Protocol ID
 		None,
+		// Fork ID
+		None,
 		// Properties
 		Some(default_properties()),
 		// Extensions
@@ -169,6 +171,8 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		// Telemetry
 		None,
 		// Protocol ID
+		None,
+		// Fork ID
 		None,
 		// Properties
 		Some(default_properties()),
@@ -254,6 +258,8 @@ pub fn mvp_config() -> Result<ChainSpec, String> {
 		None,
 		// Protocol ID
 		None,
+		// Fork ID
+		None,
 		// Properties
 		Some(default_properties()),
 		// Extensions
@@ -310,6 +316,8 @@ pub fn test_testnet_config() -> Result<ChainSpec, String> {
 		None,
 		// Protocol ID
 		None,
+		// Fork ID
+		None,
 		// Properties
 		Some(default_properties()),
 		// Extensions
@@ -329,40 +337,41 @@ fn logion_genesis(
 	legal_officers: Vec<AccountId>,
 ) -> GenesisConfig {
 	GenesisConfig {
-		frame_system: Some(SystemConfig {
+		system: SystemConfig {
 			// Add Wasm runtime to storage.
 			code: wasm_binary.to_vec(),
-			changes_trie_config: Default::default(),
-		}),
-		pallet_balances: Some(BalancesConfig {
+		},
+		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance.
 			balances: endowed_accounts.iter().cloned().map(|k|(k, INITIAL_BALANCE)).collect(),
-		}),
-		pallet_validator_set: Some(ValidatorSetConfig {
-			validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-		}),
-		pallet_session: Some(SessionConfig {
+		},
+		validator_set: ValidatorSetConfig {
+			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+		},
+		session: SessionConfig {
 			keys: initial_authorities
 				.iter()
 				.map(|x| (x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone())))
 				.collect::<Vec<_>>(),
-		}),
-		pallet_aura: Some(AuraConfig {
+		},
+		aura: AuraConfig {
 			authorities: vec![],
-		}),
-		pallet_grandpa: Some(GrandpaConfig {
+		},
+		grandpa: GrandpaConfig {
 			authorities: vec![],
-		}),
-		pallet_sudo: Some(SudoConfig {
+		},
+		sudo: SudoConfig {
 			// Assign network admin rights.
-			key: root_key,
-		}),
-		pallet_node_authorization: Some(NodeAuthorizationConfig {
+			key: Some(root_key),
+		},
+		node_authorization: NodeAuthorizationConfig {
 			nodes: initial_authorized_nodes.iter().map(|x| (x.0.clone(), x.1.clone())).collect(),
-		}),
-		pallet_lo_authority_list: Some(LoAuthorityListConfig {
+		},
+		lo_authority_list: LoAuthorityListConfig {
 			legal_officers: legal_officers.iter().map(|x| x.clone()).collect(),
-		})
+		},
+		transaction_payment: Default::default(),
+		assets: Default::default(),
 	}
 }
 
