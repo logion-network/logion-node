@@ -1,27 +1,25 @@
 [package]
-authors = ['Logion Team <https://github.com/logion-network>']
-build = 'build.rs'
-description = 'A Logion network node.'
-edition = '2021'
-homepage = 'https://logion.network'
-license = 'Apache 2.0'
-name = 'logion-node'
-repository = 'https://github.com/logion-network/logion-node'
-version = '3.0.0'
-
-[[bin]]
-name = 'logion-node'
+name = "logion-node"
+version = "4.0.0"
+description = "A Logion network node."
+authors = ["Logion Team <https://github.com/logion-network>"]
+homepage = "https://logion.network"
+edition = "2021"
+license = "Apache 2.0"
+publish = false
+repository = "https://github.com/logion-network/logion-node"
+build = "build.rs"
 
 [package.metadata.docs.rs]
-targets = ['x86_64-unknown-linux-gnu']
+targets = ["x86_64-unknown-linux-gnu"]
 
-[build-dependencies]
-substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
+[[bin]]
+name = "logion-node"
 
 [dependencies]
-bs58 = '0.4.0'
+bs58 = "0.4.0"
 clap = { version = "3.1.18", features = ["derive"] }
-serde_json = '1.0.81'
+serde_json = "1.0.81"
 
 sc-cli = { version = "0.10.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22", features = ["wasmtime"] }
 sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
@@ -45,7 +43,7 @@ sp-keyring = { version = "6.0.0", git = "https://github.com/paritytech/substrate
 frame-system = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
 pallet-transaction-payment = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
 
-# These dependencies are used for the node template's RPCs
+# These dependencies are used for the node template"s RPCs
 jsonrpsee = { version = "0.13.0", features = ["server"] }
 sc-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
 sp-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
@@ -61,12 +59,17 @@ frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/parityte
 frame-benchmarking-cli = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
 
 # local dependencies
-logion-node-runtime = { path = '../runtime', version = '3.0.0' }
+logion-node-runtime = { version = "4.0.0", path = "../runtime" }
 
 # CLI-specific dependencies
 try-runtime-cli = { version = "0.10.0-dev", optional = true, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
 
+[build-dependencies]
+substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.22" }
+
 [features]
 default = []
-runtime-benchmarks = ['logion-node-runtime/runtime-benchmarks']
+runtime-benchmarks = ["logion-node-runtime/runtime-benchmarks"]
+# Enable features that allow the runtime to be tried and debugged. Name might be subject to change
+# in the near future.
 try-runtime = ["logion-node-runtime/try-runtime", "try-runtime-cli"]

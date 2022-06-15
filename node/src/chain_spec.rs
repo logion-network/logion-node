@@ -1,28 +1,16 @@
-use std::str::FromStr;
-
-use sp_core::{Pair, Public, sr25519, ed25519, OpaquePeerId};
 use logion_node_runtime::{
+	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature, SudoConfig,
+	SystemConfig, WASM_BINARY,
 	opaque::SessionKeys,
-	AccountId,
-	AuraConfig,
-	Balance,
-	BalancesConfig,
-	GenesisConfig,
-	GrandpaConfig,
-	LoAuthorityListConfig,
-	NodeAuthorizationConfig,
-	Signature,
-	SessionConfig,
-	SudoConfig,
-	SystemConfig,
-	ValidatorSetConfig,
-	WASM_BINARY,
+	NodeAuthorizationConfig, ValidatorSetConfig, SessionConfig, LoAuthorityListConfig, Balance,
 };
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_runtime::traits::{Verify, IdentifyAccount};
 use sc_service::ChainType;
 use serde_json::json;
+use sp_consensus_aura::sr25519::AuthorityId as AuraId;
+use sp_core::{ed25519, sr25519, Pair, Public, OpaquePeerId};
+use sp_finality_grandpa::AuthorityId as GrandpaId;
+use sp_runtime::traits::{IdentifyAccount, Verify};
+use std::str::FromStr;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -44,8 +32,9 @@ fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
 type AccountPublic = <Signature as Verify>::Signer;
 
 /// Generate an account ID from seed.
-pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId where
-	AccountPublic: From<<TPublic::Pair as Pair>::Public>
+pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
+where
+	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
@@ -55,7 +44,7 @@ pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId) {
 	(
 		get_account_id_from_seed::<sr25519::Public>(s),
 		get_from_seed::<AuraId>(s),
-		get_from_seed::<GrandpaId>(s),
+		get_from_seed::<GrandpaId>(s)
 	)
 }
 

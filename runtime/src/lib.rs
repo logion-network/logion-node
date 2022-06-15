@@ -1,49 +1,52 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
-#![recursion_limit="256"]
+#![recursion_limit = "256"]
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-use pallet_multisig::Timepoint;
-use sp_std::prelude::*;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
-use sp_runtime::{
-	ApplyExtrinsicResult, generic, create_runtime_str, impl_opaque_keys, MultiSignature,
-	transaction_validity::{TransactionValidity, TransactionSource},
-	traits::{ OpaqueKeys }
-};
-use sp_runtime::traits::{
-	BlakeTwo256, Block as BlockT, AccountIdLookup, Verify, IdentifyAccount, NumberFor,
+use pallet_grandpa::{
+	fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
-use pallet_grandpa::fg_primitives;
-use sp_version::RuntimeVersion;
+use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
+use sp_runtime::{
+	create_runtime_str, generic, impl_opaque_keys,
+	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, NumberFor, Verify, OpaqueKeys},
+	transaction_validity::{TransactionSource, TransactionValidity},
+	ApplyExtrinsicResult, MultiSignature,
+};
+use sp_std::prelude::*;
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
+use sp_version::RuntimeVersion;
 
 // A few exports that help ease life for downstream crates.
-#[cfg(any(feature = "std", test))]
-pub use sp_runtime::BuildStorage;
-pub use pallet_timestamp::Call as TimestampCall;
-pub use pallet_balances::Call as BalancesCall;
-pub use sp_runtime::{Permill, Perbill};
 pub use frame_support::{
-	construct_runtime, parameter_types, StorageValue, RuntimeDebug,
-	traits::{KeyOwnerProofSystem, Randomness, InstanceFilter, Contains, ConstU8, ConstU32, WrapperKeepOpaque},
-	weights::{
-		Weight, IdentityFee,
-		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
+	construct_runtime, parameter_types,
+	traits::{
+		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo, Contains, WrapperKeepOpaque,
 	},
-	codec::{Encode, Decode},
+	weights::{
+		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
+		IdentityFee, Weight,
+	},
+	StorageValue,
 };
 pub use frame_system::Call as SystemCall;
+pub use pallet_balances::Call as BalancesCall;
+pub use pallet_timestamp::Call as TimestampCall;
 use pallet_transaction_payment::CurrencyAdapter;
+#[cfg(any(feature = "std", test))]
+pub use sp_runtime::BuildStorage;
+pub use sp_runtime::{Perbill, Permill};
+
+// Additional imports
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
+use pallet_multisig::Timepoint;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -54,10 +57,6 @@ pub type Signature = MultiSignature;
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
 pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
-
-/// The type for looking up accounts. We don't expect more than 4 billion of them, but you
-/// never know...
-pub type AccountIndex = u32;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -122,6 +121,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 /// Change this to adjust the block time.
 pub const MILLISECS_PER_BLOCK: u64 = 6000;
 
+// NOTE: Currently it is not possible to change the slot duration after the chain has started.
+//       Attempting to do so will brick block production.
 pub const SLOT_DURATION: u64 = MILLISECS_PER_BLOCK;
 
 // Time is measured by number of blocks.
@@ -132,17 +133,14 @@ pub const DAYS: BlockNumber = HOURS * 24;
 /// The version information used to identify this runtime when compiled natively.
 #[cfg(feature = "std")]
 pub fn native_version() -> NativeVersion {
-	NativeVersion {
-		runtime_version: VERSION,
-		can_author_with: Default::default(),
-	}
+	NativeVersion { runtime_version: VERSION, can_author_with: Default::default() }
 }
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 
 parameter_types! {
-	pub const Version: RuntimeVersion = VERSION;
 	pub const BlockHashCount: BlockNumber = 2400;
+	pub const Version: RuntimeVersion = VERSION;
 	/// We allow for 2 seconds of compute with a 6 second average block time.
 	pub BlockWeights: frame_system::limits::BlockWeights = frame_system::limits::BlockWeights
 		::with_sensible_defaults(2 * WEIGHT_PER_SECOND, NORMAL_DISPATCH_RATIO);
@@ -245,25 +243,16 @@ impl pallet_grandpa::Config for Runtime {
 	type MaxAuthorities = ConstU32<32>;
 }
 
-parameter_types! {
-	pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
-}
-
 impl pallet_timestamp::Config for Runtime {
 	/// A timestamp: milliseconds since the unix epoch.
 	type Moment = u64;
 	type OnTimestampSet = Aura;
-	type MinimumPeriod = MinimumPeriod;
+	type MinimumPeriod = ConstU64<{ SLOT_DURATION / 2 }>;
 	type WeightInfo = ();
 }
 
-parameter_types! {
-	pub const ExistentialDeposit: u128 = 500;
-	pub const MaxLocks: u32 = 50;
-}
-
 impl pallet_balances::Config for Runtime {
-	type MaxLocks = MaxLocks;
+	type MaxLocks = ConstU32<50>;
 	type MaxReserves = ();
 	type ReserveIdentifier = [u8; 8];
 	/// The type for recording an account's balance.
@@ -271,13 +260,9 @@ impl pallet_balances::Config for Runtime {
 	/// The ubiquitous event type.
 	type Event = Event;
 	type DustRemoval = ();
-	type ExistentialDeposit = ExistentialDeposit;
+	type ExistentialDeposit = ConstU128<500>;
 	type AccountStore = System;
-	type WeightInfo = ();
-}
-
-parameter_types! {
-	pub const TransactionByteFee: Balance = 1;
+	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 }
 
 impl pallet_transaction_payment::Config for Runtime {
@@ -294,122 +279,18 @@ impl pallet_sudo::Config for Runtime {
 }
 
 parameter_types! {
-    pub const MaxWellKnownNodes: u32 = 100;
-    pub const MaxPeerIdLength: u32 = 128;
+	pub const MaxWellKnownNodes: u32 = 100;
+	pub const MaxPeerIdLength: u32 = 128;
 }
 
 impl pallet_node_authorization::Config for Runtime {
-    type Event = Event;
-    type MaxWellKnownNodes = MaxWellKnownNodes;
-    type MaxPeerIdLength = MaxPeerIdLength;
-    type AddOrigin = EnsureRoot<AccountId>;
-    type RemoveOrigin = EnsureRoot<AccountId>;
-    type SwapOrigin = EnsureRoot<AccountId>;
-    type ResetOrigin = EnsureRoot<AccountId>;
-    type WeightInfo = ();
-}
-
-parameter_types! {
-	pub const MultiSigDepositBase: Balance = 500;
-	pub const MultiSigDepositFactor: Balance = 100;
-	pub const MaxSignatories: u16 = 20;
-}
-
-impl pallet_multisig::Config for Runtime {
 	type Event = Event;
-	type Call = Call;
-	type Currency = Currency;
-	type DepositBase = MultiSigDepositBase;
-	type DepositFactor = MultiSigDepositFactor;
-	type MaxSignatories = MaxSignatories;
-	type WeightInfo = ();
-}
-
-parameter_types! {
-	pub const RecoveryConfigDepositBase: u64 = 10;
-	pub const RecoveryFrieldDepositFactor: u64 = 1;
-	pub const MaxFriends: u16 = 3;
-	pub const RecoveryDeposit: u64 = 10;
-}
-
-impl pallet_recovery::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
-	type Currency = Currency;
-	type ConfigDepositBase = RecoveryConfigDepositBase;
-	type FriendDepositFactor = RecoveryFrieldDepositFactor;
-	type MaxFriends = MaxFriends;
-	type RecoveryDeposit = RecoveryDeposit;
-	type WeightInfo = ();
-}
-
-parameter_types! {
-	pub const AssetDepositBase: u64 = 1;
-	pub const AssetDepositPerZombie: u64 = 1;
-	pub const StringLimit: u32 = 50;
-	pub const MetadataDepositBase: u64 = 1;
-	pub const MetadataDepositPerByte: u64 = 1;
-	pub const ApprovalDeposit: u64 = 1;
-}
-
-impl pallet_assets::Config for Runtime {
-	type Event = Event;
-	type Balance = Balance;
-	type AssetId = u64;
-	type Currency = Currency;
-	type ForceOrigin = EnsureRoot<AccountId>;
-	type AssetDeposit = AssetDepositBase;
-	type AssetAccountDeposit = AssetDepositPerZombie;
-	type StringLimit = StringLimit;
-	type MetadataDepositBase = MetadataDepositBase;
-	type MetadataDepositPerByte = MetadataDepositPerByte;
-	type ApprovalDeposit = ApprovalDeposit;
-	type Freezer = ();
-	type Extra = ();
-	type WeightInfo = ();
-}
-
-impl pallet_lo_authority_list::Config for Runtime {
+	type MaxWellKnownNodes = MaxWellKnownNodes;
+	type MaxPeerIdLength = MaxPeerIdLength;
 	type AddOrigin = EnsureRoot<AccountId>;
-    type RemoveOrigin = EnsureRoot<AccountId>;
-	type Event = Event;
-}
-
-parameter_types! {
-	pub const MaxMetadataItemNameSize: usize = 255;
-	pub const MaxMetadataItemValueSize: usize = 4096;
-	pub const MaxFileNatureSize: usize = 255;
-	pub const MaxLinkNatureSize: usize = 255;
-	pub const MaxCollectionItemDescriptionSize: usize = 4096;
-}
-
-impl pallet_logion_loc::Config for Runtime {
-	type LocId = u128;
-	type Event = Event;
-	type Hash = Hash;
-	type CreateOrigin = LoAuthorityList;
-	type MaxMetadataItemNameSize = MaxMetadataItemNameSize;
-	type MaxMetadataItemValueSize = MaxMetadataItemValueSize;
-	type MaxFileNatureSize = MaxFileNatureSize;
-	type MaxLinkNatureSize = MaxLinkNatureSize;
-	type CollectionItemId = Hash;
-	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
-	type WeightInfo = ();
-}
-
-pub struct PalletRecoveryCreateRecoveryCallFactory;
-impl CreateRecoveryCallFactory<Origin, AccountId, BlockNumber> for PalletRecoveryCreateRecoveryCallFactory {
-	type Call = Call;
-
-	fn build_create_recovery_call(legal_officers: Vec<AccountId>, threshold: u16, delay_period: BlockNumber) -> Call {
-		Call::Recovery(pallet_recovery::Call::create_recovery{ friends: legal_officers, threshold, delay_period })
-	}
-}
-
-impl pallet_verified_recovery::Config for Runtime {
-	type CreateRecoveryCallFactory = PalletRecoveryCreateRecoveryCallFactory;
-	type LocQuery = LogionLoc;
-	type Event = Event;
+	type RemoveOrigin = EnsureRoot<AccountId>;
+	type SwapOrigin = EnsureRoot<AccountId>;
+	type ResetOrigin = EnsureRoot<AccountId>;
 	type WeightInfo = ();
 }
 
@@ -440,16 +321,94 @@ impl pallet_session::Config for Runtime {
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
 }
 
+impl pallet_lo_authority_list::Config for Runtime {
+	type AddOrigin = EnsureRoot<AccountId>;
+	type RemoveOrigin = EnsureRoot<AccountId>;
+	type Event = Event;
+}
+
+parameter_types! {
+	pub const MaxMetadataItemNameSize: usize = 255;
+	pub const MaxMetadataItemValueSize: usize = 4096;
+	pub const MaxFileNatureSize: usize = 255;
+	pub const MaxLinkNatureSize: usize = 255;
+	pub const MaxCollectionItemDescriptionSize: usize = 4096;
+}
+
+impl pallet_logion_loc::Config for Runtime {
+	type LocId = u128;
+	type Event = Event;
+	type Hash = Hash;
+	type CreateOrigin = LoAuthorityList;
+	type MaxMetadataItemNameSize = MaxMetadataItemNameSize;
+	type MaxMetadataItemValueSize = MaxMetadataItemValueSize;
+	type MaxFileNatureSize = MaxFileNatureSize;
+	type MaxLinkNatureSize = MaxLinkNatureSize;
+	type CollectionItemId = Hash;
+	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
+	type WeightInfo = ();
+}
+
+parameter_types! {
+	pub const RecoveryConfigDepositBase: u64 = 10;
+	pub const RecoveryFrieldDepositFactor: u64 = 1;
+	pub const MaxFriends: u16 = 3;
+	pub const RecoveryDeposit: u64 = 10;
+}
+
+impl pallet_recovery::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type Currency = Currency;
+	type ConfigDepositBase = RecoveryConfigDepositBase;
+	type FriendDepositFactor = RecoveryFrieldDepositFactor;
+	type MaxFriends = MaxFriends;
+	type RecoveryDeposit = RecoveryDeposit;
+	type WeightInfo = ();
+}
+
+pub struct PalletRecoveryCreateRecoveryCallFactory;
+impl CreateRecoveryCallFactory<Origin, AccountId, BlockNumber> for PalletRecoveryCreateRecoveryCallFactory {
+	type Call = Call;
+
+	fn build_create_recovery_call(legal_officers: Vec<AccountId>, threshold: u16, delay_period: BlockNumber) -> Call {
+		Call::Recovery(pallet_recovery::Call::create_recovery{ friends: legal_officers, threshold, delay_period })
+	}
+}
+
+impl pallet_verified_recovery::Config for Runtime {
+	type CreateRecoveryCallFactory = PalletRecoveryCreateRecoveryCallFactory;
+	type LocQuery = LogionLoc;
+	type Event = Event;
+	type WeightInfo = ();
+}
+
+parameter_types! {
+	pub const MultiSigDepositBase: Balance = 500;
+	pub const MultiSigDepositFactor: Balance = 100;
+	pub const MaxSignatories: u16 = 20;
+}
+
+impl pallet_multisig::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type Currency = Currency;
+	type DepositBase = MultiSigDepositBase;
+	type DepositFactor = MultiSigDepositFactor;
+	type MaxSignatories = MaxSignatories;
+	type WeightInfo = ();
+}
+
 pub struct PalletMultisigApproveAsMultiCallFactory;
 impl MultisigApproveAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>> for PalletMultisigApproveAsMultiCallFactory {
 	type Call = Call;
 
 	fn build_approve_as_multi_call(
-        threshold: u16,
-        other_signatories: Vec<AccountId>,
-        maybe_timepoint: Option<Timepoint<BlockNumber>>,
-        call_hash: [u8; 32],
-        max_weight: Weight
+		threshold: u16,
+		other_signatories: Vec<AccountId>,
+		maybe_timepoint: Option<Timepoint<BlockNumber>>,
+		call_hash: [u8; 32],
+		max_weight: Weight
 	) -> Call {
 		Call::Multisig(pallet_multisig::Call::approve_as_multi{ threshold, other_signatories, maybe_timepoint, call_hash, max_weight })
 	}
@@ -460,12 +419,12 @@ impl MultisigAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>> for P
 	type Call = Call;
 
 	fn build_as_multi_call(
-        threshold: u16,
-        other_signatories: Vec<AccountId>,
-        maybe_timepoint: Option<Timepoint<BlockNumber>>,
-        call: Vec<u8>,
-        store_call: bool,
-        max_weight: Weight,
+		threshold: u16,
+		other_signatories: Vec<AccountId>,
+		maybe_timepoint: Option<Timepoint<BlockNumber>>,
+		call: Vec<u8>,
+		store_call: bool,
+		max_weight: Weight,
 	) -> Call {
 		Call::Multisig(pallet_multisig::Call::as_multi{ threshold, other_signatories, maybe_timepoint, call: WrapperKeepOpaque::from_encoded(call), store_call, max_weight })
 	}
@@ -477,6 +436,32 @@ impl pallet_logion_vault::Config for Runtime {
 	type MultisigAsMultiCallFactory = PalletMultisigAsMultiCallFactory;
 	type IsLegalOfficer = LoAuthorityList;
 	type Event = Event;
+	type WeightInfo = ();
+}
+
+parameter_types! {
+	pub const AssetDepositBase: u64 = 1;
+	pub const AssetDepositPerZombie: u64 = 1;
+	pub const StringLimit: u32 = 50;
+	pub const MetadataDepositBase: u64 = 1;
+	pub const MetadataDepositPerByte: u64 = 1;
+	pub const ApprovalDeposit: u64 = 1;
+}
+
+impl pallet_assets::Config for Runtime {
+	type Event = Event;
+	type Balance = Balance;
+	type AssetId = u64;
+	type Currency = Currency;
+	type ForceOrigin = EnsureRoot<AccountId>;
+	type AssetDeposit = AssetDepositBase;
+	type AssetAccountDeposit = AssetDepositPerZombie;
+	type StringLimit = StringLimit;
+	type MetadataDepositBase = MetadataDepositBase;
+	type MetadataDepositPerByte = MetadataDepositPerByte;
+	type ApprovalDeposit = ApprovalDeposit;
+	type Freezer = ();
+	type Extra = ();
 	type WeightInfo = ();
 }
 
@@ -514,10 +499,6 @@ pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type as expected by this runtime.
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;
-/// A Block signed with a Justification
-pub type SignedBlock = generic::SignedBlock<Block>;
-/// BlockId type as expected by this runtime.
-pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
 	frame_system::CheckNonZeroSender<Runtime>,
@@ -527,7 +508,7 @@ pub type SignedExtra = (
 	frame_system::CheckEra<Runtime>,
 	frame_system::CheckNonce<Runtime>,
 	frame_system::CheckWeight<Runtime>,
-	pallet_transaction_payment::ChargeTransactionPayment<Runtime>
+	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
@@ -724,10 +705,13 @@ impl_runtime_apis! {
 		fn dispatch_benchmark(
 			config: frame_benchmarking::BenchmarkConfig
 		) -> Result<Vec<frame_benchmarking::BenchmarkBatch>, sp_runtime::RuntimeString> {
-			use frame_benchmarking::{Benchmarking, BenchmarkBatch, add_benchmark, TrackedStorageKey};
+			use frame_benchmarking::{baseline, Benchmarking, BenchmarkBatch, TrackedStorageKey};
 
-			use frame_system_benchmarking::Module as SystemBench;
+			use frame_system_benchmarking::Pallet as SystemBench;
+			use baseline::Pallet as BaselineBench;
+
 			impl frame_system_benchmarking::Config for Runtime {}
+			impl baseline::Config for Runtime {}
 
 			let whitelist: Vec<TrackedStorageKey> = vec![
 				// Block Number
@@ -744,13 +728,8 @@ impl_runtime_apis! {
 
 			let mut batches = Vec::<BenchmarkBatch>::new();
 			let params = (&config, &whitelist);
+			add_benchmarks!(params, batches);
 
-			add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
-			add_benchmark!(params, batches, pallet_balances, Balances);
-			add_benchmark!(params, batches, pallet_timestamp, Timestamp);
-			add_benchmark!(params, batches, pallet_logion_loc, LogionLoc);
-
-			if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
 			Ok(batches)
 		}
 	}
