@@ -1,28 +1,16 @@
-use std::str::FromStr;
-
-use sp_core::{Pair, Public, sr25519, ed25519, OpaquePeerId};
 use logion_node_runtime::{
+	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature, SudoConfig,
+	SystemConfig, WASM_BINARY,
 	opaque::SessionKeys,
-	AccountId,
-	AuraConfig,
-	Balance,
-	BalancesConfig,
-	GenesisConfig,
-	GrandpaConfig,
-	LoAuthorityListConfig,
-	NodeAuthorizationConfig,
-	Signature,
-	SessionConfig,
-	SudoConfig,
-	SystemConfig,
-	ValidatorSetConfig,
-	WASM_BINARY
+	NodeAuthorizationConfig, ValidatorSetConfig, SessionConfig, LoAuthorityListConfig, Balance,
 };
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_runtime::traits::{Verify, IdentifyAccount};
 use sc_service::ChainType;
 use serde_json::json;
+use sp_consensus_aura::sr25519::AuthorityId as AuraId;
+use sp_core::{ed25519, sr25519, Pair, Public, OpaquePeerId};
+use sp_finality_grandpa::AuthorityId as GrandpaId;
+use sp_runtime::traits::{IdentifyAccount, Verify};
+use std::str::FromStr;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -44,8 +32,9 @@ fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
 type AccountPublic = <Signature as Verify>::Signer;
 
 /// Generate an account ID from seed.
-pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId where
-	AccountPublic: From<<TPublic::Pair as Pair>::Public>
+pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
+where
+	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
@@ -55,7 +44,7 @@ pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId) {
 	(
 		get_account_id_from_seed::<sr25519::Public>(s),
 		get_from_seed::<AuraId>(s),
-		get_from_seed::<GrandpaId>(s),
+		get_from_seed::<GrandpaId>(s)
 	)
 }
 
@@ -101,6 +90,8 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		// Telemetry
 		None,
 		// Protocol ID
+		None,
+		// Fork ID
 		None,
 		// Properties
 		Some(default_properties()),
@@ -169,6 +160,8 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		// Telemetry
 		None,
 		// Protocol ID
+		None,
+		// Fork ID
 		None,
 		// Properties
 		Some(default_properties()),
@@ -254,6 +247,8 @@ pub fn mvp_config() -> Result<ChainSpec, String> {
 		None,
 		// Protocol ID
 		None,
+		// Fork ID
+		None,
 		// Properties
 		Some(default_properties()),
 		// Extensions
@@ -310,6 +305,8 @@ pub fn test_testnet_config() -> Result<ChainSpec, String> {
 		None,
 		// Protocol ID
 		None,
+		// Fork ID
+		None,
 		// Properties
 		Some(default_properties()),
 		// Extensions
@@ -329,40 +326,41 @@ fn logion_genesis(
 	legal_officers: Vec<AccountId>,
 ) -> GenesisConfig {
 	GenesisConfig {
-		frame_system: Some(SystemConfig {
+		system: SystemConfig {
 			// Add Wasm runtime to storage.
 			code: wasm_binary.to_vec(),
-			changes_trie_config: Default::default(),
-		}),
-		pallet_balances: Some(BalancesConfig {
+		},
+		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance.
 			balances: endowed_accounts.iter().cloned().map(|k|(k, INITIAL_BALANCE)).collect(),
-		}),
-		pallet_validator_set: Some(ValidatorSetConfig {
-			validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-		}),
-		pallet_session: Some(SessionConfig {
+		},
+		validator_set: ValidatorSetConfig {
+			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+		},
+		session: SessionConfig {
 			keys: initial_authorities
 				.iter()
 				.map(|x| (x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone())))
 				.collect::<Vec<_>>(),
-		}),
-		pallet_aura: Some(AuraConfig {
+		},
+		aura: AuraConfig {
 			authorities: vec![],
-		}),
-		pallet_grandpa: Some(GrandpaConfig {
+		},
+		grandpa: GrandpaConfig {
 			authorities: vec![],
-		}),
-		pallet_sudo: Some(SudoConfig {
+		},
+		sudo: SudoConfig {
 			// Assign network admin rights.
-			key: root_key,
-		}),
-		pallet_node_authorization: Some(NodeAuthorizationConfig {
+			key: Some(root_key),
+		},
+		node_authorization: NodeAuthorizationConfig {
 			nodes: initial_authorized_nodes.iter().map(|x| (x.0.clone(), x.1.clone())).collect(),
-		}),
-		pallet_lo_authority_list: Some(LoAuthorityListConfig {
+		},
+		lo_authority_list: LoAuthorityListConfig {
 			legal_officers: legal_officers.iter().map(|x| x.clone()).collect(),
-		})
+		},
+		transaction_payment: Default::default(),
+		assets: Default::default(),
 	}
 }
 
