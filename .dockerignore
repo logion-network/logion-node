@@ -1,4 +1,7 @@
 .github
 .settings
 .project
-target/
+**/target/
+.cargo
+bin/
+debian-bin/

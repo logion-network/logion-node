@@ -16,4 +16,5 @@
 .project
 .idea
 
-
+# Other target
+debian-bin
