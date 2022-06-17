@@ -1,0 +1,4 @@
+FROM logionnetwork/debian-rust:latest
+WORKDIR /logion-node
+COPY . .
+ENTRYPOINT . ~/.cargo/env && cargo build --release && mv target/release/logion-node /target/logion-node

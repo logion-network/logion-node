@@ -34,6 +34,7 @@ pub use frame_support::{
 		IdentityFee, Weight,
 	},
 	StorageValue,
+	pallet_prelude::ValueQuery,
 };
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
@@ -106,7 +107,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 108,
+	spec_version: 109,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -531,10 +532,28 @@ mod migration {
 
 	pub struct Upgrade;
 
+	frame_support::generate_storage_alias!(
+		System, UpgradedToTripleRefCount => Value<
+			bool,
+			ValueQuery
+		>
+	);
+
 	impl OnRuntimeUpgrade for Upgrade {
 		fn on_runtime_upgrade() -> Weight {
-			pallet_logion_loc::migrate::<Runtime>()
+			pallet_logion_loc::migrate::<Runtime>();
+			if !<UpgradedToTripleRefCount>::get() {
+				frame_system::migrations::migrate_from_dual_to_triple_ref_count::<Runtime>();
+			}
+			Weight::max_value()
 		}
+	}
+
+	impl frame_system::migrations::V2ToV3 for Runtime {
+		type Pallet = System;
+		type AccountId = AccountId;
+		type Index = Index;
+		type AccountData = pallet_balances::AccountData<Balance>;
 	}
 }
 
