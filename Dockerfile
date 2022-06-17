@@ -8,6 +8,7 @@ RUN cargo build --release
 FROM ubuntu:hirsute
 WORKDIR /usr/share/logion-node
 COPY --from=build /tmp/logion-node/target/release/logion-node logion-node
+COPY ./res  res
 
 ENV P2P_PORT=30333
 ENV WS_PORT=9944
