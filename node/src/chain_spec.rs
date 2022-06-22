@@ -68,9 +68,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 			// Pre-funded accounts
 			vec![
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
-				get_account_id_from_seed::<sr25519::Public>("Bob"),
-				get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-				get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
 			],
 			// Initial authorized nodes
 			vec![
@@ -81,78 +78,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 			],
 			vec![ // Initial set of Logion Legal Officers
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
-				get_account_id_from_seed::<sr25519::Public>("Bob"),
-				get_account_id_from_seed::<sr25519::Public>("Charlie"),
-			],
-		),
-		// Bootnodes
-		vec![],
-		// Telemetry
-		None,
-		// Protocol ID
-		None,
-		// Fork ID
-		None,
-		// Properties
-		Some(default_properties()),
-		// Extensions
-		None,
-	))
-}
-
-pub fn local_testnet_config() -> Result<ChainSpec, String> {
-	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
-
-	Ok(ChainSpec::from_genesis(
-		// Name
-		"Logion Local Testnet",
-		// ID
-		"logion_local_testnet",
-		ChainType::Local,
-		move || logion_genesis(
-			wasm_binary,
-			// Initial PoA authorities
-			vec![
-				authority_keys_from_seed("Alice"),
-				authority_keys_from_seed("Bob"),
-				authority_keys_from_seed("Charlie"),
-			],
-			// Sudo account
-			get_account_id_from_seed::<sr25519::Public>("Alice"),
-			// Pre-funded accounts
-			vec![
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
-				get_account_id_from_seed::<sr25519::Public>("Bob"),
-				get_account_id_from_seed::<sr25519::Public>("Charlie"),
-				get_account_id_from_seed::<sr25519::Public>("Dave"),
-				get_account_id_from_seed::<sr25519::Public>("Eve"),
-				get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-				get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-				get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-				get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-				get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-				get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-				get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
-			],
-			// Initial authorized nodes
-			vec![
-				(
-					OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Alice")
-				),
-				(
-					OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Bob")
-				),
-				(
-					OpaquePeerId(bs58::decode("12D3KooWJvyP3VJYymTqG7eH4PM5rN4T2agk5cdNCfNymAqwqcvZ").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Charlie")
-				),
-			],
-			vec![ // Initial set of Logion Legal Officers
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
-				get_account_id_from_seed::<sr25519::Public>("Bob"),
-				get_account_id_from_seed::<sr25519::Public>("Charlie"),
 			],
 		),
 		// Bootnodes
@@ -256,7 +181,7 @@ pub fn mvp_config() -> Result<ChainSpec, String> {
 	))
 }
 
-pub fn test_testnet_config() -> Result<ChainSpec, String> {
+pub fn test_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
 	Ok(ChainSpec::from_genesis(
@@ -271,6 +196,7 @@ pub fn test_testnet_config() -> Result<ChainSpec, String> {
 			vec![
 				authority_keys_from_seed("Alice"),
 				authority_keys_from_seed("Bob"),
+				authority_keys_from_seed("Charlie"),
 			],
 			// Sudo account
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -278,6 +204,7 @@ pub fn test_testnet_config() -> Result<ChainSpec, String> {
 			vec![
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				get_account_id_from_seed::<sr25519::Public>("Bob"),
+				get_account_id_from_seed::<sr25519::Public>("Charlie"),
 			],
 			// Initial authorized nodes
 			vec![
@@ -297,6 +224,7 @@ pub fn test_testnet_config() -> Result<ChainSpec, String> {
 			vec![ // Initial set of Logion Legal Officers
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				get_account_id_from_seed::<sr25519::Public>("Bob"),
+				get_account_id_from_seed::<sr25519::Public>("Charlie"),
 			],
 		),
 		// Bootnodes
@@ -316,7 +244,7 @@ pub fn test_testnet_config() -> Result<ChainSpec, String> {
 
 const INITIAL_BALANCE: Balance = 100_000_000_000_000_000_000_000;
 
-/// Configure initial storage state for FRAME modules.
+/// Configure initial storage state for pallets.
 fn logion_genesis(
 	wasm_binary: &[u8],
 	initial_authorities: Vec<(AccountId, AuraId, GrandpaId)>,
