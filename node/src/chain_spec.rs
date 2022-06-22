@@ -53,7 +53,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Logion Development",
+		"logion Development",
 		// ID
 		"logion_dev",
 		ChainType::Development,
@@ -114,7 +114,7 @@ pub fn mvp_config() -> Result<ChainSpec, String> {
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Logion MVP",
+		"logion MVP",
 		// ID
 		"logion_mvp",
 		ChainType::Live,
@@ -186,7 +186,7 @@ pub fn test_config() -> Result<ChainSpec, String> {
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Logion Test Testnet",
+		"logion Testnet",
 		// ID
 		"logion_test_testnet",
 		ChainType::Live,
