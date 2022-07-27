@@ -48,6 +48,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
 use pallet_multisig::Timepoint;
+use pallet_logion_loc::migrations::v7::AddTokenToCollectionItem;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -107,7 +108,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 111,
+	spec_version: 112,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -334,6 +335,8 @@ parameter_types! {
 	pub const MaxFileNatureSize: usize = 255;
 	pub const MaxLinkNatureSize: usize = 255;
 	pub const MaxCollectionItemDescriptionSize: usize = 4096;
+	pub const MaxCollectionItemTokenIdSize: usize = 255;
+	pub const MaxCollectionItemTokenTypeSize: usize = 255;
 }
 
 impl pallet_logion_loc::Config for Runtime {
@@ -347,6 +350,8 @@ impl pallet_logion_loc::Config for Runtime {
 	type MaxLinkNatureSize = MaxLinkNatureSize;
 	type CollectionItemId = Hash;
 	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
+	type MaxCollectionItemTokenIdSize = MaxCollectionItemTokenIdSize;
+	type MaxCollectionItemTokenTypeSize = MaxCollectionItemTokenTypeSize;
 	type WeightInfo = ();
 }
 
@@ -522,40 +527,8 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	migration::Upgrade,
+	AddTokenToCollectionItem<Runtime>,
 >;
-
-mod migration {
-	use super::*;
-	use frame_support::traits::OnRuntimeUpgrade;
-	use pallet_logion_loc;
-
-	pub struct Upgrade;
-
-	frame_support::generate_storage_alias!(
-		System, UpgradedToTripleRefCount => Value<
-			bool,
-			ValueQuery
-		>
-	);
-
-	impl OnRuntimeUpgrade for Upgrade {
-		fn on_runtime_upgrade() -> Weight {
-			pallet_logion_loc::migrate::<Runtime>();
-			if !<UpgradedToTripleRefCount>::get() {
-				frame_system::migrations::migrate_from_dual_to_triple_ref_count::<Runtime>();
-			}
-			Weight::max_value()
-		}
-	}
-
-	impl frame_system::migrations::V2ToV3 for Runtime {
-		type Pallet = System;
-		type AccountId = AccountId;
-		type Index = Index;
-		type AccountData = pallet_balances::AccountData<Balance>;
-	}
-}
 
 #[cfg(feature = "runtime-benchmarks")]
 #[macro_use]
