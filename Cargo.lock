@@ -4017,7 +4017,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.3.0"
-source = "git+https://github.com/logion-network/pallet-logion-loc?branch=main#830ffc6374866409d2b654438d09108e0c15dc43"
+source = "git+https://github.com/logion-network/pallet-logion-loc?branch=main#98e52944df862c6e2cbc908b10e0502a35db258e"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
