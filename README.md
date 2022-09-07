@@ -53,10 +53,8 @@ cargo build --release
 Below command will run the node in development mode with a temporary storage.
 
 ```sh
-./scripts/dev_run.sh
+./target/release/logion-node --dev
 ```
-
-See script for details.
 
 ## Logion Components
 
