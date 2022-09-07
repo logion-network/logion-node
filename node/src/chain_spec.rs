@@ -4,6 +4,7 @@ use logion_node_runtime::{
 	opaque::SessionKeys,
 	NodeAuthorizationConfig, ValidatorSetConfig, SessionConfig, LoAuthorityListConfig, Balance,
 };
+use pallet_lo_authority_list::LegalOfficerData;
 use sc_service::ChainType;
 use serde_json::json;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -77,7 +78,13 @@ pub fn development_config() -> Result<ChainSpec, String> {
 				),
 			],
 			vec![ // Initial set of Logion Legal Officers
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
+				(
+					get_account_id_from_seed::<sr25519::Public>("Alice"),
+					LegalOfficerData {
+						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap())),
+						base_url: None,
+					}
+				),
 			],
 		),
 		// Bootnodes
@@ -226,9 +233,27 @@ pub fn test_config() -> Result<ChainSpec, String> {
 				),
 			],
 			vec![ // Initial set of Logion Legal Officers
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
-				get_account_id_from_seed::<sr25519::Public>("Bob"),
-				get_account_id_from_seed::<sr25519::Public>("Charlie"),
+				(
+					get_account_id_from_seed::<sr25519::Public>("Alice"),
+					LegalOfficerData {
+						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap())),
+						base_url: None,
+					}
+				),
+				(
+					get_account_id_from_seed::<sr25519::Public>("Bob"),
+					LegalOfficerData {
+						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap())),
+						base_url: None,
+					}
+				),
+				(
+					get_account_id_from_seed::<sr25519::Public>("Charlie"),
+					LegalOfficerData {
+						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWJvyP3VJYymTqG7eH4PM5rN4T2agk5cdNCfNymAqwqcvZ").into_vec().unwrap())),
+						base_url: None,
+					}
+				),
 			],
 		),
 		// Bootnodes
@@ -255,7 +280,7 @@ fn logion_genesis(
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
 	initial_authorized_nodes: Vec<(OpaquePeerId, AccountId)>,
-	legal_officers: Vec<AccountId>,
+	legal_officers: Vec<(AccountId, LegalOfficerData)>,
 ) -> GenesisConfig {
 	GenesisConfig {
 		system: SystemConfig {
@@ -289,7 +314,7 @@ fn logion_genesis(
 			nodes: initial_authorized_nodes.iter().map(|x| (x.0.clone(), x.1.clone())).collect(),
 		},
 		lo_authority_list: LoAuthorityListConfig {
-			legal_officers: legal_officers.iter().map(|x| x.clone()).collect(),
+			legal_officers,
 		},
 		transaction_payment: Default::default(),
 		assets: Default::default(),

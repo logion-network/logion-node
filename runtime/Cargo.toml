@@ -51,8 +51,8 @@ hex-literal = { version = "0.3.4", optional = true }
 # logion dependencies
 logion-shared = { git = "https://github.com/logion-network/logion-shared", default-features = false,  branch = "polkadot-v0.9.28" }
 pallet-assets = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.28" }
-pallet-lo-authority-list = { git = "https://github.com/logion-network/pallet-lo-authority-list", default-features = false,  branch = "polkadot-v0.9.28" }
-pallet-logion-loc = { git = "https://github.com/logion-network/pallet-logion-loc", default-features = false,  branch = "polkadot-v0.9.28" }
+pallet-lo-authority-list = { git = "https://github.com/logion-network/pallet-lo-authority-list", default-features = false,  branch = "main" }
+pallet-logion-loc = { git = "https://github.com/logion-network/pallet-logion-loc", default-features = false,  branch = "main" }
 pallet-logion-vault = { git = "https://github.com/logion-network/pallet-logion-vault", default-features = false,  branch = "polkadot-v0.9.28" }
 pallet-multisig = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.28" }
 pallet-node-authorization = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.28" }
