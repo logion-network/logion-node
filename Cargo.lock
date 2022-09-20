@@ -4087,7 +4087,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/pallet-lo-authority-list?branch=polkadot-v0.9.28#e2170e8f3a9ec37cc23316ae8dbb25fe1f116260"
+source = "git+https://github.com/logion-network/pallet-lo-authority-list?branch=polkadot-v0.9.28#2e0864e7a6a1776aa1b20a97a78f8f22fccee14f"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
