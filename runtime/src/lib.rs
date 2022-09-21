@@ -48,7 +48,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
 use pallet_lo_authority_list::migrations::v2::AddOnchainSettings;
-use pallet_logion_loc::migrations::v8::AddSealToLoc;
+use pallet_logion_loc::migrations::v9::AddLicenseToCollectionItem;
 use pallet_multisig::Timepoint;
 
 /// An index to a block.
@@ -109,7 +109,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 118,
+	spec_version: 119,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -533,7 +533,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(AddOnchainSettings<Runtime>, AddSealToLoc<Runtime>),
+	(AddOnchainSettings<Runtime>, AddLicenseToCollectionItem<Runtime>),
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
