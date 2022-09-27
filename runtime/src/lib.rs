@@ -47,7 +47,6 @@ pub use sp_runtime::{Perbill, Permill};
 // Additional imports
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
-use pallet_lo_authority_list::migrations::v2::AddOnchainSettings;
 use pallet_logion_loc::migrations::v9::AddLicenseToCollectionItem;
 use pallet_multisig::Timepoint;
 
@@ -533,7 +532,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(AddOnchainSettings<Runtime>, AddLicenseToCollectionItem<Runtime>),
+	AddLicenseToCollectionItem<Runtime>,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
