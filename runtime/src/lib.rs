@@ -107,7 +107,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 120,
+	spec_version: 121,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -153,12 +153,12 @@ parameter_types! {
 // Configure FRAME pallets to include in runtime.
 
 pub struct BaseCallFilter;
-impl Contains<Call> for BaseCallFilter {
-	fn contains(call: &Call) -> bool {
+impl Contains<RuntimeCall> for BaseCallFilter {
+	fn contains(call: &RuntimeCall) -> bool {
 		match call {
-			Call::Recovery(pallet_recovery::Call::create_recovery{ .. }) => false,
-			Call::Multisig(pallet_multisig::Call::approve_as_multi{ .. }) => false,
-			Call::Multisig(pallet_multisig::Call::as_multi{ .. }) => false,
+			RuntimeCall::Recovery(pallet_recovery::Call::create_recovery{ .. }) => false,
+			RuntimeCall::Multisig(pallet_multisig::Call::approve_as_multi{ .. }) => false,
+			RuntimeCall::Multisig(pallet_multisig::Call::as_multi{ .. }) => false,
 			_ => true
 		}
 	}
@@ -174,7 +174,7 @@ impl frame_system::Config for Runtime {
 	/// The identifier used to distinguish between accounts.
 	type AccountId = AccountId;
 	/// The aggregated dispatch type that is available for extrinsics.
-	type Call = Call;
+	type RuntimeCall = RuntimeCall;
 	/// The lookup mechanism to get account ID from whatever is passed in dispatchers.
 	type Lookup = AccountIdLookup<AccountId, ()>;
 	/// The index type for storing how many extrinsics an account has signed.
@@ -188,9 +188,9 @@ impl frame_system::Config for Runtime {
 	/// The header type.
 	type Header = generic::Header<BlockNumber, BlakeTwo256>;
 	/// The ubiquitous event type.
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	/// The ubiquitous origin type.
-	type Origin = Origin;
+	type RuntimeOrigin = RuntimeOrigin;
 	/// Maximum number of block number to block hash mappings to keep (oldest pruned first).
 	type BlockHashCount = BlockHashCount;
 	/// The weight of database operations that the runtime can invoke.
@@ -225,8 +225,7 @@ impl pallet_aura::Config for Runtime {
 }
 
 impl pallet_grandpa::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
+	type RuntimeEvent = RuntimeEvent;
 
 	type KeyOwnerProofSystem = ();
 
@@ -262,7 +261,7 @@ impl pallet_balances::Config for Runtime {
 	/// The type for recording an account's balance.
 	type Balance = Balance;
 	/// The ubiquitous event type.
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type DustRemoval = ();
 	type ExistentialDeposit = ConstU128<EXISTENTIAL_DEPOSIT>;
 	type AccountStore = System;
@@ -270,7 +269,7 @@ impl pallet_balances::Config for Runtime {
 }
 
 impl pallet_transaction_payment::Config for Runtime {
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>;
@@ -279,8 +278,8 @@ impl pallet_transaction_payment::Config for Runtime {
 }
 
 impl pallet_sudo::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
+	type RuntimeEvent = RuntimeEvent;
+	type RuntimeCall = RuntimeCall;
 }
 
 parameter_types! {
@@ -289,7 +288,7 @@ parameter_types! {
 }
 
 impl pallet_node_authorization::Config for Runtime {
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type MaxWellKnownNodes = MaxWellKnownNodes;
 	type MaxPeerIdLength = MaxPeerIdLength;
 	type AddOrigin = EnsureRoot<AccountId>;
@@ -304,7 +303,7 @@ parameter_types! {
 }
 
 impl pallet_validator_set::Config for Runtime {
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type AddRemoveOrigin = EnsureRoot<AccountId>;
 	type MinAuthorities = MinAuthorities;
 }
@@ -318,7 +317,7 @@ impl pallet_session::Config for Runtime {
 	type SessionHandler = <opaque::SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
 	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
 	type SessionManager = ValidatorSet;
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type Keys = opaque::SessionKeys;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 	type ValidatorId = <Self as frame_system::Config>::AccountId;
@@ -330,7 +329,7 @@ impl pallet_lo_authority_list::Config for Runtime {
 	type AddOrigin = EnsureRoot<AccountId>;
 	type RemoveOrigin = EnsureRoot<AccountId>;
 	type UpdateOrigin = EnsureRoot<AccountId>;
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 }
 
 parameter_types! {
@@ -345,7 +344,7 @@ parameter_types! {
 
 impl pallet_logion_loc::Config for Runtime {
 	type LocId = u128;
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type Hash = Hash;
 	type CreateOrigin = LoAuthorityList;
 	type MaxMetadataItemNameSize = MaxMetadataItemNameSize;
@@ -367,8 +366,8 @@ parameter_types! {
 }
 
 impl pallet_recovery::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
+	type RuntimeEvent = RuntimeEvent;
+	type RuntimeCall = RuntimeCall;
 	type Currency = Currency;
 	type ConfigDepositBase = RecoveryConfigDepositBase;
 	type FriendDepositFactor = RecoveryFrieldDepositFactor;
@@ -378,18 +377,18 @@ impl pallet_recovery::Config for Runtime {
 }
 
 pub struct PalletRecoveryCreateRecoveryCallFactory;
-impl CreateRecoveryCallFactory<Origin, AccountId, BlockNumber> for PalletRecoveryCreateRecoveryCallFactory {
-	type Call = Call;
+impl CreateRecoveryCallFactory<RuntimeOrigin, AccountId, BlockNumber> for PalletRecoveryCreateRecoveryCallFactory {
+	type Call = RuntimeCall;
 
-	fn build_create_recovery_call(legal_officers: Vec<AccountId>, threshold: u16, delay_period: BlockNumber) -> Call {
-		Call::Recovery(pallet_recovery::Call::create_recovery{ friends: legal_officers, threshold, delay_period })
+	fn build_create_recovery_call(legal_officers: Vec<AccountId>, threshold: u16, delay_period: BlockNumber) -> RuntimeCall {
+		RuntimeCall::Recovery(pallet_recovery::Call::create_recovery{ friends: legal_officers, threshold, delay_period })
 	}
 }
 
 impl pallet_verified_recovery::Config for Runtime {
 	type CreateRecoveryCallFactory = PalletRecoveryCreateRecoveryCallFactory;
 	type LocQuery = LogionLoc;
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type WeightInfo = ();
 }
 
@@ -400,8 +399,8 @@ parameter_types! {
 }
 
 impl pallet_multisig::Config for Runtime {
-	type Event = Event;
-	type Call = Call;
+	type RuntimeEvent = RuntimeEvent;
+	type RuntimeCall = RuntimeCall;
 	type Currency = Currency;
 	type DepositBase = MultiSigDepositBase;
 	type DepositFactor = MultiSigDepositFactor;
@@ -410,8 +409,8 @@ impl pallet_multisig::Config for Runtime {
 }
 
 pub struct PalletMultisigApproveAsMultiCallFactory;
-impl MultisigApproveAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>> for PalletMultisigApproveAsMultiCallFactory {
-	type Call = Call;
+impl MultisigApproveAsMultiCallFactory<RuntimeOrigin, AccountId, Timepoint<BlockNumber>> for PalletMultisigApproveAsMultiCallFactory {
+	type Call = RuntimeCall;
 
 	fn build_approve_as_multi_call(
 		threshold: u16,
@@ -419,14 +418,14 @@ impl MultisigApproveAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>
 		maybe_timepoint: Option<Timepoint<BlockNumber>>,
 		call_hash: [u8; 32],
 		max_weight: Weight
-	) -> Call {
-		Call::Multisig(pallet_multisig::Call::approve_as_multi{ threshold, other_signatories, maybe_timepoint, call_hash, max_weight })
+	) -> RuntimeCall {
+		RuntimeCall::Multisig(pallet_multisig::Call::approve_as_multi{ threshold, other_signatories, maybe_timepoint, call_hash, max_weight })
 	}
 }
 
 pub struct PalletMultisigAsMultiCallFactory;
-impl MultisigAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>> for PalletMultisigAsMultiCallFactory {
-	type Call = Call;
+impl MultisigAsMultiCallFactory<RuntimeOrigin, AccountId, Timepoint<BlockNumber>> for PalletMultisigAsMultiCallFactory {
+	type Call = RuntimeCall;
 
 	fn build_as_multi_call(
 		threshold: u16,
@@ -435,17 +434,17 @@ impl MultisigAsMultiCallFactory<Origin, AccountId, Timepoint<BlockNumber>> for P
 		call: Vec<u8>,
 		store_call: bool,
 		max_weight: Weight,
-	) -> Call {
-		Call::Multisig(pallet_multisig::Call::as_multi{ threshold, other_signatories, maybe_timepoint, call: WrapperKeepOpaque::from_encoded(call), store_call, max_weight })
+	) -> RuntimeCall {
+		RuntimeCall::Multisig(pallet_multisig::Call::as_multi{ threshold, other_signatories, maybe_timepoint, call: WrapperKeepOpaque::from_encoded(call), store_call, max_weight })
 	}
 }
 
 impl pallet_logion_vault::Config for Runtime {
-	type Call = Call;
+	type RuntimeCall = RuntimeCall;
 	type MultisigApproveAsMultiCallFactory = PalletMultisigApproveAsMultiCallFactory;
 	type MultisigAsMultiCallFactory = PalletMultisigAsMultiCallFactory;
 	type IsLegalOfficer = LoAuthorityList;
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type WeightInfo = ();
 }
 
@@ -459,7 +458,7 @@ parameter_types! {
 }
 
 impl pallet_assets::Config for Runtime {
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type Balance = Balance;
 	type AssetId = u64;
 	type Currency = Currency;
@@ -521,9 +520,9 @@ pub type SignedExtra = (
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
-pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
+pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 /// The payload being signed in transactions.
-pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
+pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
