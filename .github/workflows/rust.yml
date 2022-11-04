@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install exiftool
+        uses: ConorMacBride/install-package@v1.1.0
+        with:
+          apt: protobuf-compiler
       - uses: actions/checkout@v2
       - name: Check Cargo version
         run: cargo --version --verbose
