@@ -3341,7 +3341,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-shared?branch=polkadot-v0.9.31#d2b961ed329eea3ad82b2f9de4e4b95a8c00d190"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.31#a626453465a1b62d85c0505f874a2f8fb3638733"
 dependencies = [
  "frame-support",
  "sp-std",
@@ -3972,7 +3972,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/pallet-lo-authority-list?branch=polkadot-v0.9.31#4f99328d5d4269a7fa2888cf8ef2b30980642329"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.31#a626453465a1b62d85c0505f874a2f8fb3638733"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3989,7 +3989,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.3.0"
-source = "git+https://github.com/logion-network/pallet-logion-loc?branch=polkadot-v0.9.31#e3d2f44092dbf8f192b4e785394f39ab31f445fb"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.31#a626453465a1b62d85c0505f874a2f8fb3638733"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4004,7 +4004,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/pallet-logion-vault?branch=polkadot-v0.9.31#c45e13cebf8d32aee0962a18054ae9c6b494f4f0"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.31#a626453465a1b62d85c0505f874a2f8fb3638733"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4176,7 +4176,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/pallet-verified-recovery?branch=polkadot-v0.9.31#32a005da048e2f19c0b335947a3e24f381189dfd"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.31#a626453465a1b62d85c0505f874a2f8fb3638733"
 dependencies = [
  "frame-support",
  "frame-system",
