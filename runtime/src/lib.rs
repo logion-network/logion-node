@@ -108,7 +108,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 122,
+	spec_version: 123,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -354,7 +354,7 @@ impl pallet_logion_loc::Config for Runtime {
 	type LocId = u128;
 	type RuntimeEvent = RuntimeEvent;
 	type Hash = Hash;
-	type CreateOrigin = LoAuthorityList;
+	type IsLegalOfficer = LoAuthorityList;
 	type MaxMetadataItemNameSize = MaxMetadataItemNameSize;
 	type MaxMetadataItemValueSize = MaxMetadataItemValueSize;
 	type MaxFileNatureSize = MaxFileNatureSize;
@@ -537,7 +537,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	pallet_multisig::migrations::v1::MigrateToV1<Runtime>,
+	(),
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
