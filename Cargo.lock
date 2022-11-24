@@ -3360,7 +3360,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#a2c545cade32f9fba7a65c2ae09f387f334ad7c2"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#9ce26577087611e16945e992265ec849f82cffa7"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3992,7 +3992,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#a2c545cade32f9fba7a65c2ae09f387f334ad7c2"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#9ce26577087611e16945e992265ec849f82cffa7"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4009,7 +4009,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.3.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#a2c545cade32f9fba7a65c2ae09f387f334ad7c2"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#9ce26577087611e16945e992265ec849f82cffa7"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4024,7 +4024,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#a2c545cade32f9fba7a65c2ae09f387f334ad7c2"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#9ce26577087611e16945e992265ec849f82cffa7"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4198,7 +4198,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#a2c545cade32f9fba7a65c2ae09f387f334ad7c2"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.32#9ce26577087611e16945e992265ec849f82cffa7"
 dependencies = [
  "frame-support",
  "frame-system",
