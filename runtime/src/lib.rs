@@ -29,7 +29,7 @@ use sp_version::RuntimeVersion;
 pub use frame_support::{
 	construct_runtime, parameter_types,
 	traits::{
-		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo, Contains, WrapperKeepOpaque,
+		AsEnsureOriginWithArg, ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo, Contains, WrapperKeepOpaque,
 	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -49,6 +49,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
 use pallet_multisig::Timepoint;
+use pallet_lo_authority_list::migrations::v3::ConvertIntoHostData;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -108,7 +109,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 125,
+	spec_version: 126,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -469,6 +470,7 @@ impl pallet_assets::Config for Runtime {
 	type Balance = Balance;
 	type AssetId = u64;
 	type Currency = Currency;
+	type CreateOrigin = AsEnsureOriginWithArg<frame_system::EnsureSigned<AccountId>>;
 	type ForceOrigin = EnsureRoot<AccountId>;
 	type AssetDeposit = AssetDepositBase;
 	type AssetAccountDeposit = AssetDepositPerZombie;
@@ -537,7 +539,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(),
+	ConvertIntoHostData<Runtime>,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
