@@ -4,7 +4,7 @@ use logion_node_runtime::{
 	opaque::SessionKeys,
 	NodeAuthorizationConfig, ValidatorSetConfig, SessionConfig, LoAuthorityListConfig, Balance,
 };
-use pallet_lo_authority_list::LegalOfficerData;
+use pallet_lo_authority_list::{LegalOfficerData, HostData};
 use sc_service::ChainType;
 use serde_json::json;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -80,10 +80,10 @@ pub fn development_config() -> Result<ChainSpec, String> {
 			vec![ // Initial set of Logion Legal Officers
 				(
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
-					LegalOfficerData {
+					LegalOfficerData::Host(HostData {
 						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap())),
 						base_url: None,
-					}
+					})
 				),
 			],
 		),
@@ -235,24 +235,24 @@ pub fn test_config() -> Result<ChainSpec, String> {
 			vec![ // Initial set of Logion Legal Officers
 				(
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
-					LegalOfficerData {
+					LegalOfficerData::<AccountId>::Host(HostData {
 						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap())),
 						base_url: None,
-					}
+					})
 				),
 				(
 					get_account_id_from_seed::<sr25519::Public>("Bob"),
-					LegalOfficerData {
+					LegalOfficerData::<AccountId>::Host(HostData {
 						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap())),
 						base_url: None,
-					}
+					})
 				),
 				(
 					get_account_id_from_seed::<sr25519::Public>("Charlie"),
-					LegalOfficerData {
+					LegalOfficerData::<AccountId>::Host(HostData {
 						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWJvyP3VJYymTqG7eH4PM5rN4T2agk5cdNCfNymAqwqcvZ").into_vec().unwrap())),
 						base_url: None,
-					}
+					})
 				),
 			],
 		),
@@ -280,7 +280,7 @@ fn logion_genesis(
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
 	initial_authorized_nodes: Vec<(OpaquePeerId, AccountId)>,
-	legal_officers: Vec<(AccountId, LegalOfficerData)>,
+	legal_officers: Vec<(AccountId, LegalOfficerData<AccountId>)>,
 ) -> GenesisConfig {
 	GenesisConfig {
 		system: SystemConfig {
