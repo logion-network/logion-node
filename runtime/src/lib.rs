@@ -49,7 +49,6 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
 use pallet_multisig::Timepoint;
-use pallet_lo_authority_list::migrations::v3::ConvertIntoHostData;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -109,7 +108,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 126,
+	spec_version: 127,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -463,12 +462,14 @@ parameter_types! {
 	pub const MetadataDepositBase: u64 = 1;
 	pub const MetadataDepositPerByte: u64 = 1;
 	pub const ApprovalDeposit: u64 = 1;
+	pub const RemoveItemsLimit: u32 = 5;
 }
 
 impl pallet_assets::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type Balance = Balance;
 	type AssetId = u64;
+	type AssetIdParameter = u64;
 	type Currency = Currency;
 	type CreateOrigin = AsEnsureOriginWithArg<frame_system::EnsureSigned<AccountId>>;
 	type ForceOrigin = EnsureRoot<AccountId>;
@@ -478,6 +479,7 @@ impl pallet_assets::Config for Runtime {
 	type MetadataDepositBase = MetadataDepositBase;
 	type MetadataDepositPerByte = MetadataDepositPerByte;
 	type ApprovalDeposit = ApprovalDeposit;
+	type RemoveItemsLimit = RemoveItemsLimit;
 	type Freezer = ();
 	type Extra = ();
 	type WeightInfo = ();
@@ -539,7 +541,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	ConvertIntoHostData<Runtime>,
+	(),
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
