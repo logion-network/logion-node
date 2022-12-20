@@ -32,7 +32,7 @@ pub use frame_support::{
 		AsEnsureOriginWithArg, ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo, Contains, WrapperKeepOpaque,
 	},
 	weights::{
-		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
+		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_REF_TIME_PER_SECOND},
 		IdentityFee, Weight,
 	},
 	StorageValue,
@@ -108,7 +108,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 127,
+	spec_version: 128,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -146,7 +146,7 @@ parameter_types! {
 	/// We allow for 2 seconds of compute with a 6 second average block time.
 	pub BlockWeights: frame_system::limits::BlockWeights =
 			frame_system::limits::BlockWeights::with_sensible_defaults(
-				(2u64 * WEIGHT_PER_SECOND).set_proof_size(u64::MAX),
+				Weight::from_parts(2u64 * WEIGHT_REF_TIME_PER_SECOND, u64::MAX),
 				NORMAL_DISPATCH_RATIO,
 			);
 	pub BlockLength: frame_system::limits::BlockLength = frame_system::limits::BlockLength
@@ -455,6 +455,13 @@ impl pallet_logion_vault::Config for Runtime {
 	type WeightInfo = ();
 }
 
+impl pallet_logion_vote::Config for Runtime {
+	type LocId = u128;
+	type RuntimeEvent = RuntimeEvent;
+	type IsLegalOfficer = LoAuthorityList;
+	type LocValidity = LogionLoc;
+}
+
 parameter_types! {
 	pub const AssetDepositBase: u64 = 1;
 	pub const AssetDepositPerZombie: u64 = 1;
@@ -510,6 +517,7 @@ construct_runtime!(
 		LogionLoc: pallet_logion_loc,
 		VerifiedRecovery: pallet_verified_recovery,
 		Vault: pallet_logion_vault,
+		Vote: pallet_logion_vote,
 	}
 );
 
