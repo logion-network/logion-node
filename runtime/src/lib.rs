@@ -72,6 +72,9 @@ pub type Hash = sp_core::H256;
 /// The currency
 pub type Currency = pallet_balances::Pallet<Runtime>;
 
+/// LOC ID
+pub type LocId = u128;
+
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -108,7 +111,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 128,
+	spec_version: 129,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -351,7 +354,7 @@ parameter_types! {
 }
 
 impl pallet_logion_loc::Config for Runtime {
-	type LocId = u128;
+	type LocId = LocId;
 	type RuntimeEvent = RuntimeEvent;
 	type Hash = Hash;
 	type IsLegalOfficer = LoAuthorityList;
@@ -394,6 +397,7 @@ impl CreateRecoveryCallFactory<RuntimeOrigin, AccountId, BlockNumber> for Pallet
 }
 
 impl pallet_verified_recovery::Config for Runtime {
+	type LocId = LocId;
 	type CreateRecoveryCallFactory = PalletRecoveryCreateRecoveryCallFactory;
 	type LocQuery = LogionLoc;
 	type RuntimeEvent = RuntimeEvent;
@@ -456,10 +460,12 @@ impl pallet_logion_vault::Config for Runtime {
 }
 
 impl pallet_logion_vote::Config for Runtime {
-	type LocId = u128;
+	type LocId = LocId;
 	type RuntimeEvent = RuntimeEvent;
 	type IsLegalOfficer = LoAuthorityList;
 	type LocValidity = LogionLoc;
+	type LocQuery = LogionLoc;
+	type LegalOfficerCreation = LoAuthorityList;
 }
 
 parameter_types! {
