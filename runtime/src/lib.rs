@@ -111,7 +111,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 130,
+	spec_version: 131,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -351,6 +351,10 @@ parameter_types! {
 	pub const MaxCollectionItemDescriptionSize: usize = 4096;
 	pub const MaxCollectionItemTokenIdSize: usize = 255;
 	pub const MaxCollectionItemTokenTypeSize: usize = 255;
+	pub const MaxFileContentTypeSize: u32 = 255;
+	pub const MaxFileNameSize: u32 = 255;
+	pub const MaxTokensRecordDescriptionSize: u32 = 4096;
+	pub const MaxTokensRecordFiles: u32 = 10;
 }
 
 impl pallet_logion_loc::Config for Runtime {
@@ -366,6 +370,11 @@ impl pallet_logion_loc::Config for Runtime {
 	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
 	type MaxCollectionItemTokenIdSize = MaxCollectionItemTokenIdSize;
 	type MaxCollectionItemTokenTypeSize = MaxCollectionItemTokenTypeSize;
+	type TokensRecordId = Hash;
+	type MaxFileContentTypeSize = MaxFileContentTypeSize;
+	type MaxFileNameSize = MaxFileNameSize;
+	type MaxTokensRecordDescriptionSize = MaxTokensRecordDescriptionSize;
+	type MaxTokensRecordFiles = MaxTokensRecordFiles;
 	type WeightInfo = ();
 }
 
