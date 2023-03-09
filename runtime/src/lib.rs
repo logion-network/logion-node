@@ -15,7 +15,8 @@ use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
-		AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, NumberFor, One, Verify, OpaqueKeys
+		AccountIdConversion, AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount,
+		NumberFor, One, Verify, OpaqueKeys,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity},
 	ApplyExtrinsicResult, MultiSignature,
@@ -29,7 +30,8 @@ use sp_version::RuntimeVersion;
 pub use frame_support::{
 	construct_runtime, parameter_types,
 	traits::{
-		AsEnsureOriginWithArg, ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo, Contains, WrapperKeepOpaque,
+		AsEnsureOriginWithArg, ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem,
+		Randomness, StorageInfo, Contains, WrapperKeepOpaque, Imbalance,
 	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_REF_TIME_PER_SECOND},
@@ -37,6 +39,8 @@ pub use frame_support::{
 	},
 	StorageValue,
 };
+use frame_support::PalletId;
+use frame_support::traits::{Currency, OnUnbalanced};
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
@@ -68,9 +72,6 @@ pub type Index = u32;
 
 /// A hash of some data used by the chain.
 pub type Hash = sp_core::H256;
-
-/// The currency
-pub type Currency = pallet_balances::Pallet<Runtime>;
 
 /// LOC ID
 pub type LocId = u128;
@@ -142,6 +143,10 @@ pub fn native_version() -> NativeVersion {
 }
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
+
+pub const MICRO_LGNT: Balance = 1_000_000_000_000;
+pub const MILLI_LGNT: Balance = 1_000 * MICRO_LGNT;
+pub const LGNT: Balance = 1_000 * MILLI_LGNT;
 
 parameter_types! {
 	pub const BlockHashCount: BlockNumber = 2400;
@@ -276,12 +281,31 @@ impl pallet_balances::Config for Runtime {
 }
 
 parameter_types! {
+    pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
+    pub TreasuryAccountId: AccountId = TreasuryPalletId::get().into_account_truncating();
+}
+
+type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
+
+pub struct DealWithFees;
+
+impl OnUnbalanced<NegativeImbalance> for DealWithFees {
+
+	fn on_nonzero_unbalanced(fees: NegativeImbalance) {
+
+		let (to_burn, treasury) = fees.ration(80, 20);
+		drop(to_burn);
+		Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), treasury);
+	}
+}
+
+parameter_types! {
 	pub FeeMultiplier: Multiplier = Multiplier::one();
 }
 
 impl pallet_transaction_payment::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
+	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithFees>;
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>;
 	type LengthToFee = IdentityFee<Balance>;
@@ -388,7 +412,7 @@ parameter_types! {
 impl pallet_recovery::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type RuntimeCall = RuntimeCall;
-	type Currency = Currency;
+	type Currency = Balances;
 	type ConfigDepositBase = RecoveryConfigDepositBase;
 	type FriendDepositFactor = RecoveryFrieldDepositFactor;
 	type MaxFriends = MaxFriends;
@@ -422,7 +446,7 @@ parameter_types! {
 impl pallet_multisig::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type RuntimeCall = RuntimeCall;
-	type Currency = Currency;
+	type Currency = Balances;
 	type DepositBase = MultiSigDepositBase;
 	type DepositFactor = MultiSigDepositFactor;
 	type MaxSignatories = MaxSignatories;
@@ -492,7 +516,7 @@ impl pallet_assets::Config for Runtime {
 	type Balance = Balance;
 	type AssetId = u64;
 	type AssetIdParameter = u64;
-	type Currency = Currency;
+	type Currency = Balances;
 	type CreateOrigin = AsEnsureOriginWithArg<frame_system::EnsureSigned<AccountId>>;
 	type ForceOrigin = EnsureRoot<AccountId>;
 	type AssetDeposit = AssetDepositBase;
@@ -506,6 +530,31 @@ impl pallet_assets::Config for Runtime {
 	type Extra = ();
 	type CallbackHandle = ();
 	type WeightInfo = ();
+}
+
+parameter_types! {
+    pub const ProposalBond: Permill = Permill::from_percent(5);
+    pub const ProposalBondMinimum: Balance = 100 * LGNT;
+    pub const SpendPeriod: BlockNumber = 1 * DAYS;
+}
+
+impl pallet_treasury::Config for Runtime {
+	type Currency = Balances;
+	type ApproveOrigin = EnsureRoot<AccountId>;
+	type RejectOrigin = EnsureRoot<AccountId>;
+	type RuntimeEvent = RuntimeEvent;
+	type OnSlash = Treasury;
+	type ProposalBond = ProposalBond;
+	type ProposalBondMinimum = ProposalBondMinimum;
+	type ProposalBondMaximum = ();
+	type SpendPeriod = SpendPeriod;
+	type Burn = ();
+	type PalletId = TreasuryPalletId;
+	type BurnDestination = ();
+	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
+	type SpendFunds = ();
+	type MaxApprovals = ConstU32<100>;
+	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -534,6 +583,7 @@ construct_runtime!(
 		VerifiedRecovery: pallet_verified_recovery,
 		Vault: pallet_logion_vault,
 		Vote: pallet_logion_vote,
+		Treasury: pallet_treasury,
 	}
 );
 
