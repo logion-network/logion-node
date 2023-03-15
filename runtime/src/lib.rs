@@ -19,7 +19,7 @@ use sp_runtime::{
 		NumberFor, One, Verify, OpaqueKeys,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity},
-	ApplyExtrinsicResult, MultiSignature,
+	ApplyExtrinsicResult, MultiSignature, Percent
 };
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -53,6 +53,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
 use pallet_multisig::Timepoint;
+use pallet_block_reward::DistributionKey;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -557,6 +558,47 @@ impl pallet_treasury::Config for Runtime {
 	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
 }
 
+pub const BLOCK_REWARD: Balance = 0; // Inflation disabled for the moment
+
+parameter_types! {
+    pub const RewardAmount: Balance = BLOCK_REWARD;
+    pub const RewardDistributionKey: DistributionKey = DistributionKey {
+        stakers_percent: Percent::from_percent(50),
+        collators_percent: Percent::from_percent(30),
+        reserve_percent: Percent::from_percent(20),
+    };
+}
+
+pub struct RewardDistributor();
+impl pallet_block_reward::RewardDistributor<NegativeImbalance>
+    for RewardDistributor
+{
+    fn payout_reserve(reward: NegativeImbalance) {
+		if reward != NegativeImbalance::zero() {
+			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+		}
+    }
+
+    fn payout_collators(reward: NegativeImbalance) {
+		if reward != NegativeImbalance::zero() {
+			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+		}
+    }
+
+    fn payout_stakers(reward: NegativeImbalance) {
+		if reward != NegativeImbalance::zero() {
+			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+		}
+    }
+}
+
+impl pallet_block_reward::Config for Runtime {
+    type Currency = Balances;
+    type RewardAmount = RewardAmount;
+    type RewardDistributor = RewardDistributor;
+    type DistributionKey = RewardDistributionKey;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -584,6 +626,7 @@ construct_runtime!(
 		Vault: pallet_logion_vault,
 		Vote: pallet_logion_vote,
 		Treasury: pallet_treasury,
+		BlockReward: pallet_block_reward,
 	}
 );
 
