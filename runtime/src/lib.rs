@@ -113,7 +113,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 132,
+	spec_version: 133,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -229,8 +229,6 @@ impl frame_system::Config for Runtime {
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
-impl pallet_randomness_collective_flip::Config for Runtime {}
-
 impl pallet_aura::Config for Runtime {
 	type AuthorityId = AuraId;
 	type DisabledValidators = ();
@@ -254,6 +252,7 @@ impl pallet_grandpa::Config for Runtime {
 
 	type WeightInfo = ();
 	type MaxAuthorities = ConstU32<32>;
+	type MaxSetIdSessionEntries = ConstU64<0>;
 }
 
 impl pallet_timestamp::Config for Runtime {
@@ -606,27 +605,27 @@ construct_runtime!(
 		NodeBlock = opaque::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: frame_system,
-		RandomnessCollectiveFlip: pallet_randomness_collective_flip,
-		Timestamp: pallet_timestamp,
-		Balances: pallet_balances,
-		ValidatorSet: pallet_validator_set,
-		Session: pallet_session,
-		Aura: pallet_aura,
-		Grandpa: pallet_grandpa,
-		TransactionPayment: pallet_transaction_payment,
-		Sudo: pallet_sudo,
-		NodeAuthorization: pallet_node_authorization,
-		Multisig:  pallet_multisig,
-		Recovery: pallet_recovery,
-		Assets: pallet_assets,
-		LoAuthorityList: pallet_lo_authority_list,
-		LogionLoc: pallet_logion_loc,
-		VerifiedRecovery: pallet_verified_recovery,
-		Vault: pallet_logion_vault,
-		Vote: pallet_logion_vote,
-		Treasury: pallet_treasury,
-		BlockReward: pallet_block_reward,
+		System: frame_system = 0,
+		// 1 was randomness collective flip which is considered as insecure: https://github.com/paritytech/substrate/pull/13301
+		Timestamp: pallet_timestamp = 2,
+		Balances: pallet_balances = 3,
+		ValidatorSet: pallet_validator_set = 4,
+		Session: pallet_session = 5,
+		Aura: pallet_aura = 6,
+		Grandpa: pallet_grandpa = 7,
+		TransactionPayment: pallet_transaction_payment = 8,
+		Sudo: pallet_sudo = 9,
+		NodeAuthorization: pallet_node_authorization = 10,
+		Multisig:  pallet_multisig = 11,
+		Recovery: pallet_recovery = 12,
+		Assets: pallet_assets = 13,
+		LoAuthorityList: pallet_lo_authority_list = 14,
+		LogionLoc: pallet_logion_loc = 15,
+		VerifiedRecovery: pallet_verified_recovery = 16,
+		Vault: pallet_logion_vault = 17,
+		Vote: pallet_logion_vote = 18,
+		Treasury: pallet_treasury = 19,
+		BlockReward: pallet_block_reward = 20,
 	}
 );
 
@@ -803,6 +802,12 @@ impl_runtime_apis! {
 			len: u32,
 		) -> pallet_transaction_payment::FeeDetails<Balance> {
 			TransactionPayment::query_fee_details(uxt, len)
+		}
+		fn query_weight_to_fee(weight: Weight) -> Balance {
+			TransactionPayment::weight_to_fee(weight)
+		}
+		fn query_length_to_fee(length: u32) -> Balance {
+			TransactionPayment::length_to_fee(length)
 		}
 	}
 
