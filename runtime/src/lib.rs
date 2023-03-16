@@ -51,9 +51,8 @@ pub use sp_runtime::{Perbill, Permill};
 
 // Additional imports
 use frame_system::EnsureRoot;
-use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
+use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey};
 use pallet_multisig::Timepoint;
-use pallet_block_reward::DistributionKey;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -283,19 +282,23 @@ impl pallet_balances::Config for Runtime {
 parameter_types! {
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
     pub TreasuryAccountId: AccountId = TreasuryPalletId::get().into_account_truncating();
+	pub const InclusionFeesToBurnPercent: u32 = 100;
+	pub const InclusionFeesTreasuryPercent: u32 = 0; // Inclusion fees disabled for the moment
 }
 
 type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
 
-pub struct DealWithFees;
+pub struct DealWithInclusionFees;
 
-impl OnUnbalanced<NegativeImbalance> for DealWithFees {
+impl OnUnbalanced<NegativeImbalance> for DealWithInclusionFees {
 
 	fn on_nonzero_unbalanced(fees: NegativeImbalance) {
 
-		let (to_burn, treasury) = fees.ration(80, 20);
+		let (to_burn, treasury) = fees.ration(InclusionFeesToBurnPercent::get(), InclusionFeesTreasuryPercent::get());
 		drop(to_burn);
-		Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), treasury);
+		if treasury != NegativeImbalance::zero() {
+			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), treasury);
+		}
 	}
 }
 
@@ -305,7 +308,7 @@ parameter_types! {
 
 impl pallet_transaction_payment::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithFees>;
+	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithInclusionFees>;
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>;
 	type LengthToFee = IdentityFee<Balance>;
@@ -379,6 +382,13 @@ parameter_types! {
 	pub const MaxFileNameSize: u32 = 255;
 	pub const MaxTokensRecordDescriptionSize: u32 = 4096;
 	pub const MaxTokensRecordFiles: u32 = 10;
+	pub const FileStorageByteFee: u32 = 0; // File Storage fees disabled for the moment
+	pub const FileStorageEntryFee: u32 = 0; // File Storage fees disabled for the moment
+    pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
+        stakers_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(20),
+        reserve_percent: Percent::from_percent(80),
+    };
 }
 
 impl pallet_logion_loc::Config for Runtime {
@@ -400,6 +410,11 @@ impl pallet_logion_loc::Config for Runtime {
 	type MaxTokensRecordDescriptionSize = MaxTokensRecordDescriptionSize;
 	type MaxTokensRecordFiles = MaxTokensRecordFiles;
 	type WeightInfo = ();
+	type Currency = Balances;
+	type FileStorageByteFee = FileStorageByteFee;
+	type FileStorageEntryFee = FileStorageEntryFee;
+	type FileStorageFeeDistributor = RewardDistributor;
+	type FileStorageFeeDistributionKey = FileStorageFeeDistributionKey;
 }
 
 parameter_types! {
@@ -569,7 +584,7 @@ parameter_types! {
 }
 
 pub struct RewardDistributor();
-impl pallet_block_reward::RewardDistributor<NegativeImbalance>
+impl logion_shared::RewardDistributor<NegativeImbalance, Balance>
     for RewardDistributor
 {
     fn payout_reserve(reward: NegativeImbalance) {
