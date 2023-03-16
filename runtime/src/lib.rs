@@ -282,19 +282,23 @@ impl pallet_balances::Config for Runtime {
 parameter_types! {
     pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
     pub TreasuryAccountId: AccountId = TreasuryPalletId::get().into_account_truncating();
+	pub const InclusionFeesToBurnPercent: u32 = 100;
+	pub const InclusionFeesTreasuryPercent: u32 = 0; // Inclusion fees disabled for the moment
 }
 
 type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
 
-pub struct DealWithFees;
+pub struct DealWithInclusionFees;
 
-impl OnUnbalanced<NegativeImbalance> for DealWithFees {
+impl OnUnbalanced<NegativeImbalance> for DealWithInclusionFees {
 
 	fn on_nonzero_unbalanced(fees: NegativeImbalance) {
 
-		let (to_burn, treasury) = fees.ration(80, 20);
+		let (to_burn, treasury) = fees.ration(InclusionFeesToBurnPercent::get(), InclusionFeesTreasuryPercent::get());
 		drop(to_burn);
-		Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), treasury);
+		if treasury != NegativeImbalance::zero() {
+			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), treasury);
+		}
 	}
 }
 
@@ -304,7 +308,7 @@ parameter_types! {
 
 impl pallet_transaction_payment::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithFees>;
+	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithInclusionFees>;
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>;
 	type LengthToFee = IdentityFee<Balance>;
