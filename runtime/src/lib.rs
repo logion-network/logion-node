@@ -51,9 +51,8 @@ pub use sp_runtime::{Perbill, Permill};
 
 // Additional imports
 use frame_system::EnsureRoot;
-use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory};
+use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey};
 use pallet_multisig::Timepoint;
-use pallet_block_reward::DistributionKey;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -379,6 +378,13 @@ parameter_types! {
 	pub const MaxFileNameSize: u32 = 255;
 	pub const MaxTokensRecordDescriptionSize: u32 = 4096;
 	pub const MaxTokensRecordFiles: u32 = 10;
+	pub const FileStorageByteFee: u32 = 0; // File Storage fees disabled for the moment
+	pub const FileStorageEntryFee: u32 = 0; // File Storage fees disabled for the moment
+    pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
+        stakers_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(20),
+        reserve_percent: Percent::from_percent(80),
+    };
 }
 
 impl pallet_logion_loc::Config for Runtime {
@@ -400,6 +406,11 @@ impl pallet_logion_loc::Config for Runtime {
 	type MaxTokensRecordDescriptionSize = MaxTokensRecordDescriptionSize;
 	type MaxTokensRecordFiles = MaxTokensRecordFiles;
 	type WeightInfo = ();
+	type Currency = Balances;
+	type FileStorageByteFee = FileStorageByteFee;
+	type FileStorageEntryFee = FileStorageEntryFee;
+	type FileStorageFeeDistributor = RewardDistributor;
+	type FileStorageFeeDistributionKey = FileStorageFeeDistributionKey;
 }
 
 parameter_types! {
@@ -569,7 +580,7 @@ parameter_types! {
 }
 
 pub struct RewardDistributor();
-impl pallet_block_reward::RewardDistributor<NegativeImbalance>
+impl logion_shared::RewardDistributor<NegativeImbalance, Balance>
     for RewardDistributor
 {
     fn payout_reserve(reward: NegativeImbalance) {
