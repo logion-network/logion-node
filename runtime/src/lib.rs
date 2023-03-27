@@ -113,7 +113,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 134,
+	spec_version: 135,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -145,7 +145,8 @@ pub fn native_version() -> NativeVersion {
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 
-pub const MICRO_LGNT: Balance = 1_000_000_000_000;
+pub const NANO_LGNT: Balance = 1_000_000_000;
+pub const MICRO_LGNT: Balance = 1_000 * NANO_LGNT;
 pub const MILLI_LGNT: Balance = 1_000 * MICRO_LGNT;
 pub const LGNT: Balance = 1_000 * MILLI_LGNT;
 
@@ -383,8 +384,8 @@ parameter_types! {
 	pub const MaxFileNameSize: u32 = 255;
 	pub const MaxTokensRecordDescriptionSize: u32 = 4096;
 	pub const MaxTokensRecordFiles: u32 = 10;
-	pub const FileStorageByteFee: u32 = 0; // File Storage fees disabled for the moment
-	pub const FileStorageEntryFee: u32 = 0; // File Storage fees disabled for the moment
+	pub const FileStorageByteFee: Balance = 100 * NANO_LGNT; // 0.1 LGNT per MB
+	pub const FileStorageEntryFee: Balance = 0;
     pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
         stakers_percent: Percent::from_percent(0),
         collators_percent: Percent::from_percent(20),
@@ -824,6 +825,12 @@ impl_runtime_apis! {
 		}
 		fn query_length_to_fee(length: u32) -> Balance {
 			TransactionPayment::length_to_fee(length)
+		}
+	}
+
+	impl pallet_logion_loc::runtime_api::FeesApi<Block, Balance> for Runtime {
+		fn query_file_storage_fee(num_of_entries: u32, tot_size: u32) -> Balance {
+			LogionLoc::calculate_fee(num_of_entries, tot_size)
 		}
 	}
 
