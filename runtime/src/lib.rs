@@ -41,6 +41,7 @@ pub use frame_support::{
 };
 use frame_support::PalletId;
 use frame_support::traits::{Currency, OnUnbalanced};
+use frame_support::weights::ConstantMultiplier;
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
@@ -113,7 +114,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 137,
+	spec_version: 138,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -306,14 +307,15 @@ impl OnUnbalanced<NegativeImbalance> for DealWithInclusionFees {
 
 parameter_types! {
 	pub FeeMultiplier: Multiplier = Multiplier::one();
+	pub const WeightToFeeMultiplier: Balance = 10_000_000;
 }
 
 impl pallet_transaction_payment::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithInclusionFees>;
 	type OperationalFeeMultiplier = ConstU8<5>;
-	type WeightToFee = IdentityFee<Balance>;
-	type LengthToFee = IdentityFee<Balance>;
+	type WeightToFee = ConstantMultiplier<Balance, WeightToFeeMultiplier>;
+	type LengthToFee = ConstantMultiplier<Balance, WeightToFeeMultiplier>;
 	type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
 }
 
