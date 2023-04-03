@@ -8087,7 +8087,7 @@ dependencies = [
 [[package]]
 name = "substrate-validator-set"
 version = "0.9.40"
-source = "git+https://github.com/logion-network/substrate-validator-set.git?branch=polkadot-v0.9.40#9a875546b58308a202711c288de1a5e5cc688dc5"
+source = "git+https://github.com/logion-network/substrate-validator-set.git?branch=polkadot-v0.9.40#ab95da4771910a093dea47a8ebfa8423a48a36eb"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
