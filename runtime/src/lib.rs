@@ -9,7 +9,7 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
+use sp_core::{crypto::KeyTypeId, H160, OpaqueMetadata};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
@@ -76,6 +76,9 @@ pub type Hash = sp_core::H256;
 /// LOC ID
 pub type LocId = u128;
 
+/// Ethereum Address
+pub type EthereumAddress = H160;
+
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -112,7 +115,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 139,
+	spec_version: 140,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -406,6 +409,7 @@ impl pallet_logion_loc::Config for Runtime {
 	type FileStorageEntryFee = FileStorageEntryFee;
 	type FileStorageFeeDistributor = RewardDistributor;
 	type FileStorageFeeDistributionKey = FileStorageFeeDistributionKey;
+	type EthereumAddress = EthereumAddress;
 }
 
 parameter_types! {
