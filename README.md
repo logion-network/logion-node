@@ -61,3 +61,12 @@ Below command will run the node in development mode with a temporary storage.
 * The [Node](https://github.com/logion-network/logion-node) is the implementation of the chain.
 * The [Typescript backend](https://github.com/logion-network/logion-backend-ts) stores data which cannot be exposed publicly, or which wait legal officer's approval.
 * The [Wallet](https://github.com/logion-network/logion-wallet) is the user application.
+
+## Chainspec
+
+The following commands can be used to rebuild testnet chainspec files in `res` folder (`$ENV` is one of dev or test):
+
+```
+./target/release/logion-node build-spec --disable-default-bootnode --chain test > ./res/$ENV-plain.json
+./target/release/logion-node build-spec --chain ./res/$ENV-plain.json --raw --disable-default-bootnode > ./res/$ENV-raw.json
+```
