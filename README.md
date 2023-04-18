@@ -38,7 +38,7 @@ Finally, here are the general parameters of Logion nodes' Runtime:
 
 ### Rust Setup
 
-First, complete the [basic Rust setup instructions](./doc/rust-setup.md).
+First, complete the [basic Rust setup instructions](./docs/rust-setup.md).
 
 ### Build
 
