@@ -389,7 +389,7 @@ dependencies = [
  "log",
  "parking",
  "polling",
- "rustix 0.37.11",
+ "rustix 0.37.13",
  "slab",
  "socket2",
  "waker-fn",
@@ -917,9 +917,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.2.2"
+version = "4.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b802d85aaf3a1cdb02b224ba472ebdea62014fccfcb269b95a4d76443b5ee5a"
+checksum = "956ac1f6381d8d82ab4684768f89c0ea3afe66925ceadb4eeb3fc452ffc55d62"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -928,9 +928,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.2.2"
+version = "4.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14a1a858f532119338887a4b8e1af9c60de8249cd7bafd68036a489e261e37b6"
+checksum = "84080e799e54cff944f4b4a4b0e71630b0e0443b25b985175c7dddc1a859b749"
 dependencies = [
  "anstream",
  "anstyle",
@@ -2494,9 +2494,9 @@ dependencies = [
 
 [[package]]
 name = "h2"
-version = "0.3.17"
+version = "0.3.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66b91535aa35fea1523ad1b86cb6b53c28e0ae566ba4a460f4457e936cad7c6f"
+checksum = "17f8a914c2987b688368b5138aa05321db91f4090cf26118185672ad588bce21"
 dependencies = [
  "bytes",
  "fnv",
@@ -2954,7 +2954,7 @@ checksum = "adcf93614601c8129ddf72e2d5633df827ba6551541c6d8c59520a371475be1f"
 dependencies = [
  "hermit-abi 0.3.1",
  "io-lifetimes 1.0.10",
- "rustix 0.37.11",
+ "rustix 0.37.13",
  "windows-sys 0.48.0",
 ]
 
@@ -3783,9 +3783,9 @@ checksum = "f051f77a7c8e6957c0696eac88f26b0117e54f52d3fc682ab19397a8812846a4"
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.3.1"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d59d8c75012853d2e872fb56bc8a2e53718e2cafe1a4c823143141c6d90c322f"
+checksum = "9b085a4f2cde5781fc4b1717f2e86c62f5cda49de7ba99a7c2eae02b61c9064c"
 
 [[package]]
 name = "lock_api"
@@ -3904,7 +3904,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#2b8e3642f5c412fe8f68494d3309f60a8d57ecbf"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#d2029451fd457b20083197691aa1d93a0f477ba6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4009,7 +4009,7 @@ version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ffc89ccdc6e10d6907450f753537ebc5c5d3460d2e4e62ea74bd571db62c0f9e"
 dependencies = [
- "rustix 0.37.11",
+ "rustix 0.37.13",
 ]
 
 [[package]]
@@ -4597,7 +4597,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#2b8e3642f5c412fe8f68494d3309f60a8d57ecbf"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#d2029451fd457b20083197691aa1d93a0f477ba6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4636,7 +4636,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#2b8e3642f5c412fe8f68494d3309f60a8d57ecbf"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#d2029451fd457b20083197691aa1d93a0f477ba6"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4653,7 +4653,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#2b8e3642f5c412fe8f68494d3309f60a8d57ecbf"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#d2029451fd457b20083197691aa1d93a0f477ba6"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4670,7 +4670,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#2b8e3642f5c412fe8f68494d3309f60a8d57ecbf"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#d2029451fd457b20083197691aa1d93a0f477ba6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4686,7 +4686,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#2b8e3642f5c412fe8f68494d3309f60a8d57ecbf"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#d2029451fd457b20083197691aa1d93a0f477ba6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4861,7 +4861,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#2b8e3642f5c412fe8f68494d3309f60a8d57ecbf"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.40#d2029451fd457b20083197691aa1d93a0f477ba6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5825,9 +5825,9 @@ dependencies = [
 
 [[package]]
 name = "rustc-demangle"
-version = "0.1.22"
+version = "0.1.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4a36c42d1873f9a77c53bde094f9664d9891bc604a45b4798fd2c389ed12e5b"
+checksum = "d626bb9dae77e28219937af045c257c28bfd3f69333c512553507f5f9798cb76"
 
 [[package]]
 name = "rustc-hash"
@@ -5889,15 +5889,15 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "0.37.11"
+version = "0.37.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85597d61f83914ddeba6a47b3b8ffe7365107221c2e557ed94426489fefb5f77"
+checksum = "f79bef90eb6d984c72722595b5b1348ab39275a5e5123faca6863bf07d75a4e0"
 dependencies = [
  "bitflags",
  "errno 0.3.1",
  "io-lifetimes 1.0.10",
  "libc",
- "linux-raw-sys 0.3.1",
+ "linux-raw-sys 0.3.3",
  "windows-sys 0.48.0",
 ]
 
@@ -8307,7 +8307,7 @@ dependencies = [
  "cfg-if",
  "fastrand",
  "redox_syscall 0.3.5",
- "rustix 0.37.11",
+ "rustix 0.37.13",
  "windows-sys 0.45.0",
 ]
 
