@@ -51,7 +51,7 @@ pub use sp_runtime::{Perbill, Permill};
 // Additional imports
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey};
-use pallet_logion_loc::migrations::v11::EnableEthereumSubmitter;
+use pallet_logion_loc::migrations::v12::AddSponsorship;
 use pallet_multisig::Timepoint;
 
 /// An index to a block.
@@ -73,11 +73,14 @@ pub type Index = u32;
 /// A hash of some data used by the chain.
 pub type Hash = sp_core::H256;
 
-/// LOC ID
+/// LOC ID, compatible with UUIDs
 pub type LocId = u128;
 
 /// Ethereum Address
 pub type EthereumAddress = H160;
+
+/// Sponsorship ID, compatible with UUIDs
+pub type SponsorshipId = u128;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -115,7 +118,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 141,
+	spec_version: 142,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -410,6 +413,7 @@ impl pallet_logion_loc::Config for Runtime {
 	type FileStorageFeeDistributor = RewardDistributor;
 	type FileStorageFeeDistributionKey = FileStorageFeeDistributionKey;
 	type EthereumAddress = EthereumAddress;
+	type SponsorshipId = SponsorshipId;
 }
 
 parameter_types! {
@@ -667,7 +671,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	EnableEthereumSubmitter<Runtime>,
+	AddSponsorship<Runtime>,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
