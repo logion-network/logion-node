@@ -1,0 +1,42 @@
+name: Build Node and Release WebAssembly
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  SUBWASM_VERSION: 0.19.0
+  WASM_PATH: target/release/wbuild/logion-node-runtime/logion_node_runtime.compact.compressed.wasm
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install required packages
+        uses: ConorMacBride/install-package@v1.1.0
+        with:
+          apt: protobuf-compiler jq
+      - name: Install subwasm
+        run: |
+          wget https://github.com/chevdor/subwasm/releases/download/v${{ env.SUBWASM_VERSION }}/subwasm_linux_amd64_v${{ env.SUBWASM_VERSION }}.deb
+          sudo apt install -y ./subwasm_linux_amd64_v${{ env.SUBWASM_VERSION }}.deb
+          subwasm --version
+      - uses: actions/checkout@v3
+      - name: Check Cargo version
+        run: cargo --version --verbose
+      - name: Check Rust Toolchain
+        run: rustup show --verbose
+      - name: Build
+        run: cargo build --release --verbose --locked
+      - name: Set specVersion
+        run: |
+          SPEC_VERSION=$(subwasm --json version ${{ env.WASM_PATH }} | jq .specVersion)
+          echo "specVersion: $SPEC_VERSION"
+          mv ${{ env.WASM_PATH }} "logion_node_runtime-$SPEC_VERSION.compact.compressed.wasm"
+      - name: Saves artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: logion_node_runtime
+          path: logion_node_runtime-*.compact.compressed.wasm
+          retention-days: 15

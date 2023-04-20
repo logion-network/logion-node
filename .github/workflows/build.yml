@@ -1,4 +1,4 @@
-name: Rust
+name: Build Node
 
 on:
   push:
@@ -15,16 +15,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install exiftool
+      - name: Install required packages
         uses: ConorMacBride/install-package@v1.1.0
         with:
           apt: protobuf-compiler
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check Cargo version
         run: cargo --version --verbose
-      - name: Update Rust
-        run: rustup update ; rustup update nightly ; rustup target add wasm32-unknown-unknown --toolchain nightly
-      - name: Check Rust version
-        run: rustup show
+      - name: Check Rust Toolchain
+        run: rustup show --verbose
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --verbose --locked
