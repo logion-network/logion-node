@@ -50,8 +50,8 @@ pub use sp_runtime::{Perbill, Permill};
 
 // Additional imports
 use frame_system::EnsureRoot;
-use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey};
-use pallet_logion_loc::migrations::v12::AddSponsorship;
+use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
+use pallet_logion_loc::LocType;
 use pallet_multisig::Timepoint;
 
 /// An index to a block.
@@ -386,6 +386,27 @@ parameter_types! {
         collators_percent: Percent::from_percent(20),
         reserve_percent: Percent::from_percent(80),
     };
+    pub const ExchangeRate: Balance = 200_000_000_000_000_000; // 1 euro cent = 0.2 LGNT
+}
+
+pub struct  LegalFeeImpl;
+impl LegalFee<NegativeImbalance, Balance, LocType, AccountId> for LegalFeeImpl {
+
+	fn get_legal_fee(loc_type: LocType) -> EuroCent {
+		match loc_type {
+			LocType::Identity => 8_00, // 8.00 euros
+			_ => 100_00, // 100.00 euros
+		}
+	}
+
+	fn distribute(amount: NegativeImbalance, loc_type: LocType, loc_owner: AccountId) -> AccountId {
+		let beneficiary = match loc_type {
+			LocType::Identity => TreasuryPalletId::get().into_account_truncating(),
+			_ => loc_owner,
+		};
+		Balances::resolve_creating(&beneficiary, amount);
+		beneficiary
+	}
 }
 
 impl pallet_logion_loc::Config for Runtime {
@@ -414,6 +435,8 @@ impl pallet_logion_loc::Config for Runtime {
 	type FileStorageFeeDistributionKey = FileStorageFeeDistributionKey;
 	type EthereumAddress = EthereumAddress;
 	type SponsorshipId = SponsorshipId;
+	type LegalFee = LegalFeeImpl;
+	type ExchangeRate = ExchangeRate;
 }
 
 parameter_types! {
@@ -671,7 +694,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	AddSponsorship<Runtime>,
+	(),
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -828,6 +851,10 @@ impl_runtime_apis! {
 	impl pallet_logion_loc::runtime_api::FeesApi<Block, Balance> for Runtime {
 		fn query_file_storage_fee(num_of_entries: u32, tot_size: u32) -> Balance {
 			LogionLoc::calculate_fee(num_of_entries, tot_size)
+		}
+
+		fn query_legal_fee(loc_type: LocType) -> Balance {
+			LogionLoc::calculate_legal_fee(loc_type)
 		}
 	}
 
