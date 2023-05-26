@@ -50,7 +50,7 @@ pub use sp_runtime::{Perbill, Permill};
 
 // Additional imports
 use frame_system::EnsureRoot;
-use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
+use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
 use pallet_logion_loc::migrations::v13::AddAcknowledgeItems;
 use pallet_logion_loc::LocType;
 use pallet_multisig::Timepoint;
@@ -400,12 +400,12 @@ impl LegalFee<NegativeImbalance, Balance, LocType, AccountId> for LegalFeeImpl {
 		}
 	}
 
-	fn distribute(amount: NegativeImbalance, loc_type: LocType, loc_owner: AccountId) -> AccountId {
-		let beneficiary = match loc_type {
-			LocType::Identity => TreasuryPalletId::get().into_account_truncating(),
-			_ => loc_owner,
+	fn distribute(amount: NegativeImbalance, loc_type: LocType, loc_owner: AccountId) -> Beneficiary<AccountId> {
+		let (beneficiary, target) = match loc_type {
+			LocType::Identity => (Beneficiary::Treasury, TreasuryPalletId::get().into_account_truncating()),
+			_ => (Beneficiary::LegalOfficer(loc_owner.clone()), loc_owner),
 		};
-		Balances::resolve_creating(&beneficiary, amount);
+		Balances::resolve_creating(&target, amount);
 		beneficiary
 	}
 }
