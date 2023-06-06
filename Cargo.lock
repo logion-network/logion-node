@@ -406,7 +406,7 @@ dependencies = [
  "polling",
  "rustix 0.37.19",
  "slab",
- "socket2",
+ "socket2 0.4.9",
  "waker-fn",
 ]
 
@@ -2720,7 +2720,7 @@ dependencies = [
  "httpdate",
  "itoa",
  "pin-project-lite 0.2.9",
- "socket2",
+ "socket2 0.4.9",
  "tokio",
  "tower-service",
  "tracing",
@@ -2926,13 +2926,13 @@ checksum = "aa2f047c0a98b2f299aa5d6d7088443570faae494e9ae1305e48be000c9e0eb1"
 
 [[package]]
 name = "ipconfig"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd302af1b90f2463a98fa5ad469fc212c8e3175a41c3068601bfa2727591c5be"
+checksum = "b58db92f96b720de98181bbbe63c831e87005ab460c1bf306eb2622b4707997f"
 dependencies = [
- "socket2",
+ "socket2 0.5.3",
  "widestring",
- "winapi",
+ "windows-sys 0.48.0",
  "winreg",
 ]
 
@@ -3179,9 +3179,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.145"
+version = "0.2.144"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc86cde3ff845662b8f4ef6cb50ea0e20c524eb3d29ae048287e06a1b3fa6a81"
+checksum = "2b00cc1c228a6782d0f076e7b232802e0c5689d41bb5df366f2a6b6621cfdfe1"
 
 [[package]]
 name = "libloading"
@@ -3396,7 +3396,7 @@ dependencies = [
  "log",
  "rand 0.8.5",
  "smallvec",
- "socket2",
+ "socket2 0.4.9",
  "tokio",
  "trust-dns-proto",
  "void",
@@ -3557,7 +3557,7 @@ dependencies = [
  "libc",
  "libp2p-core 0.38.0",
  "log",
- "socket2",
+ "socket2 0.4.9",
  "tokio",
 ]
 
@@ -3891,7 +3891,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/lo-region#51b8d0801ea0c19c97f9a21d399a6469a923245f"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.41#a384a4392aa897f8a1ca21c66d4365aef8a3d064"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4593,7 +4593,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/lo-region#51b8d0801ea0c19c97f9a21d399a6469a923245f"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.41#a384a4392aa897f8a1ca21c66d4365aef8a3d064"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4632,7 +4632,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/lo-region#51b8d0801ea0c19c97f9a21d399a6469a923245f"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.41#a384a4392aa897f8a1ca21c66d4365aef8a3d064"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4649,7 +4649,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/lo-region#51b8d0801ea0c19c97f9a21d399a6469a923245f"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.41#a384a4392aa897f8a1ca21c66d4365aef8a3d064"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4666,7 +4666,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/lo-region#51b8d0801ea0c19c97f9a21d399a6469a923245f"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.41#a384a4392aa897f8a1ca21c66d4365aef8a3d064"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4682,7 +4682,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/lo-region#51b8d0801ea0c19c97f9a21d399a6469a923245f"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.41#a384a4392aa897f8a1ca21c66d4365aef8a3d064"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4857,7 +4857,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/lo-region#51b8d0801ea0c19c97f9a21d399a6469a923245f"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.41#a384a4392aa897f8a1ca21c66d4365aef8a3d064"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -7327,6 +7327,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "socket2"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2538b18701741680e0322a2302176d3253a35388e2e62f172f64f4f16605f877"
+dependencies = [
+ "libc",
+ "windows-sys 0.48.0",
+]
+
+[[package]]
 name = "soketto"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8465,7 +8475,7 @@ dependencies = [
  "parking_lot 0.12.1",
  "pin-project-lite 0.2.9",
  "signal-hook-registry",
- "socket2",
+ "socket2 0.4.9",
  "tokio-macros",
  "windows-sys 0.48.0",
 ]
@@ -8697,7 +8707,7 @@ dependencies = [
  "lazy_static",
  "rand 0.8.5",
  "smallvec",
- "socket2",
+ "socket2 0.4.9",
  "thiserror",
  "tinyvec",
  "tokio",
@@ -9523,7 +9533,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f08dfd7a6e3987e255c4dbe710dde5d94d0f0574f8a21afa95d171376c143106"
 dependencies = [
  "log",
- "socket2",
+ "socket2 0.4.9",
  "thiserror",
  "tokio",
  "webrtc-util",
@@ -9627,9 +9637,9 @@ dependencies = [
 
 [[package]]
 name = "widestring"
-version = "0.5.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17882f045410753661207383517a6f62ec3dbeb6a4ed2acce01f0728238d1983"
+checksum = "653f141f39ec16bba3c5abe400a0c60da7468261cc2cbf36805022876bc721a8"
 
 [[package]]
 name = "winapi"
@@ -9863,11 +9873,12 @@ checksum = "1a515f5799fe4961cb532f983ce2b23082366b898e52ffbce459c86f67c8378a"
 
 [[package]]
 name = "winreg"
-version = "0.10.1"
+version = "0.50.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80d0f4e272c85def139476380b12f9ac60926689dd2e01d4923222f40580869d"
+checksum = "524e57b2c537c0f9b1e69f1965311ec12182b4122e45035b1508cd24d2adadb1"
 dependencies = [
- "winapi",
+ "cfg-if",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
