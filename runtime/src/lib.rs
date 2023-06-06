@@ -49,11 +49,13 @@ pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
 // Additional imports
+use frame_support::codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::migrations::v13::AddAcknowledgeItems;
+use pallet_lo_authority_list::migrations::v4::AddRegion;
 use pallet_logion_loc::LocType;
 use pallet_multisig::Timepoint;
+use scale_info::TypeInfo;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -119,7 +121,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 143,
+	spec_version: 144,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -361,10 +363,34 @@ impl pallet_session::Config for Runtime {
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
 }
 
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, TypeInfo, Copy)]
+pub enum Region {
+    Europe,
+}
+
+impl sp_std::str::FromStr for Region {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Europe" => Ok(Region::Europe),
+            _ => Err(()),
+        }
+    }
+}
+
+impl Default for Region {
+
+    fn default() -> Self {
+        Self::Europe
+    }
+}
+
 impl pallet_lo_authority_list::Config for Runtime {
 	type AddOrigin = EnsureRoot<AccountId>;
 	type RemoveOrigin = EnsureRoot<AccountId>;
 	type UpdateOrigin = EnsureRoot<AccountId>;
+	type Region = Region;
 	type RuntimeEvent = RuntimeEvent;
 }
 
@@ -695,7 +721,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	AddAcknowledgeItems<Runtime>,
+	AddRegion<Runtime>,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
