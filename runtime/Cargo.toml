@@ -48,19 +48,19 @@ frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "h
 frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.41", optional = true }
 
 # logion dependencies
-logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v0.9.41" }
+logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/lo-region" }
 pallet-assets = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.41" }
-pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v0.9.41" }
-pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v0.9.41" }
-pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v0.9.41" }
-pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v0.9.41" }
-pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v0.9.41" }
+pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/lo-region" }
+pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/lo-region" }
+pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/lo-region" }
+pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/lo-region" }
+pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/lo-region" }
 pallet-multisig = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.41" }
 pallet-node-authorization = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.41" }
 pallet-recovery = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.41" }
 pallet-session = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.41" }
 pallet-validator-set = { default-features = false, git = "https://github.com/logion-network/substrate-validator-set.git", package = "substrate-validator-set", branch = "polkadot-v0.9.41" }
-pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v0.9.41" }
+pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/lo-region" }
 pallet-treasury = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.41" }
 
 [build-dependencies]
