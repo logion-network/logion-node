@@ -266,7 +266,7 @@ pub const EXISTENTIAL_DEPOSIT: u128 = 500;
 
 impl pallet_balances::Config for Runtime {
 	type MaxLocks = ConstU32<50>;
-	type MaxReserves = ();
+	type MaxReserves = ConstU32<0>;
 	type ReserveIdentifier = [u8; 8];
 	/// The type for recording an account's balance.
 	type Balance = Balance;
@@ -276,6 +276,10 @@ impl pallet_balances::Config for Runtime {
 	type ExistentialDeposit = ConstU128<EXISTENTIAL_DEPOSIT>;
 	type AccountStore = System;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
+	type HoldIdentifier = [u8; 8];
+	type FreezeIdentifier = [u8; 8];
+	type MaxFreezes = ConstU32<0>;
+	type MaxHolds = ConstU32<0>;
 }
 
 parameter_types! {
@@ -344,6 +348,7 @@ impl pallet_validator_set::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type AddRemoveOrigin = EnsureRoot<AccountId>;
 	type MinAuthorities = MinAuthorities;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -392,6 +397,7 @@ impl pallet_lo_authority_list::Config for Runtime {
 	type UpdateOrigin = EnsureRoot<AccountId>;
 	type Region = Region;
 	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -563,6 +569,7 @@ impl pallet_logion_vote::Config for Runtime {
 	type LocValidity = LogionLoc;
 	type LocQuery = LogionLoc;
 	type LegalOfficerCreation = LoAuthorityList;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -756,6 +763,14 @@ impl_runtime_apis! {
 	impl sp_api::Metadata<Block> for Runtime {
 		fn metadata() -> OpaqueMetadata {
 			OpaqueMetadata::new(Runtime::metadata().into())
+		}
+
+		fn metadata_at_version(version: u32) -> Option<OpaqueMetadata> {
+			Runtime::metadata_at_version(version)
+		}
+
+		fn metadata_versions() -> sp_std::vec::Vec<u32> {
+			Runtime::metadata_versions()
 		}
 	}
 
