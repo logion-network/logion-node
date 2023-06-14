@@ -70,3 +70,22 @@ The following commands can be used to rebuild testnet chainspec files in `res` f
 ./target/release/logion-node build-spec --disable-default-bootnode --chain test > ./res/$ENV-plain.json
 ./target/release/logion-node build-spec --chain ./res/$ENV-plain.json --raw --disable-default-bootnode > ./res/$ENV-raw.json
 ```
+
+## Try Runtime
+
+`try-runtime` tool enables the testing of a new runtime against real data.
+
+### Test a runtime upgrade
+
+Generally, what's tested here is one or several storage migrations activated by the new runtime.
+This is done by executing the following command:
+
+```sh
+cargo run --release --features=try-runtime try-runtime --runtime target/release/wbuild/logion-node-runtime/logion_node_runtime.compact.compressed.wasm on-runtime-upgrade live --uri wss://rpc01.logion.network:443
+```
+
+This will:
+- connect to RPC node
+- download current state
+- execute the upgrade
+- run pallets' `post_upgrade` hook

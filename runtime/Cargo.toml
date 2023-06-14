@@ -49,19 +49,19 @@ frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "h
 frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42", optional = true }
 
 # logion dependencies
-logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/deleteable-data" }
+logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/try-runtime" }
 pallet-assets = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42" }
-pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/deleteable-data" }
-pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/deleteable-data" }
-pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/deleteable-data" }
-pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/deleteable-data" }
-pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/deleteable-data" }
+pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/try-runtime" }
+pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/try-runtime" }
+pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/try-runtime" }
+pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/try-runtime" }
+pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/try-runtime" }
 pallet-multisig = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.42" }
 pallet-node-authorization = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.42" }
 pallet-recovery = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.42" }
 pallet-session = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42" }
 pallet-validator-set = { default-features = false, git = "https://github.com/logion-network/substrate-validator-set.git", package = "substrate-validator-set", branch = "polkadot-v0.9.42" }
-pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/deleteable-data" }
+pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/try-runtime" }
 pallet-treasury = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.42" }
 
 [build-dependencies]
@@ -84,6 +84,7 @@ std = [
 	"pallet-assets/std",
 	"pallet-aura/std",
 	"pallet-balances/std",
+	"pallet-block-reward/std",
 	"pallet-grandpa/std",
 	"pallet-lo-authority-list/std",
 	"pallet-logion-loc/std",
@@ -130,10 +131,23 @@ try-runtime = [
 	"frame-executive/try-runtime",
 	"frame-system/try-runtime",
 	"frame-support/try-runtime",
+	"pallet-assets/try-runtime",
 	"pallet-aura/try-runtime",
 	"pallet-balances/try-runtime",
+	"pallet-block-reward/try-runtime",
 	"pallet-grandpa/try-runtime",
+	"pallet-lo-authority-list/try-runtime",
+	"pallet-logion-loc/try-runtime",
+	"pallet-logion-vault/try-runtime",
+	"pallet-logion-vote/try-runtime",
+	"pallet-multisig/try-runtime",
+	"pallet-node-authorization/try-runtime",
+	"pallet-recovery/try-runtime",
+	"pallet-session/try-runtime",
 	"pallet-sudo/try-runtime",
 	"pallet-timestamp/try-runtime",
 	"pallet-transaction-payment/try-runtime",
+	"pallet-validator-set/try-runtime",
+	"pallet-verified-recovery/try-runtime",
+	"pallet-treasury/try-runtime",
 ]
