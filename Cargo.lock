@@ -4007,7 +4007,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/try-runtime#a36a7d5d927271c462ab4e8516a2958e6770b077"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4709,7 +4709,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/try-runtime#a36a7d5d927271c462ab4e8516a2958e6770b077"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4749,7 +4749,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/try-runtime#a36a7d5d927271c462ab4e8516a2958e6770b077"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4766,7 +4766,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/try-runtime#a36a7d5d927271c462ab4e8516a2958e6770b077"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4783,7 +4783,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/try-runtime#a36a7d5d927271c462ab4e8516a2958e6770b077"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4799,7 +4799,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/try-runtime#a36a7d5d927271c462ab4e8516a2958e6770b077"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4974,7 +4974,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/try-runtime#a36a7d5d927271c462ab4e8516a2958e6770b077"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -6064,9 +6064,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-native-certs"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0167bac7a9f490495f3c33013e7722b53cb087ecbe082fb0c6387c96f634ea50"
+checksum = "a9aace74cb666635c918e9c12bc0d348266037aa8eb599b5cba565709a8dff00"
 dependencies = [
  "openssl-probe",
  "rustls-pemfile",
