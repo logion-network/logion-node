@@ -9,7 +9,8 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{crypto::KeyTypeId, H160, OpaqueMetadata};
+use sp_core::{crypto::KeyTypeId, H160, OpaqueMetadata, H256};
+use sp_io::hashing::sha2_256;
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
@@ -52,8 +53,8 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_support::codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_lo_authority_list::migrations::v4::AddRegion;
-use pallet_logion_loc::LocType;
+use pallet_logion_loc::migrations::v14::HashLocPublicData;
+use pallet_logion_loc::{LocType, Hasher};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
 
@@ -121,7 +122,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 144,
+	spec_version: 145,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -401,10 +402,6 @@ impl pallet_lo_authority_list::Config for Runtime {
 }
 
 parameter_types! {
-	pub const MaxMetadataItemNameSize: usize = 255;
-	pub const MaxMetadataItemValueSize: usize = 4096;
-	pub const MaxFileNatureSize: usize = 255;
-	pub const MaxLinkNatureSize: usize = 255;
 	pub const MaxCollectionItemDescriptionSize: usize = 4096;
 	pub const MaxCollectionItemTokenIdSize: usize = 255;
 	pub const MaxCollectionItemTokenTypeSize: usize = 255;
@@ -442,15 +439,21 @@ impl LegalFee<NegativeImbalance, Balance, LocType, AccountId> for LegalFeeImpl {
 	}
 }
 
+pub struct SHA256;
+impl Hasher<H256> for SHA256 {
+
+	fn hash(data: &Vec<u8>) -> H256 {
+		let bytes = sha2_256(data);
+		H256(bytes)
+	}
+}
+
 impl pallet_logion_loc::Config for Runtime {
 	type LocId = LocId;
 	type RuntimeEvent = RuntimeEvent;
 	type Hash = Hash;
+	type Hasher = SHA256;
 	type IsLegalOfficer = LoAuthorityList;
-	type MaxMetadataItemNameSize = MaxMetadataItemNameSize;
-	type MaxMetadataItemValueSize = MaxMetadataItemValueSize;
-	type MaxFileNatureSize = MaxFileNatureSize;
-	type MaxLinkNatureSize = MaxLinkNatureSize;
 	type CollectionItemId = Hash;
 	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
 	type MaxCollectionItemTokenIdSize = MaxCollectionItemTokenIdSize;
@@ -728,7 +731,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	AddRegion<Runtime>,
+	HashLocPublicData<Runtime>,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
