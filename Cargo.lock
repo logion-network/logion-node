@@ -943,9 +943,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.3.3"
+version = "4.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca8f255e4b8027970e78db75e78831229c9815fdbfa67eb1a1b777a62e24b4a0"
+checksum = "80672091db20273a15cf9fdd4e47ed43b5091ec9841bf4c6145c9dfbbcae09ed"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -954,9 +954,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.3.3"
+version = "4.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acd4f3c17c83b0ba34ffbc4f8bbd74f079413f747f84a6f89292f138057e36ab"
+checksum = "c1458a1df40e1e2afebb7ab60ce55c1fa8f431146205aa5f4887e0b111c27636"
 dependencies = [
  "anstream",
  "anstyle",
@@ -3945,6 +3945,7 @@ dependencies = [
  "sp-consensus-grandpa",
  "sp-core",
  "sp-inherents",
+ "sp-io",
  "sp-keyring",
  "sp-runtime",
  "sp-timestamp",
@@ -3992,6 +3993,7 @@ dependencies = [
  "sp-consensus-grandpa",
  "sp-core",
  "sp-inherents",
+ "sp-io",
  "sp-offchain",
  "sp-runtime",
  "sp-session",
@@ -4005,7 +4007,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#46f4478f84fce6c1ae47983aff39b1a0c7b2f458"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4707,7 +4709,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#46f4478f84fce6c1ae47983aff39b1a0c7b2f458"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4715,6 +4717,7 @@ dependencies = [
  "logion-shared",
  "parity-scale-codec",
  "scale-info",
+ "serde",
  "sp-core",
  "sp-runtime",
  "sp-std",
@@ -4746,7 +4749,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#46f4478f84fce6c1ae47983aff39b1a0c7b2f458"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4763,7 +4766,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#46f4478f84fce6c1ae47983aff39b1a0c7b2f458"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4780,7 +4783,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#46f4478f84fce6c1ae47983aff39b1a0c7b2f458"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4796,7 +4799,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#46f4478f84fce6c1ae47983aff39b1a0c7b2f458"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4971,7 +4974,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#46f4478f84fce6c1ae47983aff39b1a0c7b2f458"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#19b40c500e9a888dc92bcfd182e9c19493e243bd"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -6061,9 +6064,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-native-certs"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0167bac7a9f490495f3c33013e7722b53cb087ecbe082fb0c6387c96f634ea50"
+checksum = "a9aace74cb666635c918e9c12bc0d348266037aa8eb599b5cba565709a8dff00"
 dependencies = [
  "openssl-probe",
  "rustls-pemfile",
@@ -8970,6 +8973,7 @@ dependencies = [
  "async-trait",
  "clap",
  "frame-remote-externalities",
+ "frame-try-runtime",
  "hex",
  "log",
  "parity-scale-codec",

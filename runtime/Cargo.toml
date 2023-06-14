@@ -32,6 +32,7 @@ sp-consensus-aura = { version = "0.10.0-dev", default-features = false, git = "h
 sp-consensus-grandpa = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42" }
 sp-core = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42" }
 sp-inherents = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42"}
+sp-io = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42"}
 sp-offchain = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42" }
 sp-runtime = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42" }
 sp-session = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.42" }
@@ -83,6 +84,7 @@ std = [
 	"pallet-assets/std",
 	"pallet-aura/std",
 	"pallet-balances/std",
+	"pallet-block-reward/std",
 	"pallet-grandpa/std",
 	"pallet-lo-authority-list/std",
 	"pallet-logion-loc/std",
@@ -129,10 +131,23 @@ try-runtime = [
 	"frame-executive/try-runtime",
 	"frame-system/try-runtime",
 	"frame-support/try-runtime",
+	"pallet-assets/try-runtime",
 	"pallet-aura/try-runtime",
 	"pallet-balances/try-runtime",
+	"pallet-block-reward/try-runtime",
 	"pallet-grandpa/try-runtime",
+	"pallet-lo-authority-list/try-runtime",
+	"pallet-logion-loc/try-runtime",
+	"pallet-logion-vault/try-runtime",
+	"pallet-logion-vote/try-runtime",
+	"pallet-multisig/try-runtime",
+	"pallet-node-authorization/try-runtime",
+	"pallet-recovery/try-runtime",
+	"pallet-session/try-runtime",
 	"pallet-sudo/try-runtime",
 	"pallet-timestamp/try-runtime",
 	"pallet-transaction-payment/try-runtime",
+	"pallet-validator-set/try-runtime",
+	"pallet-verified-recovery/try-runtime",
+	"pallet-treasury/try-runtime",
 ]
