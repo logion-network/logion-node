@@ -53,7 +53,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_support::codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::migrations::v14::HashLocPublicData;
+use pallet_logion_loc::migrations::{v14::HashLocPublicData, v15::AddTokenIssuance};
 use pallet_logion_loc::{LocType, Hasher};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
@@ -85,6 +85,9 @@ pub type EthereumAddress = H160;
 
 /// Sponsorship ID, compatible with UUIDs
 pub type SponsorshipId = u128;
+
+/// A given token's total supply type
+pub type TokenIssuance = u64;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -417,6 +420,12 @@ parameter_types! {
         reserve_percent: Percent::from_percent(80),
     };
     pub const ExchangeRate: Balance = 200_000_000_000_000_000; // 1 euro cent = 0.2 LGNT
+	pub const CertificateFee: u64 = 4_000_000_000_000_000; // 0.004 LGNT
+    pub const CertificateFeeDistributionKey: DistributionKey = DistributionKey {
+        stakers_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(20),
+        reserve_percent: Percent::from_percent(80),
+    };
 }
 
 pub struct  LegalFeeImpl;
@@ -467,12 +476,15 @@ impl pallet_logion_loc::Config for Runtime {
 	type Currency = Balances;
 	type FileStorageByteFee = FileStorageByteFee;
 	type FileStorageEntryFee = FileStorageEntryFee;
-	type FileStorageFeeDistributor = RewardDistributor;
+	type RewardDistributor = RewardDistributor;
 	type FileStorageFeeDistributionKey = FileStorageFeeDistributionKey;
 	type EthereumAddress = EthereumAddress;
 	type SponsorshipId = SponsorshipId;
 	type LegalFee = LegalFeeImpl;
 	type ExchangeRate = ExchangeRate;
+	type CertificateFee = CertificateFee;
+    type CertificateFeeDistributionKey = CertificateFeeDistributionKey;
+    type TokenIssuance = TokenIssuance;
 }
 
 parameter_types! {
@@ -642,7 +654,7 @@ parameter_types! {
     };
 }
 
-pub struct RewardDistributor();
+pub struct RewardDistributor;
 impl logion_shared::RewardDistributor<NegativeImbalance, Balance>
     for RewardDistributor
 {
@@ -731,7 +743,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	HashLocPublicData<Runtime>,
+	(HashLocPublicData<Runtime>, AddTokenIssuance<Runtime>),
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -893,13 +905,17 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl pallet_logion_loc::runtime_api::FeesApi<Block, Balance> for Runtime {
+	impl pallet_logion_loc::runtime_api::FeesApi<Block, Balance, TokenIssuance> for Runtime {
 		fn query_file_storage_fee(num_of_entries: u32, tot_size: u32) -> Balance {
 			LogionLoc::calculate_fee(num_of_entries, tot_size)
 		}
 
 		fn query_legal_fee(loc_type: LocType) -> Balance {
 			LogionLoc::calculate_legal_fee(loc_type)
+		}
+
+		fn query_certificate_fee(token_issuance: TokenIssuance) -> Balance {
+			LogionLoc::calculate_certificate_fee(token_issuance)
 		}
 	}
 
