@@ -4007,7 +4007,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/fungible-legal-fees#214d5c53ad3fc6398dd96eb2cda070a24396b893"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#1d274a0ba981dafefde0ad36d413e089299266d6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4709,7 +4709,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/fungible-legal-fees#214d5c53ad3fc6398dd96eb2cda070a24396b893"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#1d274a0ba981dafefde0ad36d413e089299266d6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4749,7 +4749,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/fungible-legal-fees#214d5c53ad3fc6398dd96eb2cda070a24396b893"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#1d274a0ba981dafefde0ad36d413e089299266d6"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4766,7 +4766,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/fungible-legal-fees#214d5c53ad3fc6398dd96eb2cda070a24396b893"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#1d274a0ba981dafefde0ad36d413e089299266d6"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4783,7 +4783,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/fungible-legal-fees#214d5c53ad3fc6398dd96eb2cda070a24396b893"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#1d274a0ba981dafefde0ad36d413e089299266d6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4799,7 +4799,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/fungible-legal-fees#214d5c53ad3fc6398dd96eb2cda070a24396b893"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#1d274a0ba981dafefde0ad36d413e089299266d6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4974,7 +4974,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/fungible-legal-fees#214d5c53ad3fc6398dd96eb2cda070a24396b893"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v0.9.42#1d274a0ba981dafefde0ad36d413e089299266d6"
 dependencies = [
  "frame-support",
  "frame-system",
