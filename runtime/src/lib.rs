@@ -53,7 +53,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_support::codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::migrations::{v14::HashLocPublicData, v15::AddTokenIssuance};
+use pallet_logion_loc::migrations::{v14::HashLocPublicData, v15::AddTokenIssuance, v16::MoveTokenIssuance};
 use pallet_logion_loc::{LocType, Hasher};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
@@ -125,7 +125,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 145,
+	spec_version: 146,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -743,7 +743,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(HashLocPublicData<Runtime>, AddTokenIssuance<Runtime>),
+	(HashLocPublicData<Runtime>, AddTokenIssuance<Runtime>, MoveTokenIssuance<Runtime>),
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
