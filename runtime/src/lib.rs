@@ -743,8 +743,44 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	HashItemRecordPublicData<Runtime>,
+	(
+		pallet_balances::migration::MigrateManyToTrackInactive<Runtime, frame_support::pallet_prelude::GetDefault>,
+		MigrateAssetsStorage,
+		MigrateGrandpaStorage,
+		HashItemRecordPublicData<Runtime>,
+	),
 >;
+
+use frame_support::traits::{StorageVersion, GetStorageVersion};
+
+pub struct MigrateAssetsStorage(sp_std::marker::PhantomData<Runtime>);
+impl frame_support::traits::OnRuntimeUpgrade for MigrateAssetsStorage {
+	fn on_runtime_upgrade() -> Weight {
+		let current_version = Assets::current_storage_version();
+		let onchain_version = Assets::on_chain_storage_version();
+		if current_version != onchain_version {
+			log::info!("Setting assets storage version to current");
+			current_version.put::<Assets>();
+			<Runtime as frame_system::Config>::BlockWeights::get().max_block
+		} else {
+			Weight::zero()
+		}
+	}
+}
+
+pub struct MigrateGrandpaStorage(sp_std::marker::PhantomData<Runtime>);
+impl frame_support::traits::OnRuntimeUpgrade for MigrateGrandpaStorage {
+	fn on_runtime_upgrade() -> Weight {
+		let storage_version = StorageVersion::get::<Grandpa>();
+		if storage_version != 4 {
+			log::info!("Setting grandpa storage version to 4");
+			StorageVersion::new(4).put::<Grandpa>();
+			<Runtime as frame_system::Config>::BlockWeights::get().max_block
+		} else {
+			Weight::zero()
+		}
+	}
+}
 
 #[cfg(feature = "runtime-benchmarks")]
 #[macro_use]

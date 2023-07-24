@@ -49,6 +49,7 @@ frame-benchmarking = { version = "4.0.0-dev", default-features = false, git = "h
 frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.43", optional = true }
 
 # logion dependencies
+log = { version = "0.4.14", default-features = false }
 logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/hash-item-record" }
 pallet-assets = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.43" }
 pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/hash-item-record" }
@@ -80,6 +81,7 @@ std = [
 	"frame-system-rpc-runtime-api/std",
 	"frame-system/std",
 	"frame-try-runtime/std",
+	"log/std",
 	"logion-shared/std",
 	"pallet-assets/std",
 	"pallet-aura/std",

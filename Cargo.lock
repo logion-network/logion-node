@@ -3992,6 +3992,7 @@ dependencies = [
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
+ "log",
  "logion-shared",
  "pallet-assets",
  "pallet-aura",
