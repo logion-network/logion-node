@@ -53,7 +53,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_support::codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::{LocType, Hasher};
+use pallet_logion_loc::{LocType, Hasher, migrations::v17::HashItemRecordPublicData};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
 
@@ -124,7 +124,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 147,
+	spec_version: 148,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -743,8 +743,44 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(),
+	(
+		pallet_balances::migration::MigrateManyToTrackInactive<Runtime, frame_support::pallet_prelude::GetDefault>,
+		MigrateAssetsStorage,
+		MigrateGrandpaStorage,
+		HashItemRecordPublicData<Runtime>,
+	),
 >;
+
+use frame_support::traits::{StorageVersion, GetStorageVersion};
+
+pub struct MigrateAssetsStorage(sp_std::marker::PhantomData<Runtime>);
+impl frame_support::traits::OnRuntimeUpgrade for MigrateAssetsStorage {
+	fn on_runtime_upgrade() -> Weight {
+		let current_version = Assets::current_storage_version();
+		let onchain_version = Assets::on_chain_storage_version();
+		if current_version != onchain_version {
+			log::info!("Setting assets storage version to current");
+			current_version.put::<Assets>();
+			<Runtime as frame_system::Config>::BlockWeights::get().max_block
+		} else {
+			Weight::zero()
+		}
+	}
+}
+
+pub struct MigrateGrandpaStorage(sp_std::marker::PhantomData<Runtime>);
+impl frame_support::traits::OnRuntimeUpgrade for MigrateGrandpaStorage {
+	fn on_runtime_upgrade() -> Weight {
+		let storage_version = StorageVersion::get::<Grandpa>();
+		if storage_version != 4 {
+			log::info!("Setting grandpa storage version to 4");
+			StorageVersion::new(4).put::<Grandpa>();
+			<Runtime as frame_system::Config>::BlockWeights::get().max_block
+		} else {
+			Weight::zero()
+		}
+	}
+}
 
 #[cfg(feature = "runtime-benchmarks")]
 #[macro_use]
