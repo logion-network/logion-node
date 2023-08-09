@@ -53,7 +53,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_support::codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::{LocType, Hasher, migrations::v17::HashItemRecordPublicData};
+use pallet_logion_loc::{LocType, Hasher, migrations::v18::AddValueFee};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
 
@@ -124,7 +124,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 148,
+	spec_version: 149,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -418,6 +418,7 @@ parameter_types! {
         stakers_percent: Percent::from_percent(0),
         collators_percent: Percent::from_percent(20),
         reserve_percent: Percent::from_percent(80),
+		treasury_percent: Percent::from_percent(0),
     };
     pub const ExchangeRate: Balance = 200_000_000_000_000_000; // 1 euro cent = 0.2 LGNT
 	pub const CertificateFee: u64 = 4_000_000_000_000_000; // 0.004 LGNT
@@ -425,6 +426,13 @@ parameter_types! {
         stakers_percent: Percent::from_percent(0),
         collators_percent: Percent::from_percent(20),
         reserve_percent: Percent::from_percent(80),
+		treasury_percent: Percent::from_percent(0),
+    };
+	pub const ValueFeeDistributionKey: DistributionKey = DistributionKey {
+        stakers_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(0),
+        reserve_percent: Percent::from_percent(0),
+		treasury_percent: Percent::from_percent(100),
     };
 }
 
@@ -485,6 +493,7 @@ impl pallet_logion_loc::Config for Runtime {
 	type CertificateFee = CertificateFee;
     type CertificateFeeDistributionKey = CertificateFeeDistributionKey;
     type TokenIssuance = TokenIssuance;
+	type ValueFeeDistributionKey = ValueFeeDistributionKey;
 }
 
 parameter_types! {
@@ -651,6 +660,7 @@ parameter_types! {
         stakers_percent: Percent::from_percent(50),
         collators_percent: Percent::from_percent(30),
         reserve_percent: Percent::from_percent(20),
+		treasury_percent: Percent::from_percent(0),
     };
 }
 
@@ -675,6 +685,12 @@ impl logion_shared::RewardDistributor<NegativeImbalance, Balance>
 			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
 		}
     }
+
+	fn payout_treasury(reward: NegativeImbalance) {
+		if reward != NegativeImbalance::zero() {
+			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+		}
+	}
 }
 
 impl pallet_block_reward::Config for Runtime {
@@ -743,44 +759,8 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(
-		pallet_balances::migration::MigrateManyToTrackInactive<Runtime, frame_support::pallet_prelude::GetDefault>,
-		MigrateAssetsStorage,
-		MigrateGrandpaStorage,
-		HashItemRecordPublicData<Runtime>,
-	),
+	AddValueFee<Runtime>,
 >;
-
-use frame_support::traits::{StorageVersion, GetStorageVersion};
-
-pub struct MigrateAssetsStorage(sp_std::marker::PhantomData<Runtime>);
-impl frame_support::traits::OnRuntimeUpgrade for MigrateAssetsStorage {
-	fn on_runtime_upgrade() -> Weight {
-		let current_version = Assets::current_storage_version();
-		let onchain_version = Assets::on_chain_storage_version();
-		if current_version != onchain_version {
-			log::info!("Setting assets storage version to current");
-			current_version.put::<Assets>();
-			<Runtime as frame_system::Config>::BlockWeights::get().max_block
-		} else {
-			Weight::zero()
-		}
-	}
-}
-
-pub struct MigrateGrandpaStorage(sp_std::marker::PhantomData<Runtime>);
-impl frame_support::traits::OnRuntimeUpgrade for MigrateGrandpaStorage {
-	fn on_runtime_upgrade() -> Weight {
-		let storage_version = StorageVersion::get::<Grandpa>();
-		if storage_version != 4 {
-			log::info!("Setting grandpa storage version to 4");
-			StorageVersion::new(4).put::<Grandpa>();
-			<Runtime as frame_system::Config>::BlockWeights::get().max_block
-		} else {
-			Weight::zero()
-		}
-	}
-}
 
 #[cfg(feature = "runtime-benchmarks")]
 #[macro_use]
