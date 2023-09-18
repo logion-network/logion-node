@@ -1,5 +1,5 @@
 use logion_node_runtime::{
-	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature, SudoConfig,
+	AccountId, AuraConfig, BalancesConfig, RuntimeGenesisConfig, GrandpaConfig, Signature, SudoConfig,
 	SystemConfig, WASM_BINARY,
 	opaque::SessionKeys,
 	NodeAuthorizationConfig, ValidatorSetConfig, SessionConfig, LoAuthorityListConfig, Balance,
@@ -17,7 +17,7 @@ use std::str::FromStr;
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
-pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
+pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig>;
 
 /// Generate a crypto pair from seed.
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -285,11 +285,12 @@ fn logion_genesis(
 	endowed_accounts: Vec<AccountId>,
 	initial_authorized_nodes: Vec<(OpaquePeerId, AccountId)>,
 	legal_officers: Vec<(AccountId, GenesisHostData)>,
-) -> GenesisConfig {
-	GenesisConfig {
+) -> RuntimeGenesisConfig {
+	RuntimeGenesisConfig {
 		system: SystemConfig {
 			// Add Wasm runtime to storage.
 			code: wasm_binary.to_vec(),
+			..Default::default()
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance.
@@ -309,6 +310,7 @@ fn logion_genesis(
 		},
 		grandpa: GrandpaConfig {
 			authorities: vec![],
+			..Default::default()
 		},
 		sudo: SudoConfig {
 			// Assign network admin rights.
