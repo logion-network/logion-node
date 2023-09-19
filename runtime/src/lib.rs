@@ -53,7 +53,7 @@ pub use sp_runtime::{Perbill, Permill};
 use frame_support::codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::{LocType, Hasher, migrations::v20::AddCustomLegalFee};
+use pallet_logion_loc::{LocType, Hasher, migrations::v21::EnableRequesterLinks};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
 
@@ -757,7 +757,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	AddCustomLegalFee<Runtime>,
+	EnableRequesterLinks<Runtime>,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
