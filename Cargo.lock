@@ -4071,7 +4071,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=main#d5f41e8da6230acecfa22f018b6ed5df77322dcc"
+source = "git+https://github.com/logion-network/logion-pallets?branch=main#3942a61f5db3a86042f94e7b27055128128f2393"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4788,7 +4788,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=main#d5f41e8da6230acecfa22f018b6ed5df77322dcc"
+source = "git+https://github.com/logion-network/logion-pallets?branch=main#3942a61f5db3a86042f94e7b27055128128f2393"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4827,7 +4827,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=main#d5f41e8da6230acecfa22f018b6ed5df77322dcc"
+source = "git+https://github.com/logion-network/logion-pallets?branch=main#3942a61f5db3a86042f94e7b27055128128f2393"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4844,7 +4844,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=main#d5f41e8da6230acecfa22f018b6ed5df77322dcc"
+source = "git+https://github.com/logion-network/logion-pallets?branch=main#3942a61f5db3a86042f94e7b27055128128f2393"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4862,7 +4862,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=main#d5f41e8da6230acecfa22f018b6ed5df77322dcc"
+source = "git+https://github.com/logion-network/logion-pallets?branch=main#3942a61f5db3a86042f94e7b27055128128f2393"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4877,7 +4877,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=main#d5f41e8da6230acecfa22f018b6ed5df77322dcc"
+source = "git+https://github.com/logion-network/logion-pallets?branch=main#3942a61f5db3a86042f94e7b27055128128f2393"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5053,7 +5053,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=main#d5f41e8da6230acecfa22f018b6ed5df77322dcc"
+source = "git+https://github.com/logion-network/logion-pallets?branch=main#3942a61f5db3a86042f94e7b27055128128f2393"
 dependencies = [
  "frame-support",
  "frame-system",
