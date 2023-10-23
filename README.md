@@ -77,11 +77,24 @@ The following commands can be used to rebuild testnet chainspec files in `res` f
 
 ### Test a runtime upgrade
 
-Generally, what's tested here is one or several storage migrations activated by the new runtime.
-This is done by executing the following command:
+Generally, what's tested here is one or several storage migrations activated by the new runtime or any Polkadot upgrade.
+
+If not yet done, the [Substrate Try Runtime CLI](https://github.com/paritytech/try-runtime-cli) must be installed:
 
 ```sh
-cargo run --release --features=try-runtime try-runtime --runtime target/release/wbuild/logion-node-runtime/logion_node_runtime.compact.compressed.wasm on-runtime-upgrade live --uri wss://rpc01.logion.network:443
+cargo install --git https://github.com/paritytech/try-runtime-cli --locked
+```
+
+If not yet done, the runtime has to be built with the `try-runtime` feature:
+
+```sh
+cargo build --release --features=try-runtime
+```
+
+It can then be tested by executing the following command:
+
+```sh
+try-runtime --runtime target/release/wbuild/logion-node-runtime/logion_node_runtime.compact.compressed.wasm on-runtime-upgrade live --uri wss://rpc01.logion.network:443
 ```
 
 This will:
