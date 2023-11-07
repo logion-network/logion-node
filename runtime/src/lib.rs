@@ -53,7 +53,7 @@ pub use sp_runtime::{Perbill, Permill};
 use codec::{Decode, Encode};
 use frame_system::EnsureRoot;
 use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::{LocType, Hasher};
+use pallet_logion_loc::{LocType, Hasher, migrations::v22::AddRecurrentFees};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
 
@@ -124,7 +124,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 155,
+	spec_version: 156,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -424,6 +424,7 @@ parameter_types! {
         collators_percent: Percent::from_percent(20),
         reserve_percent: Percent::from_percent(80),
 		treasury_percent: Percent::from_percent(0),
+        loc_owner_percent: Percent::from_percent(0),
     };
     pub const ExchangeRate: Balance = 200_000_000_000_000_000; // 1 euro cent = 0.2 LGNT
 	pub const CertificateFee: u64 = 4_000_000_000_000_000; // 0.004 LGNT
@@ -432,12 +433,21 @@ parameter_types! {
         collators_percent: Percent::from_percent(20),
         reserve_percent: Percent::from_percent(80),
 		treasury_percent: Percent::from_percent(0),
+        loc_owner_percent: Percent::from_percent(0),
     };
 	pub const ValueFeeDistributionKey: DistributionKey = DistributionKey {
         stakers_percent: Percent::from_percent(0),
         collators_percent: Percent::from_percent(0),
         reserve_percent: Percent::from_percent(0),
 		treasury_percent: Percent::from_percent(100),
+        loc_owner_percent: Percent::from_percent(0),
+    };
+    pub const RecurentFeeDistributionKey: DistributionKey = DistributionKey {
+        stakers_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(0),
+        reserve_percent: Percent::from_percent(0),
+        treasury_percent: Percent::from_percent(95),
+        loc_owner_percent: Percent::from_percent(5),
     };
 }
 
@@ -453,7 +463,7 @@ impl LegalFee<NegativeImbalance, Balance, LocType, AccountId> for LegalFeeImpl {
 
 	fn distribute(amount: NegativeImbalance, loc_type: LocType, loc_owner: AccountId) -> Beneficiary<AccountId> {
 		let (beneficiary, target) = match loc_type {
-			LocType::Identity => (Beneficiary::Treasury, TreasuryPalletId::get().into_account_truncating()),
+			LocType::Identity => (Beneficiary::Other, TreasuryPalletId::get().into_account_truncating()),
 			_ => (Beneficiary::LegalOfficer(loc_owner.clone()), loc_owner),
 		};
 		Balances::resolve_creating(&target, amount);
@@ -499,6 +509,8 @@ impl pallet_logion_loc::Config for Runtime {
     type CertificateFeeDistributionKey = CertificateFeeDistributionKey;
     type TokenIssuance = TokenIssuance;
 	type ValueFeeDistributionKey = ValueFeeDistributionKey;
+	type CollectionItemFeeDistributionKey = RecurentFeeDistributionKey;
+	type TokensRecordFeeDistributionKey = RecurentFeeDistributionKey;
 }
 
 parameter_types! {
@@ -666,11 +678,12 @@ parameter_types! {
         collators_percent: Percent::from_percent(30),
         reserve_percent: Percent::from_percent(20),
 		treasury_percent: Percent::from_percent(0),
+		loc_owner_percent: Percent::from_percent(0),
     };
 }
 
 pub struct RewardDistributor;
-impl logion_shared::RewardDistributor<NegativeImbalance, Balance>
+impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
     for RewardDistributor
 {
     fn payout_reserve(reward: NegativeImbalance) {
@@ -694,6 +707,12 @@ impl logion_shared::RewardDistributor<NegativeImbalance, Balance>
 	fn payout_treasury(reward: NegativeImbalance) {
 		if reward != NegativeImbalance::zero() {
 			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+		}
+	}
+
+	fn payout_to(reward: NegativeImbalance, account: &AccountId) {
+		if reward != NegativeImbalance::zero() {
+			Balances::resolve_creating(account, reward);
 		}
 	}
 }
@@ -760,7 +779,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(),
+	AddRecurrentFees<Runtime>,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
