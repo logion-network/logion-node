@@ -681,13 +681,13 @@ impl pallet_treasury::Config<CommunityTreasuryType> for Runtime {
 	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
 }
 
-pub const BLOCK_REWARD: Balance = 0; // Inflation disabled for the moment
+pub const BLOCK_REWARD: Balance = 10 * LGNT;
 
 parameter_types! {
     pub const RewardAmount: Balance = BLOCK_REWARD;
     pub const RewardDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
-        community_treasury_percent: Percent::from_percent(100),
+        collators_percent: Percent::from_percent(20),
+        community_treasury_percent: Percent::from_percent(80),
         logion_treasury_percent: Percent::from_percent(0),
         loc_owner_percent: Percent::from_percent(0),
     };
