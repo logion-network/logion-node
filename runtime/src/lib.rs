@@ -52,8 +52,8 @@ pub use sp_runtime::{Perbill, Permill};
 // Additional imports
 use codec::{Decode, Encode};
 use frame_system::EnsureRoot;
-use logion_shared::{Beneficiary, CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, LegalFee, EuroCent};
-use pallet_logion_loc::{LocType, Hasher, migrations::v22::AddRecurrentFees};
+use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey};
+use pallet_logion_loc::{Hasher, migrations::v22::AddRecurrentFees};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
 
@@ -124,7 +124,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 156,
+	spec_version: 157,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -291,8 +291,10 @@ impl pallet_balances::Config for Runtime {
 }
 
 parameter_types! {
-    pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
-    pub TreasuryAccountId: AccountId = TreasuryPalletId::get().into_account_truncating();
+    pub const LogionTreasuryPalletId: PalletId = PalletId(*b"py/lgtrs");
+    pub LogionTreasuryAccountId: AccountId = LogionTreasuryPalletId::get().into_account_truncating();
+    pub const CommunityTreasuryPalletId: PalletId = PalletId(*b"py/cmtrs");
+    pub CommunityTreasuryAccountId: AccountId = CommunityTreasuryPalletId::get().into_account_truncating();
 	pub const InclusionFeesToBurnPercent: u32 = 100;
 	pub const InclusionFeesTreasuryPercent: u32 = 0; // Inclusion fees disabled for the moment
 }
@@ -308,7 +310,7 @@ impl OnUnbalanced<NegativeImbalance> for DealWithInclusionFees {
 		let (to_burn, treasury) = fees.ration(InclusionFeesToBurnPercent::get(), InclusionFeesTreasuryPercent::get());
 		drop(to_burn);
 		if treasury != NegativeImbalance::zero() {
-			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), treasury);
+			Balances::resolve_creating(&LogionTreasuryPalletId::get().into_account_truncating(), treasury);
 		}
 	}
 }
@@ -420,55 +422,43 @@ parameter_types! {
 	pub const FileStorageByteFee: Balance = 100 * NANO_LGNT; // 0.1 LGNT per MB
 	pub const FileStorageEntryFee: Balance = 0;
     pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
-        stakers_percent: Percent::from_percent(0),
-        collators_percent: Percent::from_percent(20),
-        reserve_percent: Percent::from_percent(80),
-		treasury_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(80),
+        community_treasury_percent: Percent::from_percent(20),
+        logion_treasury_percent: Percent::from_percent(0),
         loc_owner_percent: Percent::from_percent(0),
     };
     pub const ExchangeRate: Balance = 200_000_000_000_000_000; // 1 euro cent = 0.2 LGNT
 	pub const CertificateFee: u64 = 4_000_000_000_000_000; // 0.004 LGNT
     pub const CertificateFeeDistributionKey: DistributionKey = DistributionKey {
-        stakers_percent: Percent::from_percent(0),
         collators_percent: Percent::from_percent(20),
-        reserve_percent: Percent::from_percent(80),
-		treasury_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(80),
+        logion_treasury_percent: Percent::from_percent(0),
         loc_owner_percent: Percent::from_percent(0),
     };
 	pub const ValueFeeDistributionKey: DistributionKey = DistributionKey {
-        stakers_percent: Percent::from_percent(0),
         collators_percent: Percent::from_percent(0),
-        reserve_percent: Percent::from_percent(0),
-		treasury_percent: Percent::from_percent(100),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(100),
         loc_owner_percent: Percent::from_percent(0),
     };
     pub const RecurentFeeDistributionKey: DistributionKey = DistributionKey {
-        stakers_percent: Percent::from_percent(0),
         collators_percent: Percent::from_percent(0),
-        reserve_percent: Percent::from_percent(0),
-        treasury_percent: Percent::from_percent(95),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(95),
         loc_owner_percent: Percent::from_percent(5),
     };
-}
-
-pub struct  LegalFeeImpl;
-impl LegalFee<NegativeImbalance, Balance, LocType, AccountId> for LegalFeeImpl {
-
-	fn get_default_legal_fee(loc_type: LocType) -> EuroCent {
-		match loc_type {
-			LocType::Identity => 8_00, // 8.00 euros
-			_ => 100_00, // 100.00 euros
-		}
-	}
-
-	fn distribute(amount: NegativeImbalance, loc_type: LocType, loc_owner: AccountId) -> Beneficiary<AccountId> {
-		let (beneficiary, target) = match loc_type {
-			LocType::Identity => (Beneficiary::Other, TreasuryPalletId::get().into_account_truncating()),
-			_ => (Beneficiary::LegalOfficer(loc_owner.clone()), loc_owner),
-		};
-		Balances::resolve_creating(&target, amount);
-		beneficiary
-	}
+    pub const IdentityLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(100),
+        loc_owner_percent: Percent::from_percent(0),
+    };
+    pub const OtherLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(0),
+        loc_owner_percent: Percent::from_percent(100),
+    };
 }
 
 pub struct SHA256;
@@ -503,14 +493,15 @@ impl pallet_logion_loc::Config for Runtime {
 	type FileStorageFeeDistributionKey = FileStorageFeeDistributionKey;
 	type EthereumAddress = EthereumAddress;
 	type SponsorshipId = SponsorshipId;
-	type LegalFee = LegalFeeImpl;
-	type ExchangeRate = ExchangeRate;
 	type CertificateFee = CertificateFee;
     type CertificateFeeDistributionKey = CertificateFeeDistributionKey;
     type TokenIssuance = TokenIssuance;
 	type ValueFeeDistributionKey = ValueFeeDistributionKey;
 	type CollectionItemFeeDistributionKey = RecurentFeeDistributionKey;
 	type TokensRecordFeeDistributionKey = RecurentFeeDistributionKey;
+	type IdentityLocLegalFeeDistributionKey = IdentityLocLegalFeeDistributionKey;
+	type TransactionLocLegalFeeDistributionKey = OtherLocLegalFeeDistributionKey;
+	type CollectionLocLegalFeeDistributionKey = OtherLocLegalFeeDistributionKey;
 }
 
 parameter_types! {
@@ -650,18 +641,39 @@ parameter_types! {
     pub const SpendPeriod: BlockNumber = 1 * DAYS;
 }
 
-impl pallet_treasury::Config for Runtime {
+type LogionTreasuryType = pallet_treasury::Instance1;
+impl pallet_treasury::Config<LogionTreasuryType> for Runtime {
 	type Currency = Balances;
 	type ApproveOrigin = EnsureRoot<AccountId>;
 	type RejectOrigin = EnsureRoot<AccountId>;
 	type RuntimeEvent = RuntimeEvent;
-	type OnSlash = Treasury;
+	type OnSlash = LogionTreasury;
 	type ProposalBond = ProposalBond;
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type ProposalBondMaximum = ();
 	type SpendPeriod = SpendPeriod;
 	type Burn = ();
-	type PalletId = TreasuryPalletId;
+	type PalletId = LogionTreasuryPalletId;
+	type BurnDestination = ();
+	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
+	type SpendFunds = ();
+	type MaxApprovals = ConstU32<100>;
+	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
+}
+
+type CommunityTreasuryType = pallet_treasury::Instance2;
+impl pallet_treasury::Config<CommunityTreasuryType> for Runtime {
+	type Currency = Balances;
+	type ApproveOrigin = EnsureRoot<AccountId>;
+	type RejectOrigin = EnsureRoot<AccountId>;
+	type RuntimeEvent = RuntimeEvent;
+	type OnSlash = CommunityTreasury;
+	type ProposalBond = ProposalBond;
+	type ProposalBondMinimum = ProposalBondMinimum;
+	type ProposalBondMaximum = ();
+	type SpendPeriod = SpendPeriod;
+	type Burn = ();
+	type PalletId = CommunityTreasuryPalletId;
 	type BurnDestination = ();
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type SpendFunds = ();
@@ -674,11 +686,10 @@ pub const BLOCK_REWARD: Balance = 0; // Inflation disabled for the moment
 parameter_types! {
     pub const RewardAmount: Balance = BLOCK_REWARD;
     pub const RewardDistributionKey: DistributionKey = DistributionKey {
-        stakers_percent: Percent::from_percent(50),
-        collators_percent: Percent::from_percent(30),
-        reserve_percent: Percent::from_percent(20),
-		treasury_percent: Percent::from_percent(0),
-		loc_owner_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(100),
+        logion_treasury_percent: Percent::from_percent(0),
+        loc_owner_percent: Percent::from_percent(0),
     };
 }
 
@@ -686,27 +697,22 @@ pub struct RewardDistributor;
 impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
     for RewardDistributor
 {
-    fn payout_reserve(reward: NegativeImbalance) {
+    fn payout_community_treasury(reward: NegativeImbalance) {
 		if reward != NegativeImbalance::zero() {
-			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+			Balances::resolve_creating(&CommunityTreasuryPalletId::get().into_account_truncating(), reward);
 		}
     }
 
     fn payout_collators(reward: NegativeImbalance) {
+		// TODO Implement !
 		if reward != NegativeImbalance::zero() {
-			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+			Balances::resolve_creating(&LogionTreasuryPalletId::get().into_account_truncating(), reward);
 		}
     }
 
-    fn payout_stakers(reward: NegativeImbalance) {
+	fn payout_logion_treasury(reward: NegativeImbalance) {
 		if reward != NegativeImbalance::zero() {
-			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
-		}
-    }
-
-	fn payout_treasury(reward: NegativeImbalance) {
-		if reward != NegativeImbalance::zero() {
-			Balances::resolve_creating(&TreasuryPalletId::get().into_account_truncating(), reward);
+			Balances::resolve_creating(&LogionTreasuryPalletId::get().into_account_truncating(), reward);
 		}
 	}
 
@@ -746,8 +752,10 @@ construct_runtime!(
 		VerifiedRecovery: pallet_verified_recovery = 16,
 		Vault: pallet_logion_vault = 17,
 		Vote: pallet_logion_vote = 18,
-		Treasury: pallet_treasury = 19,
+		// 19 was Treasury
 		BlockReward: pallet_block_reward = 20,
+		LogionTreasury: pallet_treasury::<Instance1> = 21,
+		CommunityTreasury: pallet_treasury::<Instance2> = 22,
 	}
 );
 
@@ -944,10 +952,6 @@ impl_runtime_apis! {
 	impl pallet_logion_loc::runtime_api::FeesApi<Block, Balance, TokenIssuance> for Runtime {
 		fn query_file_storage_fee(num_of_entries: u32, tot_size: u32) -> Balance {
 			LogionLoc::calculate_fee(num_of_entries, tot_size)
-		}
-
-		fn query_legal_fee(loc_type: LocType) -> Balance {
-			LogionLoc::calculate_default_legal_fee(loc_type)
 		}
 
 		fn query_certificate_fee(token_issuance: TokenIssuance) -> Balance {
