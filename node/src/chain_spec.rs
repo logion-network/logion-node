@@ -2,7 +2,7 @@ use logion_node_runtime::{
 	AccountId, AuraConfig, BalancesConfig, RuntimeGenesisConfig, GrandpaConfig, Signature, SudoConfig,
 	SystemConfig, WASM_BINARY,
 	opaque::SessionKeys,
-	NodeAuthorizationConfig, ValidatorSetConfig, SessionConfig, LoAuthorityListConfig, Balance,
+	ValidatorSetConfig, SessionConfig, LoAuthorityListConfig, Balance,
 };
 use pallet_lo_authority_list::GenesisHostData;
 use sc_service::ChainType;
@@ -70,13 +70,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 			vec![
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 			],
-			// Initial authorized nodes
-			vec![
-				(
-					OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Alice")
-				),
-			],
 			vec![ // Initial set of Logion Legal Officers
 				(
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -110,15 +103,12 @@ pub fn mvp_config() -> Result<ChainSpec, String> {
 
 	const NODE1_PUBLIC_SR25519: &str = "5DjzFDhFidvGCuuy6i8Lsi4XyruYjxTTkJKb1o7XzVdMNPVb";
 	const NODE1_PUBLIC_ED25519: &str = "5EVSLLEFUhrWtb5n7tC7ud91nT1qFodhYkAkxdbNpJznqTZ5";
-	const NODE1_PEER_ID: &str = "12D3KooWPPCrBT2WxxPuBmdMFRs1JddaZjTPWvNdgRzWoFzZw2yT";
 
 	const NODE2_PUBLIC_SR25519: &str = "5DoD9n61SssFiWQDTD7bz1eX3KCxZJ6trVj2GsDwMi2PqP85";
 	const NODE2_PUBLIC_ED25519: &str = "5CUJgAjKLb64bHFFbLu5hQzgR28zH6apcymSDLV1RBFujVjW";
-	const NODE2_PEER_ID: &str = "12D3KooWSweFqPDamxmzjpgX7Q4bvfnpRKzTJ1igsYLU2ZsLL1TM";
 
 	const NODE3_PUBLIC_SR25519: &str = "5CJTSSJ4v1RAauZpeqTeddyui4wESZZqPor33wum9aKuQXZC";
 	const NODE3_PUBLIC_ED25519: &str = "5FuUhqoi1BhAf92K5DnKPUFDrYNDX4JUAQKgT3AvCNewjpTw";
-	const NODE3_PEER_ID: &str = "12D3KooWJSnG148nKuds3cEjYrjFMPNWh6biVBPxuppgQnn1owZC";
 
 	Ok(ChainSpec::from_genesis(
 		// Name
@@ -155,21 +145,6 @@ pub fn mvp_config() -> Result<ChainSpec, String> {
 				AccountId::from_str(NODE1_PUBLIC_SR25519).unwrap(),
 				AccountId::from_str(NODE2_PUBLIC_SR25519).unwrap(),
 				AccountId::from_str(NODE3_PUBLIC_SR25519).unwrap(),
-			],
-			// Initial authorized nodes
-			vec![
-				(
-					OpaquePeerId(bs58::decode(NODE1_PEER_ID).into_vec().unwrap()),
-					AccountId::from_str(NODE1_PUBLIC_SR25519).unwrap()
-				),
-				(
-					OpaquePeerId(bs58::decode(NODE2_PEER_ID).into_vec().unwrap()),
-					AccountId::from_str(NODE2_PUBLIC_SR25519).unwrap()
-				),
-				(
-					OpaquePeerId(bs58::decode(NODE3_PEER_ID).into_vec().unwrap()),
-					AccountId::from_str(NODE3_PUBLIC_SR25519).unwrap()
-				)
 			],
 			vec![ // Initial set of Logion Legal Officers
 			],
@@ -213,25 +188,6 @@ pub fn test_config() -> Result<ChainSpec, String> {
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				get_account_id_from_seed::<sr25519::Public>("Bob"),
 				get_account_id_from_seed::<sr25519::Public>("Charlie"),
-			],
-			// Initial authorized nodes
-			vec![
-				(
-					OpaquePeerId(bs58::decode("12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Alice")
-				),
-				(
-					OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Bob")
-				),
-				(
-					OpaquePeerId(bs58::decode("12D3KooWJvyP3VJYymTqG7eH4PM5rN4T2agk5cdNCfNymAqwqcvZ").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Charlie")
-				),
-				(
-					OpaquePeerId(bs58::decode("12D3KooWPHWFrfaJzxPnqnAYAoRUyAHHKqACmEycGTVmeVhQYuZN").into_vec().unwrap()),
-					get_account_id_from_seed::<sr25519::Public>("Dave")
-				),
 			],
 			vec![ // Initial set of Logion Legal Officers
 				(
@@ -283,7 +239,6 @@ fn logion_genesis(
 	initial_authorities: Vec<(AccountId, AuraId, GrandpaId)>,
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
-	initial_authorized_nodes: Vec<(OpaquePeerId, AccountId)>,
 	legal_officers: Vec<(AccountId, GenesisHostData)>,
 ) -> RuntimeGenesisConfig {
 	RuntimeGenesisConfig {
@@ -315,9 +270,6 @@ fn logion_genesis(
 		sudo: SudoConfig {
 			// Assign network admin rights.
 			key: Some(root_key),
-		},
-		node_authorization: NodeAuthorizationConfig {
-			nodes: initial_authorized_nodes.iter().map(|x| (x.0.clone(), x.1.clone())).collect(),
 		},
 		lo_authority_list: LoAuthorityListConfig {
 			legal_officers,

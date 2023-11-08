@@ -4365,7 +4365,6 @@ dependencies = [
  "pallet-logion-vault",
  "pallet-logion-vote",
  "pallet-multisig",
- "pallet-node-authorization",
  "pallet-recovery",
  "pallet-session",
  "pallet-sudo",
@@ -5241,22 +5240,6 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "scale-info",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-node-authorization"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.1.0#f60318f68687e601c47de5ad5ca88e2c3f8139a7"
-dependencies = [
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",

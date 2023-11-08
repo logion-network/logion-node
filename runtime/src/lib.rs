@@ -340,17 +340,6 @@ parameter_types! {
 	pub const MaxPeerIdLength: u32 = 128;
 }
 
-impl pallet_node_authorization::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type MaxWellKnownNodes = MaxWellKnownNodes;
-	type MaxPeerIdLength = MaxPeerIdLength;
-	type AddOrigin = EnsureRoot<AccountId>;
-	type RemoveOrigin = EnsureRoot<AccountId>;
-	type SwapOrigin = EnsureRoot<AccountId>;
-	type ResetOrigin = EnsureRoot<AccountId>;
-	type WeightInfo = ();
-}
-
 parameter_types! {
 	pub const MinAuthorities: u32 = 1;
 }
@@ -743,7 +732,7 @@ construct_runtime!(
 		Grandpa: pallet_grandpa = 7,
 		TransactionPayment: pallet_transaction_payment = 8,
 		Sudo: pallet_sudo = 9,
-		NodeAuthorization: pallet_node_authorization = 10,
+		// 10 was NodeAuthorization
 		Multisig:  pallet_multisig = 11,
 		Recovery: pallet_recovery = 12,
 		Assets: pallet_assets = 13,
