@@ -296,9 +296,9 @@ parameter_types! {
     pub const CommunityTreasuryPalletId: PalletId = PalletId(*b"py/cmtrs");
     pub CommunityTreasuryAccountId: AccountId = CommunityTreasuryPalletId::get().into_account_truncating();
 	pub const InclusionFeesDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
-        community_treasury_percent: Percent::from_percent(0),
-        logion_treasury_percent: Percent::from_percent(100),
+        collators_percent: Percent::from_percent(35),
+        community_treasury_percent: Percent::from_percent(30),
+        logion_treasury_percent: Percent::from_percent(35),
         loc_owner_percent: Percent::from_percent(0),
 	};
 }
@@ -675,9 +675,9 @@ pub const BLOCK_REWARD: Balance = 10 * LGNT;
 parameter_types! {
     pub const RewardAmount: Balance = BLOCK_REWARD;
     pub const RewardDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(20),
-        community_treasury_percent: Percent::from_percent(80),
-        logion_treasury_percent: Percent::from_percent(0),
+        collators_percent: Percent::from_percent(35),
+        community_treasury_percent: Percent::from_percent(30),
+        logion_treasury_percent: Percent::from_percent(35),
         loc_owner_percent: Percent::from_percent(0),
     };
 }
@@ -693,9 +693,8 @@ impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
     }
 
     fn payout_collators(reward: NegativeImbalance) {
-		// TODO Implement !
 		if reward != NegativeImbalance::zero() {
-			Balances::resolve_creating(&LogionTreasuryPalletId::get().into_account_truncating(), reward);
+			drop(reward);
 		}
     }
 
