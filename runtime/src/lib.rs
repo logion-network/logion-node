@@ -291,16 +291,72 @@ impl pallet_balances::Config for Runtime {
 }
 
 parameter_types! {
-    pub const LogionTreasuryPalletId: PalletId = PalletId(*b"py/lgtrs");
-    pub LogionTreasuryAccountId: AccountId = LogionTreasuryPalletId::get().into_account_truncating();
-    pub const CommunityTreasuryPalletId: PalletId = PalletId(*b"py/cmtrs");
-    pub CommunityTreasuryAccountId: AccountId = CommunityTreasuryPalletId::get().into_account_truncating();
 	pub const InclusionFeesDistributionKey: DistributionKey = DistributionKey {
         collators_percent: Percent::from_percent(35),
         community_treasury_percent: Percent::from_percent(30),
         logion_treasury_percent: Percent::from_percent(35),
         loc_owner_percent: Percent::from_percent(0),
 	};
+
+    pub const InflationAmount: Balance = 10 * LGNT;
+    pub const InflationDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(35),
+        community_treasury_percent: Percent::from_percent(30),
+        logion_treasury_percent: Percent::from_percent(35),
+        loc_owner_percent: Percent::from_percent(0),
+    };
+
+	pub const FileStorageByteFee: Balance = 100 * NANO_LGNT; // 0.1 LGNT per MB
+	pub const FileStorageEntryFee: Balance = 0;
+	pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(80),
+        community_treasury_percent: Percent::from_percent(20),
+        logion_treasury_percent: Percent::from_percent(0),
+        loc_owner_percent: Percent::from_percent(0),
+    };
+
+	pub const CertificateFee: Balance = 4 * MILLI_LGNT; // 0.004 LGNT
+    pub const CertificateFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(20),
+        community_treasury_percent: Percent::from_percent(80),
+        logion_treasury_percent: Percent::from_percent(0),
+        loc_owner_percent: Percent::from_percent(0),
+    };
+
+	pub const ValueFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(100),
+        loc_owner_percent: Percent::from_percent(0),
+    };
+
+    pub const RecurentFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(95),
+        loc_owner_percent: Percent::from_percent(5),
+    };
+
+    pub const IdentityLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(100),
+        loc_owner_percent: Percent::from_percent(0),
+    };
+
+    pub const OtherLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(0),
+        loc_owner_percent: Percent::from_percent(100),
+    };
+}
+
+parameter_types! {
+    pub const LogionTreasuryPalletId: PalletId = PalletId(*b"py/lgtrs");
+    pub LogionTreasuryAccountId: AccountId = LogionTreasuryPalletId::get().into_account_truncating();
+    pub const CommunityTreasuryPalletId: PalletId = PalletId(*b"py/cmtrs");
+    pub CommunityTreasuryAccountId: AccountId = CommunityTreasuryPalletId::get().into_account_truncating();
 }
 
 type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
@@ -408,46 +464,6 @@ parameter_types! {
 	pub const MaxFileNameSize: u32 = 255;
 	pub const MaxTokensRecordDescriptionSize: u32 = 4096;
 	pub const MaxTokensRecordFiles: u32 = 10;
-	pub const FileStorageByteFee: Balance = 100 * NANO_LGNT; // 0.1 LGNT per MB
-	pub const FileStorageEntryFee: Balance = 0;
-    pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(80),
-        community_treasury_percent: Percent::from_percent(20),
-        logion_treasury_percent: Percent::from_percent(0),
-        loc_owner_percent: Percent::from_percent(0),
-    };
-    pub const ExchangeRate: Balance = 200_000_000_000_000_000; // 1 euro cent = 0.2 LGNT
-	pub const CertificateFee: u64 = 4_000_000_000_000_000; // 0.004 LGNT
-    pub const CertificateFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(20),
-        community_treasury_percent: Percent::from_percent(80),
-        logion_treasury_percent: Percent::from_percent(0),
-        loc_owner_percent: Percent::from_percent(0),
-    };
-	pub const ValueFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
-        community_treasury_percent: Percent::from_percent(0),
-        logion_treasury_percent: Percent::from_percent(100),
-        loc_owner_percent: Percent::from_percent(0),
-    };
-    pub const RecurentFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
-        community_treasury_percent: Percent::from_percent(0),
-        logion_treasury_percent: Percent::from_percent(95),
-        loc_owner_percent: Percent::from_percent(5),
-    };
-    pub const IdentityLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
-        community_treasury_percent: Percent::from_percent(0),
-        logion_treasury_percent: Percent::from_percent(100),
-        loc_owner_percent: Percent::from_percent(0),
-    };
-    pub const OtherLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
-        community_treasury_percent: Percent::from_percent(0),
-        logion_treasury_percent: Percent::from_percent(0),
-        loc_owner_percent: Percent::from_percent(100),
-    };
 }
 
 pub struct SHA256;
@@ -670,18 +686,6 @@ impl pallet_treasury::Config<CommunityTreasuryType> for Runtime {
 	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
 }
 
-pub const BLOCK_REWARD: Balance = 10 * LGNT;
-
-parameter_types! {
-    pub const RewardAmount: Balance = BLOCK_REWARD;
-    pub const RewardDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(35),
-        community_treasury_percent: Percent::from_percent(30),
-        logion_treasury_percent: Percent::from_percent(35),
-        loc_owner_percent: Percent::from_percent(0),
-    };
-}
-
 pub struct RewardDistributor;
 impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
     for RewardDistributor
@@ -713,9 +717,9 @@ impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
 
 impl pallet_block_reward::Config for Runtime {
     type Currency = Balances;
-    type RewardAmount = RewardAmount;
+    type RewardAmount = InflationAmount;
     type RewardDistributor = RewardDistributor;
-    type DistributionKey = RewardDistributionKey;
+    type DistributionKey = InflationDistributionKey;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
