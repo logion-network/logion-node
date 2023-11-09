@@ -291,12 +291,12 @@ impl pallet_balances::Config for Runtime {
 }
 
 parameter_types! {
-	pub const InclusionFeesDistributionKey: DistributionKey = DistributionKey {
+    pub const InclusionFeesDistributionKey: DistributionKey = DistributionKey {
         collators_percent: Percent::from_percent(35),
         community_treasury_percent: Percent::from_percent(30),
         logion_treasury_percent: Percent::from_percent(35),
         loc_owner_percent: Percent::from_percent(0),
-	};
+    };
 
     pub const InflationAmount: Balance = 10 * LGNT;
     pub const InflationDistributionKey: DistributionKey = DistributionKey {
@@ -353,9 +353,9 @@ parameter_types! {
 }
 
 parameter_types! {
-    pub const LogionTreasuryPalletId: PalletId = PalletId(*b"py/lgtrs");
+    pub const LogionTreasuryPalletId: PalletId = PalletId(*b"lg/lgtrs");
     pub LogionTreasuryAccountId: AccountId = LogionTreasuryPalletId::get().into_account_truncating();
-    pub const CommunityTreasuryPalletId: PalletId = PalletId(*b"py/cmtrs");
+    pub const CommunityTreasuryPalletId: PalletId = PalletId(*b"lg/cmtrs");
     pub CommunityTreasuryAccountId: AccountId = CommunityTreasuryPalletId::get().into_account_truncating();
 }
 
