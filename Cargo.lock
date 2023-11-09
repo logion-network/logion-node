@@ -2296,9 +2296,9 @@ dependencies = [
 
 [[package]]
 name = "fiat-crypto"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a481586acf778f1b1455424c343f71124b048ffa5f4fc3f8f6ae9dc432dcb3c7"
+checksum = "f69037fe1b785e84986b4f2cbcf647381876a00671d25ceef715d7812dd7e1dd"
 
 [[package]]
 name = "file-per-thread-logger"
@@ -4396,7 +4396,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/split-treasury#1f4c11bd46b4db64eb4f029bd94766ec6ce8c06c"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.1.0#f7eb899fe4db38c3f4f68301db1a6ca1b7f7ed9a"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5128,7 +5128,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/split-treasury#1f4c11bd46b4db64eb4f029bd94766ec6ce8c06c"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.1.0#f7eb899fe4db38c3f4f68301db1a6ca1b7f7ed9a"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5167,7 +5167,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/split-treasury#1f4c11bd46b4db64eb4f029bd94766ec6ce8c06c"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.1.0#f7eb899fe4db38c3f4f68301db1a6ca1b7f7ed9a"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5184,7 +5184,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/split-treasury#1f4c11bd46b4db64eb4f029bd94766ec6ce8c06c"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.1.0#f7eb899fe4db38c3f4f68301db1a6ca1b7f7ed9a"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5202,7 +5202,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/split-treasury#1f4c11bd46b4db64eb4f029bd94766ec6ce8c06c"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.1.0#f7eb899fe4db38c3f4f68301db1a6ca1b7f7ed9a"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5218,7 +5218,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/split-treasury#1f4c11bd46b4db64eb4f029bd94766ec6ce8c06c"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.1.0#f7eb899fe4db38c3f4f68301db1a6ca1b7f7ed9a"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5380,7 +5380,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=feature/split-treasury#1f4c11bd46b4db64eb4f029bd94766ec6ce8c06c"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.1.0#f7eb899fe4db38c3f4f68301db1a6ca1b7f7ed9a"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -8682,9 +8682,9 @@ dependencies = [
 
 [[package]]
 name = "ss58-registry"
-version = "1.43.0"
+version = "1.44.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e6915280e2d0db8911e5032a5c275571af6bdded2916abd691a659be25d3439"
+checksum = "35935738370302d5e33963665b77541e4b990a3e919ec904c837a56cfc891de1"
 dependencies = [
  "Inflector",
  "num-format",
