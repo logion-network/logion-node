@@ -52,7 +52,7 @@ pub use sp_runtime::{Perbill, Permill};
 // Additional imports
 use codec::{Decode, Encode};
 use frame_system::EnsureRoot;
-use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey};
+use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, RewardDistributor as RewardDistributorTrait};
 use pallet_logion_loc::{Hasher, migrations::v22::AddRecurrentFees};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
@@ -295,8 +295,12 @@ parameter_types! {
     pub LogionTreasuryAccountId: AccountId = LogionTreasuryPalletId::get().into_account_truncating();
     pub const CommunityTreasuryPalletId: PalletId = PalletId(*b"py/cmtrs");
     pub CommunityTreasuryAccountId: AccountId = CommunityTreasuryPalletId::get().into_account_truncating();
-	pub const InclusionFeesToBurnPercent: u32 = 100;
-	pub const InclusionFeesTreasuryPercent: u32 = 0; // Inclusion fees disabled for the moment
+	pub const InclusionFeesDistributionKey: DistributionKey = DistributionKey {
+        collators_percent: Percent::from_percent(0),
+        community_treasury_percent: Percent::from_percent(0),
+        logion_treasury_percent: Percent::from_percent(100),
+        loc_owner_percent: Percent::from_percent(0),
+	};
 }
 
 type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
@@ -307,11 +311,7 @@ impl OnUnbalanced<NegativeImbalance> for DealWithInclusionFees {
 
 	fn on_nonzero_unbalanced(fees: NegativeImbalance) {
 
-		let (to_burn, treasury) = fees.ration(InclusionFeesToBurnPercent::get(), InclusionFeesTreasuryPercent::get());
-		drop(to_burn);
-		if treasury != NegativeImbalance::zero() {
-			Balances::resolve_creating(&LogionTreasuryPalletId::get().into_account_truncating(), treasury);
-		}
+		RewardDistributor::distribute(fees, InclusionFeesDistributionKey::get());
 	}
 }
 
