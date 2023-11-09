@@ -59,7 +59,6 @@ pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", 
 pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.1.0" }
 pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.1.0" }
 pallet-multisig = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.1.0" }
-pallet-node-authorization = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.1.0" }
 pallet-recovery = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.1.0" }
 pallet-session = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.1.0" }
 pallet-validator-set = { default-features = false, git = "https://github.com/logion-network/substrate-validator-set.git", package = "substrate-validator-set", branch = "polkadot-v1.1.0" }
@@ -94,7 +93,6 @@ std = [
 	"pallet-logion-vault/std",
 	"pallet-logion-vote/std",
 	"pallet-multisig/std",
-	"pallet-node-authorization/std",
 	"pallet-recovery/std",
 	"pallet-session/std",
 	"pallet-sudo/std",
@@ -144,7 +142,6 @@ try-runtime = [
 	"pallet-logion-vault/try-runtime",
 	"pallet-logion-vote/try-runtime",
 	"pallet-multisig/try-runtime",
-	"pallet-node-authorization/try-runtime",
 	"pallet-recovery/try-runtime",
 	"pallet-session/try-runtime",
 	"pallet-sudo/try-runtime",
