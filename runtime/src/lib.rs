@@ -298,6 +298,9 @@ parameter_types! {
         loc_owner_percent: Percent::from_percent(0),
     };
 
+// Inflation: 5%
+// The reward can be calculated as follows: N * (0,05 / (3600 * 24 * 365 / 6)) where N is the total supply
+// With N=10^9, we would mint 10 LGNT every block
     pub const InflationAmount: Balance = 10 * LGNT;
     pub const InflationDistributionKey: DistributionKey = DistributionKey {
         collators_percent: Percent::from_percent(35),
