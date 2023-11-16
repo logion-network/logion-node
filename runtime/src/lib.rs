@@ -124,7 +124,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 157,
+	spec_version: 158,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -298,9 +298,11 @@ parameter_types! {
         loc_owner_percent: Percent::from_percent(0),
     };
 
-// Inflation: 5%
-// The reward can be calculated as follows: N * (0,05 / (3600 * 24 * 365 / 6)) where N is the total supply
-// With N=10^9, we would mint 10 LGNT every block
+	// Inflation: I=0,05 (5%)
+	// Total supply: N=10^9
+	// Block rate: B=6 (Number of seconds between 2 blocks)
+	// The reward can be calculated as follows: N * (I / (3600 * 24 * 365 / B))
+	// We thus mint 10 LGNT every block
     pub const InflationAmount: Balance = 10 * LGNT;
     pub const InflationDistributionKey: DistributionKey = DistributionKey {
         collators_percent: Percent::from_percent(35),
@@ -699,11 +701,10 @@ impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
 		}
     }
 
-    fn payout_collators(reward: NegativeImbalance) {
-		if reward != NegativeImbalance::zero() {
-			drop(reward);
-		}
-    }
+	fn get_collators() -> Vec<AccountId> {
+		// On Standalone chain, there are no collators thus validators are rewarded instead
+		Session::validators()
+	}
 
 	fn payout_logion_treasury(reward: NegativeImbalance) {
 		if reward != NegativeImbalance::zero() {
