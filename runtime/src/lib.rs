@@ -300,8 +300,9 @@ parameter_types! {
 
 	// Inflation: I=0,05 (5%)
 	// Total supply: N=10^9
-	// The reward can be calculated as follows: N * (I / (3600 * 24 * 365 / 6))
-	// With N=10^9 and I=5%, we mint 10 LGNT every block
+	// Block rate: B=6 (Number of seconds between 2 blocks)
+	// The reward can be calculated as follows: N * (I / (3600 * 24 * 365 / B))
+	// We thus mint 10 LGNT every block
     pub const InflationAmount: Balance = 10 * LGNT;
     pub const InflationDistributionKey: DistributionKey = DistributionKey {
         collators_percent: Percent::from_percent(35),
