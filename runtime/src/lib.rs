@@ -292,7 +292,7 @@ impl pallet_balances::Config for Runtime {
 
 parameter_types! {
     pub const InclusionFeesDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(35),
+        legal_officers_percent: Percent::from_percent(35),
         community_treasury_percent: Percent::from_percent(30),
         logion_treasury_percent: Percent::from_percent(35),
         loc_owner_percent: Percent::from_percent(0),
@@ -305,7 +305,7 @@ parameter_types! {
 	// We thus mint 10 LGNT every block
     pub const InflationAmount: Balance = 10 * LGNT;
     pub const InflationDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(35),
+        legal_officers_percent: Percent::from_percent(35),
         community_treasury_percent: Percent::from_percent(30),
         logion_treasury_percent: Percent::from_percent(35),
         loc_owner_percent: Percent::from_percent(0),
@@ -314,7 +314,7 @@ parameter_types! {
 	pub const FileStorageByteFee: Balance = 100 * NANO_LGNT; // 0.1 LGNT per MB
 	pub const FileStorageEntryFee: Balance = 0;
 	pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(80),
+        legal_officers_percent: Percent::from_percent(80),
         community_treasury_percent: Percent::from_percent(20),
         logion_treasury_percent: Percent::from_percent(0),
         loc_owner_percent: Percent::from_percent(0),
@@ -322,35 +322,35 @@ parameter_types! {
 
 	pub const CertificateFee: Balance = 4 * MILLI_LGNT; // 0.004 LGNT
     pub const CertificateFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(20),
+        legal_officers_percent: Percent::from_percent(20),
         community_treasury_percent: Percent::from_percent(80),
         logion_treasury_percent: Percent::from_percent(0),
         loc_owner_percent: Percent::from_percent(0),
     };
 
 	pub const ValueFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
+        legal_officers_percent: Percent::from_percent(0),
         community_treasury_percent: Percent::from_percent(0),
         logion_treasury_percent: Percent::from_percent(100),
         loc_owner_percent: Percent::from_percent(0),
     };
 
     pub const RecurentFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
+        legal_officers_percent: Percent::from_percent(0),
         community_treasury_percent: Percent::from_percent(0),
         logion_treasury_percent: Percent::from_percent(95),
         loc_owner_percent: Percent::from_percent(5),
     };
 
     pub const IdentityLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
+        legal_officers_percent: Percent::from_percent(0),
         community_treasury_percent: Percent::from_percent(0),
         logion_treasury_percent: Percent::from_percent(100),
         loc_owner_percent: Percent::from_percent(0),
     };
 
     pub const OtherLocLegalFeeDistributionKey: DistributionKey = DistributionKey {
-        collators_percent: Percent::from_percent(0),
+        legal_officers_percent: Percent::from_percent(0),
         community_treasury_percent: Percent::from_percent(0),
         logion_treasury_percent: Percent::from_percent(0),
         loc_owner_percent: Percent::from_percent(100),
@@ -692,7 +692,7 @@ impl pallet_treasury::Config<CommunityTreasuryType> for Runtime {
 }
 
 pub struct RewardDistributor;
-impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
+impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId, RuntimeOrigin, LoAuthorityList>
     for RewardDistributor
 {
     fn payout_community_treasury(reward: NegativeImbalance) {
@@ -700,11 +700,6 @@ impl logion_shared::RewardDistributor<NegativeImbalance, Balance, AccountId>
 			Balances::resolve_creating(&CommunityTreasuryPalletId::get().into_account_truncating(), reward);
 		}
     }
-
-	fn get_collators() -> Vec<AccountId> {
-		// On Standalone chain, there are no collators thus validators are rewarded instead
-		Session::validators()
-	}
 
 	fn payout_logion_treasury(reward: NegativeImbalance) {
 		if reward != NegativeImbalance::zero() {
@@ -724,6 +719,7 @@ impl pallet_block_reward::Config for Runtime {
     type RewardAmount = InflationAmount;
     type RewardDistributor = RewardDistributor;
     type DistributionKey = InflationDistributionKey;
+	type IsLegalOfficer = LoAuthorityList;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
