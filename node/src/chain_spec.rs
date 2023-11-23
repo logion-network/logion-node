@@ -275,7 +275,6 @@ fn logion_genesis(
 			legal_officers,
 		},
 		transaction_payment: Default::default(),
-		assets: Default::default(),
 		logion_treasury: Default::default(),
 		community_treasury: Default::default(),
 	}

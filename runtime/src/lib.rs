@@ -41,6 +41,7 @@ pub use frame_support::{
 use frame_support::PalletId;
 use frame_support::traits::{Currency, OnUnbalanced};
 use frame_support::weights::ConstantMultiplier;
+use frame_support::traits::tokens::{UnityAssetBalanceConversion, PayFromAccount};
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
@@ -56,6 +57,7 @@ use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory
 use pallet_logion_loc::{Hasher};
 use pallet_multisig::Timepoint;
 use scale_info::TypeInfo;
+use sp_runtime::traits::IdentityLookup;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -274,7 +276,7 @@ pub const EXISTENTIAL_DEPOSIT: u128 = 500;
 
 impl pallet_balances::Config for Runtime {
 	type MaxLocks = ConstU32<50>;
-	type MaxReserves = ConstU32<0>;
+	type MaxReserves = ();
 	type ReserveIdentifier = [u8; 8];
 	/// The type for recording an account's balance.
 	type Balance = Balance;
@@ -285,9 +287,10 @@ impl pallet_balances::Config for Runtime {
 	type AccountStore = System;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 	type FreezeIdentifier = [u8; 8];
-	type MaxFreezes = ConstU32<0>;
+	type MaxFreezes = ();
 	type RuntimeHoldReason = ();
-	type MaxHolds = ConstU32<0>;
+	type RuntimeFreezeReason = ();
+	type MaxHolds = ();
 }
 
 parameter_types! {
@@ -615,40 +618,10 @@ impl pallet_logion_vote::Config for Runtime {
 }
 
 parameter_types! {
-	pub const AssetDepositBase: u64 = 1;
-	pub const AssetDepositPerZombie: u64 = 1;
-	pub const StringLimit: u32 = 50;
-	pub const MetadataDepositBase: u64 = 1;
-	pub const MetadataDepositPerByte: u64 = 1;
-	pub const ApprovalDeposit: u64 = 1;
-	pub const RemoveItemsLimit: u32 = 5;
-}
-
-impl pallet_assets::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type Balance = Balance;
-	type AssetId = u64;
-	type AssetIdParameter = u64;
-	type Currency = Balances;
-	type CreateOrigin = AsEnsureOriginWithArg<frame_system::EnsureSigned<AccountId>>;
-	type ForceOrigin = EnsureRoot<AccountId>;
-	type AssetDeposit = AssetDepositBase;
-	type AssetAccountDeposit = AssetDepositPerZombie;
-	type StringLimit = StringLimit;
-	type MetadataDepositBase = MetadataDepositBase;
-	type MetadataDepositPerByte = MetadataDepositPerByte;
-	type ApprovalDeposit = ApprovalDeposit;
-	type RemoveItemsLimit = RemoveItemsLimit;
-	type Freezer = ();
-	type Extra = ();
-	type CallbackHandle = ();
-	type WeightInfo = ();
-}
-
-parameter_types! {
     pub const ProposalBond: Permill = Permill::from_percent(5);
     pub const ProposalBondMinimum: Balance = 100 * LGNT;
     pub const SpendPeriod: BlockNumber = 1 * DAYS;
+	pub const SpendPayoutPeriod: BlockNumber = 30 * DAYS;
 }
 
 type LogionTreasuryType = pallet_treasury::Instance1;
@@ -669,6 +642,12 @@ impl pallet_treasury::Config<LogionTreasuryType> for Runtime {
 	type SpendFunds = ();
 	type MaxApprovals = ConstU32<100>;
 	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
+	type AssetKind = ();
+	type Beneficiary = AccountId;
+	type BeneficiaryLookup = IdentityLookup<AccountId>;
+	type Paymaster = PayFromAccount<Balances, LogionTreasuryAccountId>;
+	type BalanceConverter = UnityAssetBalanceConversion;
+	type PayoutPeriod = SpendPayoutPeriod;
 }
 
 type CommunityTreasuryType = pallet_treasury::Instance2;
@@ -689,6 +668,12 @@ impl pallet_treasury::Config<CommunityTreasuryType> for Runtime {
 	type SpendFunds = ();
 	type MaxApprovals = ConstU32<100>;
 	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
+	type AssetKind = ();
+	type Beneficiary = AccountId;
+	type BeneficiaryLookup = IdentityLookup<AccountId>;
+	type Paymaster = PayFromAccount<Balances, CommunityTreasuryAccountId>;
+	type BalanceConverter = UnityAssetBalanceConversion;
+	type PayoutPeriod = SpendPayoutPeriod;
 }
 
 pub struct RewardDistributor;
@@ -738,7 +723,7 @@ construct_runtime!(
 		// 10 was NodeAuthorization
 		Multisig:  pallet_multisig = 11,
 		Recovery: pallet_recovery = 12,
-		Assets: pallet_assets = 13,
+		// 13 was Assets
 		LoAuthorityList: pallet_lo_authority_list = 14,
 		LogionLoc: pallet_logion_loc = 15,
 		VerifiedRecovery: pallet_verified_recovery = 16,
