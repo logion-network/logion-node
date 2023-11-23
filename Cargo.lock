@@ -1274,7 +1274,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.1.0"
-source = "git+https://github.com/w3f/ring-proof#d3dcccd76cfdb8e2f905e789f129618898026447"
+source = "git+https://github.com/w3f/ring-proof#9d79ccf8bb72b132262ccc86e4e42e4396d1bfb8"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1282,6 +1282,7 @@ dependencies = [
  "ark-serialize",
  "ark-std",
  "fflonk",
+ "getrandom_or_panic",
  "merlin 3.0.0",
  "rand_chacha 0.3.1",
 ]
@@ -2464,9 +2465,9 @@ dependencies = [
 
 [[package]]
 name = "form_urlencoded"
-version = "1.2.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a62bc1cf6f830c2ec14a513a9fb124d0a213a629668a4186f329db21fe045652"
+checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
 ]
@@ -2941,6 +2942,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "getrandom_or_panic"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ea1015b5a70616b688dc230cfe50c8af89d972cb132d5a622814d29773b10b9"
+dependencies = [
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+]
+
+[[package]]
 name = "ghash"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3283,7 +3294,7 @@ dependencies = [
  "rustls-native-certs",
  "tokio",
  "tokio-rustls",
- "webpki-roots 0.25.2",
+ "webpki-roots 0.25.3",
 ]
 
 [[package]]
@@ -3328,9 +3339,9 @@ dependencies = [
 
 [[package]]
 name = "idna"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d20d6b07bfbc108882d88ed8e37d39636dcc260e15e30c45e6ba089610b917c"
+checksum = "634d9b1461af396cad843f47fdba5597a4f9e6ddd4bfb6ff5d85028c25cb12f6"
 dependencies = [
  "unicode-bidi",
  "unicode-normalization",
@@ -3605,7 +3616,7 @@ dependencies = [
  "tokio-rustls",
  "tokio-util",
  "tracing",
- "webpki-roots 0.25.2",
+ "webpki-roots 0.25.3",
 ]
 
 [[package]]
@@ -4456,7 +4467,6 @@ dependencies = [
  "frame-try-runtime",
  "log",
  "logion-shared",
- "pallet-assets",
  "pallet-aura",
  "pallet-balances",
  "pallet-block-reward",
@@ -4497,7 +4507,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#d50a82ec97d3e7c4f28a298c6287c32506409616"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#ebe851b8fbe9c4ef7d51d6cf4076d636c5e365e2"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5197,22 +5207,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-assets"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.3.0#7c9fd83805cc446983a7698c7a3281677cf655c8"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-aura"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.3.0#7c9fd83805cc446983a7698c7a3281677cf655c8"
@@ -5261,7 +5255,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#d50a82ec97d3e7c4f28a298c6287c32506409616"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#ebe851b8fbe9c4ef7d51d6cf4076d636c5e365e2"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5300,7 +5294,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#d50a82ec97d3e7c4f28a298c6287c32506409616"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#ebe851b8fbe9c4ef7d51d6cf4076d636c5e365e2"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5317,7 +5311,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#d50a82ec97d3e7c4f28a298c6287c32506409616"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#ebe851b8fbe9c4ef7d51d6cf4076d636c5e365e2"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5335,7 +5329,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#d50a82ec97d3e7c4f28a298c6287c32506409616"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#ebe851b8fbe9c4ef7d51d6cf4076d636c5e365e2"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5351,7 +5345,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#d50a82ec97d3e7c4f28a298c6287c32506409616"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#ebe851b8fbe9c4ef7d51d6cf4076d636c5e365e2"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5517,7 +5511,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#d50a82ec97d3e7c4f28a298c6287c32506409616"
+source = "git+https://github.com/logion-network/logion-pallets?branch=polkadot-v1.3.0#ebe851b8fbe9c4ef7d51d6cf4076d636c5e365e2"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5696,9 +5690,9 @@ dependencies = [
 
 [[package]]
 name = "percent-encoding"
-version = "2.3.0"
+version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b2a4787296e9989611394c33f193f676704af1686e70b8f8033ab5ba9a35a94"
+checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 
 [[package]]
 name = "pest"
@@ -6470,7 +6464,7 @@ dependencies = [
 [[package]]
 name = "ring"
 version = "0.1.0"
-source = "git+https://github.com/w3f/ring-proof#d3dcccd76cfdb8e2f905e789f129618898026447"
+source = "git+https://github.com/w3f/ring-proof#9d79ccf8bb72b132262ccc86e4e42e4396d1bfb8"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -9832,12 +9826,12 @@ checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "url"
-version = "2.4.1"
+version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "143b538f18257fac9cad154828a57c6bf5157e1aa604d4816b5995bf6de87ae5"
+checksum = "31e6302e3bb753d46e83516cae55ae196fc0c309407cf11ab35cc51a4c2a4633"
 dependencies = [
  "form_urlencoded",
- "idna 0.4.0",
+ "idna 0.5.0",
  "percent-encoding",
 ]
 
@@ -10326,9 +10320,9 @@ dependencies = [
 
 [[package]]
 name = "webpki-roots"
-version = "0.25.2"
+version = "0.25.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14247bb57be4f377dfb94c72830b8ce8fc6beac03cf4bf7b9732eadd414123fc"
+checksum = "1778a42e8b3b90bff8d0f5032bf22250792889a5cdc752aa0020c84abe3aaf10"
 
 [[package]]
 name = "webrtc"

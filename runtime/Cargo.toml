@@ -52,7 +52,6 @@ frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, g
 # logion dependencies
 log = { version = "0.4.17", default-features = false }
 logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
-pallet-assets = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.3.0" }
 pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
 pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
 pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
@@ -83,7 +82,6 @@ std = [
 	"frame-try-runtime/std",
 	"log/std",
 	"logion-shared/std",
-	"pallet-assets/std",
 	"pallet-aura/std",
 	"pallet-balances/std",
 	"pallet-block-reward/std",
@@ -132,7 +130,6 @@ try-runtime = [
 	"frame-executive/try-runtime",
 	"frame-system/try-runtime",
 	"frame-support/try-runtime",
-	"pallet-assets/try-runtime",
 	"pallet-aura/try-runtime",
 	"pallet-balances/try-runtime",
 	"pallet-block-reward/try-runtime",
