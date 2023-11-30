@@ -191,6 +191,8 @@ impl Contains<RuntimeCall> for BaseCallFilter {
 	}
 }
 
+mod weights;
+
 impl frame_system::Config for Runtime {
 	/// The basic call filter to use in dispatchable.
 	type BaseCallFilter = BaseCallFilter;
@@ -233,7 +235,7 @@ impl frame_system::Config for Runtime {
 	/// The data to be stored in an account.
 	type AccountData = pallet_balances::AccountData<Balance>;
 	/// Weight information for the extrinsics of this pallet.
-	type SystemWeightInfo = ();
+	type SystemWeightInfo = weights::frame_system::WeightInfo<Runtime>;
 	/// This is used as an identifier of the chain. 42 is the generic substrate prefix.
 	type SS58Prefix = SS58Prefix;
 	/// The set code logic, just the default since we're not a parachain.
@@ -254,7 +256,7 @@ impl pallet_aura::Config for Runtime {
 impl pallet_grandpa::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 
-	type WeightInfo = ();
+	type WeightInfo = (); // Broken benchmark
 	type MaxAuthorities = ConstU32<32>;
 	type MaxNominators = ConstU32<0>;
 	type MaxSetIdSessionEntries = ConstU64<0>;
@@ -268,7 +270,7 @@ impl pallet_timestamp::Config for Runtime {
 	type Moment = u64;
 	type OnTimestampSet = Aura;
 	type MinimumPeriod = ConstU64<{ SLOT_DURATION / 2 }>;
-	type WeightInfo = ();
+	type WeightInfo = weights::pallet_timestamp::WeightInfo<Runtime>;
 }
 
 /// Existential deposit.
@@ -285,7 +287,7 @@ impl pallet_balances::Config for Runtime {
 	type DustRemoval = ();
 	type ExistentialDeposit = ConstU128<EXISTENTIAL_DEPOSIT>;
 	type AccountStore = System;
-	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = weights::pallet_balances::WeightInfo<Runtime>;
 	type FreezeIdentifier = [u8; 8];
 	type MaxFreezes = ();
 	type RuntimeHoldReason = ();
@@ -396,7 +398,7 @@ impl pallet_transaction_payment::Config for Runtime {
 impl pallet_sudo::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type RuntimeCall = RuntimeCall;
-	type WeightInfo = ();
+	type WeightInfo = weights::pallet_sudo::WeightInfo<Runtime>;
 }
 
 parameter_types! {
@@ -412,7 +414,7 @@ impl pallet_validator_set::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type AddRemoveOrigin = EnsureRoot<AccountId>;
 	type MinAuthorities = MinAuthorities;
-	type WeightInfo = ();
+	type WeightInfo = (); // Benchmark broken
 }
 
 parameter_types! {
@@ -429,7 +431,7 @@ impl pallet_session::Config for Runtime {
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 	type ValidatorId = <Self as frame_system::Config>::AccountId;
 	type ValidatorIdOf = pallet_validator_set::ValidatorOf<Self>;
-	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>; // No benchmark available
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, TypeInfo, Copy)]
@@ -461,7 +463,7 @@ impl pallet_lo_authority_list::Config for Runtime {
 	type UpdateOrigin = EnsureRoot<AccountId>;
 	type Region = Region;
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = ();
+	type WeightInfo = (); // TODO
 }
 
 parameter_types! {
@@ -498,7 +500,7 @@ impl pallet_logion_loc::Config for Runtime {
 	type MaxFileNameSize = MaxFileNameSize;
 	type MaxTokensRecordDescriptionSize = MaxTokensRecordDescriptionSize;
 	type MaxTokensRecordFiles = MaxTokensRecordFiles;
-	type WeightInfo = ();
+	type WeightInfo = (); // TODO
 	type Currency = Balances;
 	type FileStorageByteFee = FileStorageByteFee;
 	type FileStorageEntryFee = FileStorageEntryFee;
@@ -532,7 +534,7 @@ impl pallet_recovery::Config for Runtime {
 	type FriendDepositFactor = RecoveryFrieldDepositFactor;
 	type MaxFriends = MaxFriends;
 	type RecoveryDeposit = RecoveryDeposit;
-	type WeightInfo = ();
+	type WeightInfo = weights::pallet_recovery::WeightInfo<Runtime>;
 }
 
 pub struct PalletRecoveryCreateRecoveryCallFactory;
@@ -549,7 +551,7 @@ impl pallet_verified_recovery::Config for Runtime {
 	type CreateRecoveryCallFactory = PalletRecoveryCreateRecoveryCallFactory;
 	type LocQuery = LogionLoc;
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = ();
+	type WeightInfo = (); // TODO
 }
 
 parameter_types! {
@@ -565,7 +567,7 @@ impl pallet_multisig::Config for Runtime {
 	type DepositBase = MultiSigDepositBase;
 	type DepositFactor = MultiSigDepositFactor;
 	type MaxSignatories = MaxSignatories;
-	type WeightInfo = ();
+	type WeightInfo = weights::pallet_multisig::WeightInfo<Runtime>;
 }
 
 pub struct PalletMultisigApproveAsMultiCallFactory;
@@ -604,7 +606,7 @@ impl pallet_logion_vault::Config for Runtime {
 	type MultisigAsMultiCallFactory = PalletMultisigAsMultiCallFactory;
 	type IsLegalOfficer = LoAuthorityList;
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = ();
+	type WeightInfo = (); // TODO
 }
 
 impl pallet_logion_vote::Config for Runtime {
@@ -614,7 +616,7 @@ impl pallet_logion_vote::Config for Runtime {
 	type LocValidity = LogionLoc;
 	type LocQuery = LogionLoc;
 	type LegalOfficerCreation = LoAuthorityList;
-	type WeightInfo = ();
+	type WeightInfo = (); // TODO
 }
 
 parameter_types! {
@@ -638,7 +640,7 @@ impl pallet_treasury::Config<LogionTreasuryType> for Runtime {
 	type Burn = ();
 	type PalletId = LogionTreasuryPalletId;
 	type BurnDestination = ();
-	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>; // Benchmark broken
 	type SpendFunds = ();
 	type MaxApprovals = ConstU32<100>;
 	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
@@ -664,7 +666,7 @@ impl pallet_treasury::Config<CommunityTreasuryType> for Runtime {
 	type Burn = ();
 	type PalletId = CommunityTreasuryPalletId;
 	type BurnDestination = ();
-	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>; // Benchmark broken
 	type SpendFunds = ();
 	type MaxApprovals = ConstU32<100>;
 	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<Balance>;
@@ -777,7 +779,12 @@ mod benches {
 		[frame_benchmarking, BaselineBench::<Runtime>]
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
+		[pallet_grandpa, Grandpa]
+		[pallet_multisig, Multisig]
+		[pallet_recovery, Recovery]
+		[pallet_sudo, Sudo]
 		[pallet_timestamp, Timestamp]
+		[pallet_validator_set, ValidatorSet]
 	);
 }
 
@@ -958,26 +965,16 @@ impl_runtime_apis! {
 		fn dispatch_benchmark(
 			config: frame_benchmarking::BenchmarkConfig
 		) -> Result<Vec<frame_benchmarking::BenchmarkBatch>, sp_runtime::RuntimeString> {
-			use frame_benchmarking::{baseline, Benchmarking, BenchmarkBatch, TrackedStorageKey};
-
+			use frame_benchmarking::{baseline, Benchmarking, BenchmarkBatch};
+			use sp_storage::TrackedStorageKey;
 			use frame_system_benchmarking::Pallet as SystemBench;
 			use baseline::Pallet as BaselineBench;
 
 			impl frame_system_benchmarking::Config for Runtime {}
 			impl baseline::Config for Runtime {}
 
-			let whitelist: Vec<TrackedStorageKey> = vec![
-				// Block Number
-				hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef702a5c1b19ab7a04f536c519aca4983ac").to_vec().into(),
-				// Total Issuance
-				hex_literal::hex!("c2261276cc9d1f8598ea4b6a74b15c2f57c875e4cff74148e4628f264b974c80").to_vec().into(),
-				// Execution Phase
-				hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef7ff553b5a9862a516939d82b3d3d8661a").to_vec().into(),
-				// Event Count
-				hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef70a98fdbe9ce6c55837576c60c7af3850").to_vec().into(),
-				// System Events
-				hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7").to_vec().into(),
-			];
+			use frame_support::traits::WhitelistedStorageKeys;
+			let whitelist: Vec<TrackedStorageKey> = AllPalletsWithSystem::whitelisted_storage_keys();
 
 			let mut batches = Vec::<BenchmarkBatch>::new();
 			let params = (&config, &whitelist);
