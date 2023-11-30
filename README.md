@@ -102,3 +102,38 @@ This will:
 - download current state
 - execute the upgrade
 - run pallets' `post_upgrade` hook
+
+## Benchmark
+
+In order to run benchmarks, the runtime has to be built with the right features enabled:
+
+```
+./scripts/build_benchmark.sh
+```
+
+All required benchmarks can be run by executing the following command:
+
+```
+./scripts/benchmark_all.sh
+```
+
+Pallet benchmarks can be run one at a time with the following command:
+
+```
+./scripts/benchmark_one.sh $PALLET
+```
+
+with $PALLET being a pallet name listed in [`runtime/src/weights`](`./runtime/src/weights`) (the file name without extesion `.rs`).
+
+### Benchmarking a new pallet
+
+1. `Cargo.toml`: in section `[features]`, add pallet to `runtime-benchmarks` array.
+2. `./runtime/src/lib.rs`:
+  - Configure pallet with default `WeightInfo` (`type WeightInfo = ();`) and add to runtime.
+  - Add pallet to `define_benchmarks!` arguments
+3. Re-build runtime for benchmarks (see above); a failure here may mean that the pallet does not have any bencharmk or benchmark code is broken.
+4. Run benchmark for the new pallet (see above); a failure here (no module file produced) may mean that benchmark code is broken.
+5. `./runtime/src/weights.rs`: Add newly generated module.
+6. `./runtime/src/lib.rs`: Pass generated `WeightInfo` to pallet (`type WeightInfo = weights::PALLET_NAME::WeightInfo<Runtime>;`).
+7. Run `cargo check`; a failure here may mean that pallet benchmarks were not updated following a pallet API change.
+8. `./scripts/benchmark_all.sh`: add pallet to `PALLETS` array.

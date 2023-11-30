@@ -51,17 +51,17 @@ frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, g
 
 # logion dependencies
 log = { version = "0.4.17", default-features = false }
-logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
-pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
-pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
-pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
-pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
-pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
+logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/benchmark" }
+pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/benchmark" }
+pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/benchmark" }
+pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/benchmark" }
+pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/benchmark" }
+pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/benchmark" }
 pallet-multisig = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
 pallet-recovery = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
 pallet-session = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.3.0" }
 pallet-validator-set = { default-features = false, git = "https://github.com/logion-network/substrate-validator-set.git", package = "substrate-validator-set", branch = "polkadot-v1.3.0" }
-pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
+pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/benchmark" }
 pallet-treasury = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
 
 [build-dependencies]
@@ -122,7 +122,11 @@ runtime-benchmarks = [
 	"pallet-grandpa/runtime-benchmarks",
 	"pallet-lo-authority-list/runtime-benchmarks",
 	"pallet-logion-loc/runtime-benchmarks",
+	"pallet-multisig/runtime-benchmarks",
+	"pallet-recovery/runtime-benchmarks",
+	"pallet-sudo/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
+	"pallet-validator-set/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 ]
 try-runtime = [
