@@ -383,7 +383,14 @@ impl OnUnbalanced<NegativeImbalance> for DealWithInclusionFees {
 
 parameter_types! {
 	pub FeeMultiplier: Multiplier = Multiplier::one();
-	pub const WeightToFeeMultiplier: Balance = 10_000_000;
+
+	// The multiplier is set such as inclusion fees are ~2 LGNT on average.
+	// Spreadsheet in /docs/inclusion_fees.ods contains the model that lead
+	// to this result.
+	//
+	// This value will probably have to be adjusted once we have more
+	// usage statistics available.
+	pub const WeightToFeeMultiplier: Balance = 7_462_686_567;
 }
 
 impl pallet_transaction_payment::Config for Runtime {
