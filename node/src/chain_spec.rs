@@ -69,6 +69,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 			// Pre-funded accounts
 			vec![
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
+				get_account_id_from_seed::<sr25519::Public>("Bob"),
 			],
 			vec![ // Initial set of Logion Legal Officers
 				(
@@ -78,6 +79,14 @@ pub fn development_config() -> Result<ChainSpec, String> {
 						base_url: None,
 						region: "Europe".into(),
 					},
+				),
+				(
+					get_account_id_from_seed::<sr25519::Public>("Bob"),
+					GenesisHostData {
+						node_id: Some(OpaquePeerId(bs58::decode("12D3KooWQYV9dGMFoRzNStwpXztXaBUjtPqi6aU76ZgUriHhKust").into_vec().unwrap())),
+						base_url: None,
+						region: "Europe".into(),
+					}
 				),
 			],
 		),

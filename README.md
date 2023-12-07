@@ -127,13 +127,15 @@ with $PALLET being a pallet name listed in [`runtime/src/weights`](`./runtime/sr
 
 ### Benchmarking a new pallet
 
-1. `Cargo.toml`: in section `[features]`, add pallet to `runtime-benchmarks` array.
+1. `./runtime/Cargo.toml`: in section `[features]`, add pallet to `runtime-benchmarks` array.
 2. `./runtime/src/lib.rs`:
-  - Configure pallet with default `WeightInfo` (`type WeightInfo = ();`) and add to runtime.
+  - If not already done, configure pallet with default `WeightInfo` (`type WeightInfo = ();`).
   - Add pallet to `define_benchmarks!` arguments
-3. Re-build runtime for benchmarks (see above); a failure here may mean that the pallet does not have any bencharmk or benchmark code is broken.
-4. Run benchmark for the new pallet (see above); a failure here (no module file produced) may mean that benchmark code is broken.
-5. `./runtime/src/weights.rs`: Add newly generated module.
-6. `./runtime/src/lib.rs`: Pass generated `WeightInfo` to pallet (`type WeightInfo = weights::PALLET_NAME::WeightInfo<Runtime>;`).
-7. Run `cargo check`; a failure here may mean that pallet benchmarks were not updated following a pallet API change.
-8. `./scripts/benchmark_all.sh`: add pallet to `PALLETS` array.
+3. Re-build runtime for benchmarks (see above); a failure here may mean that the pallet does not have any benchmark or benchmark code is broken.
+4. Run `./scripts/list_benchmarks.sh` and make sure that added pallet appears. If it is not the case, `cargo clean` then restart from step 3.
+5. Run benchmark for the new pallet (see above); a failure here (no module file produced) may mean that benchmark code is broken.
+   If the bencharmks are not
+6. `./runtime/src/weights.rs`: Add newly generated module.
+7. `./runtime/src/lib.rs`: Pass generated `WeightInfo` to pallet (`type WeightInfo = weights::PALLET_NAME::WeightInfo<Runtime>;`).
+8. Run `cargo check`; a failure here may mean that pallet benchmarks were not updated following a pallet API change.
+9. `./scripts/benchmark_all.sh`: add pallet to `PALLETS` array.

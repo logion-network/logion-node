@@ -463,7 +463,7 @@ impl pallet_lo_authority_list::Config for Runtime {
 	type UpdateOrigin = EnsureRoot<AccountId>;
 	type Region = Region;
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = (); // TODO
+	type WeightInfo = weights::pallet_lo_authority_list::WeightInfo<Runtime>;
 }
 
 parameter_types! {
@@ -500,7 +500,7 @@ impl pallet_logion_loc::Config for Runtime {
 	type MaxFileNameSize = MaxFileNameSize;
 	type MaxTokensRecordDescriptionSize = MaxTokensRecordDescriptionSize;
 	type MaxTokensRecordFiles = MaxTokensRecordFiles;
-	type WeightInfo = (); // TODO
+	type WeightInfo = weights::pallet_logion_loc::WeightInfo<Runtime>;
 	type Currency = Balances;
 	type FileStorageByteFee = FileStorageByteFee;
 	type FileStorageEntryFee = FileStorageEntryFee;
@@ -517,6 +517,16 @@ impl pallet_logion_loc::Config for Runtime {
 	type IdentityLocLegalFeeDistributionKey = IdentityLocLegalFeeDistributionKey;
 	type TransactionLocLegalFeeDistributionKey = OtherLocLegalFeeDistributionKey;
 	type CollectionLocLegalFeeDistributionKey = OtherLocLegalFeeDistributionKey;
+	#[cfg(feature = "runtime-benchmarks")]
+	type LocIdFactory = ();
+	#[cfg(feature = "runtime-benchmarks")]
+	type CollectionItemIdFactory = ();
+	#[cfg(feature = "runtime-benchmarks")]
+	type TokensRecordIdFactory = ();
+	#[cfg(feature = "runtime-benchmarks")]
+	type EthereumAddressFactory = ();
+	#[cfg(feature = "runtime-benchmarks")]
+	type SponsorshipIdFactory = ();
 }
 
 parameter_types! {
@@ -546,12 +556,62 @@ impl CreateRecoveryCallFactory<RuntimeOrigin, AccountId, BlockNumber> for Pallet
 	}
 }
 
+#[cfg(feature = "runtime-benchmarks")]
+use pallet_verified_recovery::benchmarking::{
+	SetupBenchmark,
+};
+#[cfg(feature = "runtime-benchmarks")]
+pub struct VerifiedRecoverySetupBenchmark;
+#[cfg(feature = "runtime-benchmarks")]
+impl SetupBenchmark<AccountId> for VerifiedRecoverySetupBenchmark {
+
+	fn setup() -> (AccountId, Vec<AccountId>) {
+		let requester: AccountId = [0u8;32].into();
+		Balances::make_free_balance_be(&requester, Balance::max_value());
+
+		let loc_id1: LocId = 0;
+		let legal_officer_id1 = LoAuthorityList::legal_officers()[0].clone();
+		Self::setup_loc(loc_id1, &requester, &legal_officer_id1);
+
+		let loc_id2: LocId = 1;
+		let legal_officer_id2 = LoAuthorityList::legal_officers()[1].clone();
+		Self::setup_loc(loc_id2, &requester, &legal_officer_id2);
+		(
+			requester,
+			Vec::from([
+				legal_officer_id1,
+				legal_officer_id2,
+			])
+		)
+	}
+}
+#[cfg(feature = "runtime-benchmarks")]
+impl VerifiedRecoverySetupBenchmark {
+	fn setup_loc(loc_id: LocId, requester: &AccountId, legal_officer_id: &AccountId) {
+		let _ = LogionLoc::create_polkadot_identity_loc(
+			RuntimeOrigin::signed(requester.clone()),
+			loc_id,
+			legal_officer_id.clone(),
+			0u32.into(),
+			ItemsParams::empty(),
+		);
+		let _ = LogionLoc::close(
+			RuntimeOrigin::signed(legal_officer_id.clone()),
+			loc_id,
+			None,
+			false,
+		);
+	}
+}
+
 impl pallet_verified_recovery::Config for Runtime {
 	type LocId = LocId;
 	type CreateRecoveryCallFactory = PalletRecoveryCreateRecoveryCallFactory;
 	type LocQuery = LogionLoc;
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = (); // TODO
+	type WeightInfo = weights::pallet_verified_recovery::WeightInfo<Runtime>;
+	#[cfg(feature = "runtime-benchmarks")]
+	type SetupBenchmark = VerifiedRecoverySetupBenchmark;
 }
 
 parameter_types! {
@@ -606,7 +666,42 @@ impl pallet_logion_vault::Config for Runtime {
 	type MultisigAsMultiCallFactory = PalletMultisigAsMultiCallFactory;
 	type IsLegalOfficer = LoAuthorityList;
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = (); // TODO
+	type WeightInfo = weights::pallet_multisig::WeightInfo<Runtime>;
+}
+
+#[cfg(feature = "runtime-benchmarks")]
+use pallet_logion_vote::benchmarking::{
+	LocSetup,
+};
+#[cfg(feature = "runtime-benchmarks")]
+use logion_shared::IsLegalOfficer;
+#[cfg(feature = "runtime-benchmarks")]
+use pallet_logion_loc::ItemsParams;
+#[cfg(feature = "runtime-benchmarks")]
+pub struct VoteLocSetup;
+#[cfg(feature = "runtime-benchmarks")]
+impl LocSetup<LocId, AccountId> for VoteLocSetup {
+
+	fn setup_vote_loc() -> (LocId, AccountId) {
+		let loc_id: LocId = 0;
+		let requester: AccountId = [0u8;32].into();
+		Balances::make_free_balance_be(&requester, Balance::max_value());
+		let legal_officer_id = LoAuthorityList::legal_officers()[0].clone();
+		let _ = LogionLoc::create_polkadot_identity_loc(
+			RuntimeOrigin::signed(requester),
+			loc_id,
+			legal_officer_id.clone(),
+			0u32.into(),
+			ItemsParams::empty(),
+		);
+		let _ = LogionLoc::close(
+			RuntimeOrigin::signed(legal_officer_id.clone()),
+			loc_id,
+			None,
+			false,
+		);
+		(loc_id, legal_officer_id)
+	}
 }
 
 impl pallet_logion_vote::Config for Runtime {
@@ -616,7 +711,9 @@ impl pallet_logion_vote::Config for Runtime {
 	type LocValidity = LogionLoc;
 	type LocQuery = LogionLoc;
 	type LegalOfficerCreation = LoAuthorityList;
-	type WeightInfo = (); // TODO
+	type WeightInfo = weights::pallet_logion_vote::WeightInfo<Runtime>;
+	#[cfg(feature = "runtime-benchmarks")]
+	type LocSetup = VoteLocSetup;
 }
 
 parameter_types! {
@@ -755,6 +852,13 @@ pub type SignedExtra = (
 	frame_system::CheckWeight<Runtime>,
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
+
+/// All migrations of the runtime, aside from the ones declared in the pallets.
+///
+/// This can be a tuple of types, each implementing `OnRuntimeUpgrade`.
+#[allow(unused_parens)]
+type Migrations = ();
+
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 /// The payload being signed in transactions.
@@ -766,7 +870,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	(),
+	Migrations,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -780,11 +884,15 @@ mod benches {
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
 		[pallet_grandpa, Grandpa]
+		[pallet_lo_authority_list, LoAuthorityList]
+		[pallet_logion_loc, LogionLoc]
+		[pallet_logion_vote, Vote]
 		[pallet_multisig, Multisig]
 		[pallet_recovery, Recovery]
 		[pallet_sudo, Sudo]
 		[pallet_timestamp, Timestamp]
 		[pallet_validator_set, ValidatorSet]
+		[pallet_verified_recovery, VerifiedRecovery]
 	);
 }
 

@@ -6,11 +6,14 @@
 PALLETS=(
   "frame_system" \
   "pallet_balances" \
-  "pallet_grandpa" \
+  "pallet_lo_authority_list" \
+  "pallet_logion_loc" \
+  "pallet_logion_vote" \
   "pallet_multisig" \
   "pallet_recovery" \
   "pallet_sudo" \
   "pallet_timestamp" \
+  "pallet_verified_recovery" \
 );
 
 for pallet in ${PALLETS[*]}
