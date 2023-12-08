@@ -51,17 +51,17 @@ frame-system-benchmarking = { version = "4.0.0-dev", default-features = false, g
 
 # logion dependencies
 log = { version = "0.4.17", default-features = false }
-logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/fix-loc-creation-weights" }
-pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/fix-loc-creation-weights" }
-pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/fix-loc-creation-weights" }
-pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/fix-loc-creation-weights" }
-pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/fix-loc-creation-weights" }
-pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/fix-loc-creation-weights" }
+logion-shared = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
+pallet-block-reward = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
+pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
+pallet-logion-loc = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
+pallet-logion-vault = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
+pallet-logion-vote = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
 pallet-multisig = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
 pallet-recovery = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
 pallet-session = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.3.0" }
 pallet-validator-set = { default-features = false, git = "https://github.com/logion-network/substrate-validator-set.git", package = "substrate-validator-set", branch = "polkadot-v1.3.0" }
-pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "feature/fix-loc-creation-weights" }
+pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
 pallet-treasury = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
 
 [build-dependencies]
