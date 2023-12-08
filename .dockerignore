@@ -1,7 +1,9 @@
 .github
+.vscode
 .settings
 .project
 **/target/
 .cargo
 bin/
 debian-bin/
+docs/

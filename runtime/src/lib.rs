@@ -126,7 +126,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 158,
+	spec_version: 159,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -383,7 +383,14 @@ impl OnUnbalanced<NegativeImbalance> for DealWithInclusionFees {
 
 parameter_types! {
 	pub FeeMultiplier: Multiplier = Multiplier::one();
-	pub const WeightToFeeMultiplier: Balance = 10_000_000;
+
+	// The multiplier is set such as inclusion fees are ~2 LGNT on average.
+	// Spreadsheet in /docs/inclusion_fees.ods contains the model that lead
+	// to this result.
+	//
+	// This value will probably have to be adjusted once we have more
+	// usage statistics available.
+	pub const WeightToFeeMultiplier: Balance = 5_089_484_898;
 }
 
 impl pallet_transaction_payment::Config for Runtime {
