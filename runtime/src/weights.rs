@@ -7,4 +7,5 @@ pub mod pallet_multisig;
 pub mod pallet_recovery;
 pub mod pallet_sudo;
 pub mod pallet_timestamp;
+pub mod pallet_utility;
 pub mod pallet_verified_recovery;

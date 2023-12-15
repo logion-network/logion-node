@@ -63,6 +63,7 @@ pallet-session = { version = "4.0.0-dev", default-features = false, git = "https
 pallet-validator-set = { default-features = false, git = "https://github.com/logion-network/substrate-validator-set.git", package = "substrate-validator-set", branch = "polkadot-v1.3.0" }
 pallet-verified-recovery = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  branch = "polkadot-v1.3.0" }
 pallet-treasury = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
+pallet-utility = { git = "https://github.com/paritytech/polkadot-sdk", default-features = false, tag = "polkadot-v1.3.0" }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "5.0.0-dev", git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.3.0" }
@@ -100,6 +101,7 @@ std = [
 	"pallet-validator-set/std",
 	"pallet-verified-recovery/std",
 	"pallet-treasury/std",
+	"pallet-utility/std",
 	"sp-api/std",
 	"sp-block-builder/std",
 	"sp-consensus-aura/std",
@@ -130,6 +132,7 @@ runtime-benchmarks = [
 	"pallet-timestamp/runtime-benchmarks",
 	"pallet-validator-set/runtime-benchmarks",
 	"pallet-verified-recovery/runtime-benchmarks",
+	"pallet-utility/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 ]
 try-runtime = [
@@ -154,4 +157,5 @@ try-runtime = [
 	"pallet-validator-set/try-runtime",
 	"pallet-verified-recovery/try-runtime",
 	"pallet-treasury/try-runtime",
+	"pallet-utility/try-runtime",
 ]

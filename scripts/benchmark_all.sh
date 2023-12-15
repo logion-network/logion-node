@@ -14,6 +14,7 @@ PALLETS=(
   "pallet_sudo" \
   "pallet_timestamp" \
   "pallet_verified_recovery" \
+  "pallet_utility" \
 );
 
 for pallet in ${PALLETS[*]}

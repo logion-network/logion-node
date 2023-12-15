@@ -126,7 +126,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 159,
+	spec_version: 160,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -813,6 +813,13 @@ impl pallet_block_reward::Config for Runtime {
 	type IsLegalOfficer = LoAuthorityList;
 }
 
+impl pallet_utility::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type RuntimeCall = RuntimeCall;
+	type PalletsOrigin = OriginCaller;
+	type WeightInfo = weights::pallet_utility::WeightInfo<Runtime>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime {
@@ -839,6 +846,7 @@ construct_runtime!(
 		BlockReward: pallet_block_reward = 20,
 		LogionTreasury: pallet_treasury::<Instance1> = 21,
 		CommunityTreasury: pallet_treasury::<Instance2> = 22,
+		Utility: pallet_utility = 23,
 	}
 );
 
@@ -900,6 +908,7 @@ mod benches {
 		[pallet_timestamp, Timestamp]
 		[pallet_validator_set, ValidatorSet]
 		[pallet_verified_recovery, VerifiedRecovery]
+		[pallet_utility, Utility]
 	);
 }
 
