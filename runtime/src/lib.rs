@@ -25,6 +25,7 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
+use frame_support::genesis_builder_helper::{build_config, create_default_config};
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
 	construct_runtime, parameter_types,
@@ -316,7 +317,7 @@ parameter_types! {
         loc_owner_percent: Percent::from_percent(0),
     };
 
-	pub const FileStorageByteFee: Balance = 100 * NANO_LGNT; // 0.1 LGNT per MB
+	pub const FileStorageByteFee: Balance = 2000 * NANO_LGNT; // 2.0 LGNT per MB -> 0.000002 LGNT per B
 	pub const FileStorageEntryFee: Balance = 0;
 	pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
         legal_officers_percent: Percent::from_percent(80),
@@ -325,7 +326,7 @@ parameter_types! {
         loc_owner_percent: Percent::from_percent(0),
     };
 
-	pub const CertificateFee: Balance = 4 * MILLI_LGNT; // 0.004 LGNT
+	pub const CertificateFee: Balance = 40 * MILLI_LGNT; // 0.04 LGNT per token
     pub const CertificateFeeDistributionKey: DistributionKey = DistributionKey {
         legal_officers_percent: Percent::from_percent(20),
         community_treasury_percent: Percent::from_percent(80),
@@ -872,7 +873,9 @@ pub type SignedExtra = (
 ///
 /// This can be a tuple of types, each implementing `OnRuntimeUpgrade`.
 #[allow(unused_parens)]
-type Migrations = ();
+type Migrations = (
+	pallet_grandpa::migrations::MigrateV4ToV5<Runtime>,
+);
 
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
@@ -1127,6 +1130,16 @@ impl_runtime_apis! {
 			// NOTE: intentional unwrap: we don't want to propagate the error backwards, and want to
 			// have a backtrace here.
 			Executive::try_execute_block(block, state_root_check, signature_check, select).expect("execute-block failed")
+		}
+	}
+
+	impl sp_genesis_builder::GenesisBuilder<Block> for Runtime {
+		fn create_default_config() -> Vec<u8> {
+			create_default_config::<RuntimeGenesisConfig>()
+		}
+
+		fn build_config(config: Vec<u8>) -> sp_genesis_builder::Result {
+			build_config::<RuntimeGenesisConfig>(config)
 		}
 	}
 }
