@@ -317,7 +317,7 @@ parameter_types! {
         loc_owner_percent: Percent::from_percent(0),
     };
 
-	pub const FileStorageByteFee: Balance = 100 * NANO_LGNT; // 0.1 LGNT per MB
+	pub const FileStorageByteFee: Balance = 2000 * NANO_LGNT; // 2.0 LGNT per MB -> 0.000002 LGNT per B
 	pub const FileStorageEntryFee: Balance = 0;
 	pub const FileStorageFeeDistributionKey: DistributionKey = DistributionKey {
         legal_officers_percent: Percent::from_percent(80),
@@ -326,7 +326,7 @@ parameter_types! {
         loc_owner_percent: Percent::from_percent(0),
     };
 
-	pub const CertificateFee: Balance = 4 * MILLI_LGNT; // 0.004 LGNT
+	pub const CertificateFee: Balance = 40 * MILLI_LGNT; // 0.04 LGNT per token
     pub const CertificateFeeDistributionKey: DistributionKey = DistributionKey {
         legal_officers_percent: Percent::from_percent(20),
         community_treasury_percent: Percent::from_percent(80),
