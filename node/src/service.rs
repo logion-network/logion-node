@@ -3,12 +3,13 @@
 use futures::FutureExt;
 use logion_node_runtime::{self, opaque::Block, RuntimeApi};
 use sc_client_api::{Backend, BlockBackend};
-use sc_consensus_aura::{ImportQueueParams, SlotProportion, StartAuraParams};
+use sc_consensus_aura::{ImportQueueParams, SlotProportion, StartAuraParams, CompatibilityMode};
 use sc_consensus_grandpa::SharedVoterState;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager, WarpSyncParams};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
+use sp_runtime::traits::NumberFor;
 use std::{sync::Arc, time::Duration};
 
 pub(crate) type FullClient = sc_service::TFullClient<
@@ -111,7 +112,7 @@ pub fn new_partial(
 			registry: config.prometheus_registry(),
 			check_for_equivocation: Default::default(),
 			telemetry: telemetry.as_ref().map(|x| x.handle()),
-			compatibility_mode: Default::default(),
+			compatibility_mode: compatibility_mode(&config),
 		})?;
 
 	Ok(sc_service::PartialComponents {
@@ -124,6 +125,19 @@ pub fn new_partial(
 		transaction_pool,
 		other: (grandpa_block_import, grandpa_link, telemetry),
 	})
+}
+
+fn compatibility_mode(config: &Configuration) -> CompatibilityMode<NumberFor<Block>> {
+	if config.chain_spec.id().contains("mvp") {
+		CompatibilityMode::UseInitializeBlock {
+			// On MVP chain, verification fails on block 0x2b4e96021b427ac071238e530dd1a10993c6e22bea6d61f106358d31ed0c3212
+			// which has number 1053452. So until must be set to 1053452 + 1
+			// (see https://github.com/paritytech/substrate/blob/master/client/consensus/aura/src/lib.rs#L94-L101).
+			until: 1053453
+		}
+	} else {
+		CompatibilityMode::None
+	}
 }
 
 /// Builds a new service for a full client.
