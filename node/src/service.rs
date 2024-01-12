@@ -130,10 +130,11 @@ pub fn new_partial(
 fn compatibility_mode(config: &Configuration) -> CompatibilityMode<NumberFor<Block>> {
 	if config.chain_spec.id().contains("mvp") {
 		CompatibilityMode::UseInitializeBlock {
-			// On MVP chain, verification fails on block 0x2b4e96021b427ac071238e530dd1a10993c6e22bea6d61f106358d31ed0c3212
-			// which has number 1053452. So until must be set to 1053452 + 1
+			// On MVP chain, the latest verification failing because of new Aura validation mode
+			// is in block 0x7bb5932376cfa566ce055a26d030cecbc97e6f38a292c6e0e4571539f9e8811e
+			// which has number 3262756. So `until` must be set to 3262756 + 1
 			// (see https://github.com/paritytech/substrate/blob/master/client/consensus/aura/src/lib.rs#L94-L101).
-			until: 1053453
+			until: 3262757
 		}
 	} else {
 		CompatibilityMode::None
