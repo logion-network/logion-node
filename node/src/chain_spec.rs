@@ -155,8 +155,8 @@ pub fn test_config() -> Result<ChainSpec, String> {
 		WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?,
 		None,
 	)
-	.with_name("logion Testnet")
-	.with_id("logion_test_testnet")
+	.with_name("Logion Testnet")
+	.with_id("logion_test")
 	.with_chain_type(ChainType::Live)
 	.with_genesis_config_patch(logion_genesis(
 		// Initial PoA authorities
