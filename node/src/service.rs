@@ -136,14 +136,6 @@ fn compatibility_mode(config: &Configuration) -> CompatibilityMode<NumberFor<Blo
 			// (see https://github.com/paritytech/substrate/blob/master/client/consensus/aura/src/lib.rs#L94-L101).
 			until: 3262757
 		}
-	} else if config.chain_spec.id().contains("test") {
-		CompatibilityMode::UseInitializeBlock {
-			// On test chain, the latest verification failing because of new Aura validation mode
-			// is in block 0x2543517cded27b02c39ee84be1b5f6798ac86acaabcdd7cce96efd353e7301d8
-			// which has number 2391583. So `until` must be set to 2391583 + 1
-			// (see https://github.com/paritytech/substrate/blob/master/client/consensus/aura/src/lib.rs#L94-L101).
-			until: 2391584
-		}
 	} else {
 		CompatibilityMode::None
 	}
