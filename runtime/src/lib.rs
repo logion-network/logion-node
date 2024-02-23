@@ -127,7 +127,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 161,
+	spec_version: 162,
 	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 5,
@@ -475,12 +475,15 @@ impl pallet_lo_authority_list::Config for Runtime {
 }
 
 parameter_types! {
-	pub const MaxCollectionItemDescriptionSize: usize = 4096;
-	pub const MaxCollectionItemTokenIdSize: usize = 255;
-	pub const MaxCollectionItemTokenTypeSize: usize = 255;
-	pub const MaxFileContentTypeSize: u32 = 255;
-	pub const MaxFileNameSize: u32 = 255;
-	pub const MaxTokensRecordDescriptionSize: u32 = 4096;
+	pub const MaxAccountLocs: u32 = 200;
+	#[derive(TypeInfo)]
+	pub const MaxLocMetadata: u32 = 50;
+	#[derive(TypeInfo)]
+	pub const MaxLocFiles: u32 = 50;
+	#[derive(TypeInfo)]
+	pub const MaxLocLinks: u32 = 50;
+	pub const MaxCollectionItemFiles: u32 = 10;
+	pub const MaxCollectionItemTCs: u32 = 10;
 	pub const MaxTokensRecordFiles: u32 = 10;
 }
 
@@ -500,13 +503,13 @@ impl pallet_logion_loc::Config for Runtime {
 	type Hasher = SHA256;
 	type IsLegalOfficer = LoAuthorityList;
 	type CollectionItemId = Hash;
-	type MaxCollectionItemDescriptionSize = MaxCollectionItemDescriptionSize;
-	type MaxCollectionItemTokenIdSize = MaxCollectionItemTokenIdSize;
-	type MaxCollectionItemTokenTypeSize = MaxCollectionItemTokenTypeSize;
 	type TokensRecordId = Hash;
-	type MaxFileContentTypeSize = MaxFileContentTypeSize;
-	type MaxFileNameSize = MaxFileNameSize;
-	type MaxTokensRecordDescriptionSize = MaxTokensRecordDescriptionSize;
+	type MaxAccountLocs = MaxAccountLocs;
+	type MaxLocMetadata = MaxLocMetadata;
+	type MaxLocFiles = MaxLocFiles;
+	type MaxLocLinks = MaxLocLinks;
+	type MaxCollectionItemFiles = MaxCollectionItemFiles;
+	type MaxCollectionItemTCs = MaxCollectionItemTCs;
 	type MaxTokensRecordFiles = MaxTokensRecordFiles;
 	type WeightInfo = weights::pallet_logion_loc::WeightInfo<Runtime>;
 	type Currency = Balances;
@@ -874,7 +877,8 @@ pub type SignedExtra = (
 /// This can be a tuple of types, each implementing `OnRuntimeUpgrade`.
 #[allow(unused_parens)]
 type Migrations = (
-	pallet_grandpa::migrations::MigrateV4ToV5<Runtime>,
+	// Migration does not fit in one block and thus will be prepared offchain, and storage will be updated using system.setstorage()
+	// pallet_logion_loc::migrations::v23::BoundedLocItems<Runtime>,
 );
 
 /// Unchecked extrinsic type as expected by this runtime.
