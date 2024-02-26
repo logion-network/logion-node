@@ -872,13 +872,17 @@ pub type SignedExtra = (
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 
+parameter_types! {
+	pub const LogionLocStr: &'static str = "LogionLoc";
+}
+
 /// All migrations of the runtime, aside from the ones declared in the pallets.
 ///
 /// This can be a tuple of types, each implementing `OnRuntimeUpgrade`.
 #[allow(unused_parens)]
 type Migrations = (
 	// Migration does not fit in one block and thus will be prepared offchain, and storage will be updated using system.setstorage()
-	// pallet_logion_loc::migrations::v23::BoundedLocItems<Runtime>,
+	pallet_logion_loc::migrations::v23::RemoveUselessMaps<LogionLocStr, Runtime>,
 );
 
 /// Unchecked extrinsic type as expected by this runtime.
