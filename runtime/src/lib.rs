@@ -715,6 +715,12 @@ impl LocSetup<LocId, AccountId> for VoteLocSetup {
 	}
 }
 
+
+parameter_types! {
+	#[derive(Debug, PartialEq, TypeInfo)]
+	pub const MaxBallots: u32 = 12;
+}
+
 impl pallet_logion_vote::Config for Runtime {
 	type LocId = LocId;
 	type RuntimeEvent = RuntimeEvent;
@@ -722,6 +728,7 @@ impl pallet_logion_vote::Config for Runtime {
 	type LocValidity = LogionLoc;
 	type LocQuery = LogionLoc;
 	type LegalOfficerCreation = LoAuthorityList;
+	type MaxBallots = MaxBallots;
 	type WeightInfo = weights::pallet_logion_vote::WeightInfo<Runtime>;
 	#[cfg(feature = "runtime-benchmarks")]
 	type LocSetup = VoteLocSetup;
@@ -882,7 +889,7 @@ parameter_types! {
 #[allow(unused_parens)]
 type Migrations = (
 	// Migration does not fit in one block and thus will be prepared offchain, and storage will be updated using system.setstorage()
-	pallet_logion_loc::migrations::v23::RemoveUselessMaps<LogionLocStr, Runtime>,
+	pallet_logion_loc::migrations::v23::RemoveUselessMapsAddImported<LogionLocStr, Runtime>,
 );
 
 /// Unchecked extrinsic type as expected by this runtime.
