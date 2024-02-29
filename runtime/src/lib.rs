@@ -52,7 +52,7 @@ pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
 // Additional imports
-use codec::{Decode, Encode};
+use codec::{Decode, Encode, MaxEncodedLen};
 use frame_system::EnsureRoot;
 use logion_shared::{CreateRecoveryCallFactory, MultisigApproveAsMultiCallFactory, MultisigAsMultiCallFactory, DistributionKey, RewardDistributor as RewardDistributorTrait};
 use pallet_logion_loc::{Hasher};
@@ -410,7 +410,10 @@ impl pallet_sudo::Config for Runtime {
 }
 
 parameter_types! {
+	#[derive(Debug, Eq, Clone, PartialEq, TypeInfo)]
+	pub const MaxBaseUrlLen: u32 = 2000;
 	pub const MaxWellKnownNodes: u32 = 100;
+	#[derive(Debug, Eq, Clone, PartialEq, TypeInfo, PartialOrd, Ord)]
 	pub const MaxPeerIdLength: u32 = 128;
 }
 
@@ -442,7 +445,7 @@ impl pallet_session::Config for Runtime {
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>; // No benchmark available
 }
 
-#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, TypeInfo, Copy)]
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, TypeInfo, Copy, MaxEncodedLen)]
 pub enum Region {
     Europe,
 }
@@ -472,6 +475,9 @@ impl pallet_lo_authority_list::Config for Runtime {
 	type Region = Region;
 	type RuntimeEvent = RuntimeEvent;
 	type WeightInfo = weights::pallet_lo_authority_list::WeightInfo<Runtime>;
+	type MaxBaseUrlLen = MaxBaseUrlLen;
+	type MaxNodes = MaxWellKnownNodes;
+	type MaxPeerIdLength = MaxPeerIdLength;
 }
 
 parameter_types! {

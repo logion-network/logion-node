@@ -84,9 +84,9 @@ dependencies = [
 
 [[package]]
 name = "ahash"
-version = "0.8.10"
+version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b79b82693f705137f8fb9b37871d99e4f9a7df12b917eed79c3d3954830a60b"
+checksum = "d713b3834d76b85304d4d525563c1276e2e30dc97cc67bfb4585a4a29fc2c89f"
 dependencies = [
  "cfg-if",
  "getrandom 0.2.12",
@@ -136,9 +136,9 @@ dependencies = [
 
 [[package]]
 name = "anstream"
-version = "0.6.13"
+version = "0.6.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d96bd03f33fe50a863e394ee9718a706f988b9079b20c3784fb726e7678b62fb"
+checksum = "96b09b5178381e0874812a9b157f7fe84982617e48f71f4e3235482775e5b540"
 dependencies = [
  "anstyle",
  "anstyle-parse",
@@ -2882,7 +2882,7 @@ version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43a3c133739dddd0d2990f9a4bdf8eb4b21ef50e4851ca85ab661199821d510e"
 dependencies = [
- "ahash 0.8.10",
+ "ahash 0.8.9",
 ]
 
 [[package]]
@@ -2891,7 +2891,7 @@ version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "290f1a1d9242c78d09ce40a5e87e7554ee637af1351968159f4952f028f75604"
 dependencies = [
- "ahash 0.8.10",
+ "ahash 0.8.9",
  "allocator-api2",
 ]
 
@@ -3098,7 +3098,7 @@ dependencies = [
  "iana-time-zone-haiku",
  "js-sys",
  "wasm-bindgen",
- "windows-core 0.52.0",
+ "windows-core",
 ]
 
 [[package]]
@@ -4234,7 +4234,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-4#1938fc659e8a025a9e7eee4922d0f2e3f4ad2e86"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-5#f2b92ac04e949024f27ca5174b19cd0daac722d2"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4927,7 +4927,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-4#1938fc659e8a025a9e7eee4922d0f2e3f4ad2e86"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-5#f2b92ac04e949024f27ca5174b19cd0daac722d2"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4967,7 +4967,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-4#1938fc659e8a025a9e7eee4922d0f2e3f4ad2e86"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-5#f2b92ac04e949024f27ca5174b19cd0daac722d2"
 dependencies = [
  "bs58 0.5.0",
  "frame-benchmarking",
@@ -4987,7 +4987,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-4#1938fc659e8a025a9e7eee4922d0f2e3f4ad2e86"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-5#f2b92ac04e949024f27ca5174b19cd0daac722d2"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5006,7 +5006,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-4#1938fc659e8a025a9e7eee4922d0f2e3f4ad2e86"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-5#f2b92ac04e949024f27ca5174b19cd0daac722d2"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5023,7 +5023,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-4#1938fc659e8a025a9e7eee4922d0f2e3f4ad2e86"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-5#f2b92ac04e949024f27ca5174b19cd0daac722d2"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5206,7 +5206,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-4#1938fc659e8a025a9e7eee4922d0f2e3f4ad2e86"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-5#f2b92ac04e949024f27ca5174b19cd0daac722d2"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5985,9 +5985,9 @@ checksum = "60a357793950651c4ed0f3f52338f53b2f809f32d83a07f72909fa13e4c6c1e3"
 
 [[package]]
 name = "rayon"
-version = "1.9.0"
+version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4963ed1bc86e4f3ee217022bd855b297cef07fb9eac5dfa1f788b220b49b3bd"
+checksum = "fa7237101a77a10773db45d62004a272517633fbcc3df19d96455ede1122e051"
 dependencies = [
  "either",
  "rayon-core",
@@ -6628,7 +6628,7 @@ name = "sc-consensus-grandpa"
 version = "0.10.0-dev"
 source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.5.0#a3dc2f15f23b3fd25ada62917bfab169a01f2b0d"
 dependencies = [
- "ahash 0.8.10",
+ "ahash 0.8.9",
  "array-bytes 6.2.2",
  "async-trait",
  "dyn-clone",
@@ -6885,7 +6885,7 @@ name = "sc-network-gossip"
 version = "0.10.0-dev"
 source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.5.0#a3dc2f15f23b3fd25ada62917bfab169a01f2b0d"
 dependencies = [
- "ahash 0.8.10",
+ "ahash 0.8.9",
  "futures",
  "futures-timer",
  "libp2p",
@@ -7366,7 +7366,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "772575a524feeb803e5b0fcbc6dd9f367e579488197c94c6e4023aad2305774d"
 dependencies = [
- "ahash 0.8.10",
+ "ahash 0.8.9",
  "cfg-if",
  "hashbrown 0.13.2",
 ]
@@ -7999,7 +7999,7 @@ dependencies = [
 [[package]]
 name = "sp-crypto-ec-utils"
 version = "0.10.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-377-ext",
@@ -8039,7 +8039,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "14.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8060,7 +8060,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.25.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -8247,7 +8247,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "24.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "bytes",
  "impl-trait-for-tuples",
@@ -8279,7 +8279,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "17.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "Inflector",
  "expander",
@@ -8371,7 +8371,7 @@ source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.5.0
 [[package]]
 name = "sp-std"
 version = "14.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 
 [[package]]
 name = "sp-storage"
@@ -8389,7 +8389,7 @@ dependencies = [
 [[package]]
 name = "sp-storage"
 version = "19.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -8427,7 +8427,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "16.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "parity-scale-codec",
  "sp-std 14.0.0",
@@ -8465,7 +8465,7 @@ name = "sp-trie"
 version = "22.0.0"
 source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.5.0#a3dc2f15f23b3fd25ada62917bfab169a01f2b0d"
 dependencies = [
- "ahash 0.8.10",
+ "ahash 0.8.9",
  "hash-db",
  "hashbrown 0.13.2",
  "lazy_static",
@@ -8529,7 +8529,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "20.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#f4eedcebafa4d2addb8b71ba31ab1bc579ba3c4a"
+source = "git+https://github.com/paritytech/polkadot-sdk#a035dc9be718c6327420c87fecb7a752954492f4"
 dependencies = [
  "anyhow",
  "impl-trait-for-tuples",
@@ -10061,7 +10061,7 @@ version = "0.51.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca229916c5ee38c2f2bc1e9d8f04df975b4bd93f9955dc69fabb5d91270045c9"
 dependencies = [
- "windows-core 0.51.1",
+ "windows-core",
  "windows-targets 0.48.5",
 ]
 
@@ -10072,15 +10072,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1f8cf84f35d2db49a46868f947758c7a1138116f7fac3bc844f43ade1292e64"
 dependencies = [
  "windows-targets 0.48.5",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.52.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
-dependencies = [
- "windows-targets 0.52.3",
 ]
 
 [[package]]
