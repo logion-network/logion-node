@@ -894,8 +894,8 @@ parameter_types! {
 /// This can be a tuple of types, each implementing `OnRuntimeUpgrade`.
 #[allow(unused_parens)]
 type Migrations = (
-	// Migration does not fit in one block and thus will be prepared offchain, and storage will be updated using system.setstorage()
 	pallet_logion_loc::migrations::v23::RemoveUselessMapsAddImported<LogionLocStr, Runtime>,
+	pallet_lo_authority_list::migrations::v5::AddImported<Runtime>,
 );
 
 /// Unchecked extrinsic type as expected by this runtime.
