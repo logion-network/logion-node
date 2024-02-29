@@ -1,7 +1,7 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
 use futures::FutureExt;
-use logion_node_runtime::{self, opaque::Block, RuntimeApi};
+use logion_node_runtime::{opaque::Block, RuntimeApi};
 use sc_client_api::{Backend, BlockBackend};
 use sc_consensus_aura::{ImportQueueParams, SlotProportion, StartAuraParams, CompatibilityMode};
 use sc_consensus_grandpa::SharedVoterState;
