@@ -4141,7 +4141,7 @@ dependencies = [
  "futures",
  "jsonrpsee",
  "logion-node-runtime",
- "pallet-lo-authority-list",
+ "pallet-lo-authority-list 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6)",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
  "sc-basic-authorship",
@@ -4190,12 +4190,12 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "log",
- "logion-shared",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
  "pallet-aura",
  "pallet-balances",
  "pallet-block-reward",
  "pallet-grandpa",
- "pallet-lo-authority-list",
+ "pallet-lo-authority-list 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
  "pallet-logion-loc",
  "pallet-logion-vault",
  "pallet-logion-vote",
@@ -4229,6 +4229,19 @@ dependencies = [
  "sp-version",
  "substrate-validator-set",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "logion-shared"
+version = "0.1.1"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0#50a1b44fd3ba802ef34af0afe03f9573304abfca"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-std 8.0.0",
+ "sp-weights",
 ]
 
 [[package]]
@@ -4927,13 +4940,13 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6#5b21ea5d1f6264e88007eceee6c13085ee871844"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0#50a1b44fd3ba802ef34af0afe03f9573304abfca"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
- "logion-shared",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
  "parity-scale-codec",
  "scale-info",
  "sp-core",
@@ -4967,14 +4980,33 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6#5b21ea5d1f6264e88007eceee6c13085ee871844"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0#50a1b44fd3ba802ef34af0afe03f9573304abfca"
 dependencies = [
  "bs58 0.5.0",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
- "logion-shared",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 8.0.0",
+]
+
+[[package]]
+name = "pallet-lo-authority-list"
+version = "0.1.1"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6#5b21ea5d1f6264e88007eceee6c13085ee871844"
+dependencies = [
+ "bs58 0.5.0",
+ "frame-support",
+ "frame-system",
+ "log",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6)",
  "parity-scale-codec",
  "scale-info",
  "serde",
@@ -4987,13 +5019,13 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6#5b21ea5d1f6264e88007eceee6c13085ee871844"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0#50a1b44fd3ba802ef34af0afe03f9573304abfca"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
- "logion-shared",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
  "parity-scale-codec",
  "scale-info",
  "sp-api",
@@ -5006,12 +5038,12 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6#5b21ea5d1f6264e88007eceee6c13085ee871844"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0#50a1b44fd3ba802ef34af0afe03f9573304abfca"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
- "logion-shared",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
  "pallet-multisig",
  "parity-scale-codec",
  "scale-info",
@@ -5023,13 +5055,13 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6#5b21ea5d1f6264e88007eceee6c13085ee871844"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0#50a1b44fd3ba802ef34af0afe03f9573304abfca"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
- "logion-shared",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
  "parity-scale-codec",
  "scale-info",
  "sp-std 8.0.0",
@@ -5206,12 +5238,12 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0-6#5b21ea5d1f6264e88007eceee6c13085ee871844"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.0#50a1b44fd3ba802ef34af0afe03f9573304abfca"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
- "logion-shared",
+ "logion-shared 0.1.1 (git+https://github.com/logion-network/logion-pallets?tag=v0.2.0)",
  "parity-scale-codec",
  "scale-info",
  "sp-std 8.0.0",
@@ -7999,7 +8031,7 @@ dependencies = [
 [[package]]
 name = "sp-crypto-ec-utils"
 version = "0.10.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-377-ext",
@@ -8039,7 +8071,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "14.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8060,7 +8092,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.25.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -8247,7 +8279,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "24.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "bytes",
  "impl-trait-for-tuples",
@@ -8279,7 +8311,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "17.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "Inflector",
  "expander",
@@ -8371,7 +8403,7 @@ source = "git+https://github.com/paritytech/polkadot-sdk.git?tag=polkadot-v1.5.0
 [[package]]
 name = "sp-std"
 version = "14.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 
 [[package]]
 name = "sp-storage"
@@ -8389,7 +8421,7 @@ dependencies = [
 [[package]]
 name = "sp-storage"
 version = "19.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -8427,7 +8459,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "16.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "parity-scale-codec",
  "sp-std 14.0.0",
@@ -8529,7 +8561,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "20.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk#c244a94e4a77c0798c5a45d3004ec2389378b394"
+source = "git+https://github.com/paritytech/polkadot-sdk#7f5d308d2983dcce324a8625edf3f2a838209da8"
 dependencies = [
  "anyhow",
  "impl-trait-for-tuples",
