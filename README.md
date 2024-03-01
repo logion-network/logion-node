@@ -139,3 +139,13 @@ with $PALLET being a pallet name listed in [`runtime/src/weights`](`./runtime/sr
 7. `./runtime/src/lib.rs`: Pass generated `WeightInfo` to pallet (`type WeightInfo = weights::PALLET_NAME::WeightInfo<Runtime>;`).
 8. Run `cargo check`; a failure here may mean that pallet benchmarks were not updated following a pallet API change.
 9. `./scripts/benchmark_all.sh`: add pallet to `PALLETS` array.
+
+## Build for release
+
+- Build using [`srtool`](https://docs.substrate.io/reference/command-line-tools/srtool/)
+  - `cp rust-toolchain.toml runtime/`
+  - `srtool build --root --package logion-node-runtime --runtime-dir runtime`
+  - `rm runtime/rust-toolchain.toml`
+
+The toolchain file must be copied to prevent an issue about missing `rust-src` during build. This step (and clean-up)
+may be removed once it is added to srtool's [Docker image](https://github.com/paritytech/srtool/blob/master/Dockerfile).
