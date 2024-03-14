@@ -12,7 +12,7 @@ use sp_keyring::Sr25519Keyring;
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
-		"logion Node".into()
+		"Logion Node".into()
 	}
 
 	fn impl_version() -> String {
@@ -118,7 +118,7 @@ pub fn run() -> sc_cli::Result<()> {
 							)
 						}
 
-						cmd.run::<Block, ()>(config)
+						cmd.run::<sp_runtime::traits::HashingFor<Block>, ()>(config)
 					},
 					BenchmarkCmd::Block(cmd) => {
 						let PartialComponents { client, .. } = service::new_partial(&config)?;
