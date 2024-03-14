@@ -4187,7 +4187,7 @@ dependencies = [
 [[package]]
 name = "logion-shared"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1-1#35d9de02a325a2811c538628d6f3c697471680e7"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1#3f835421fc765dad6ef45b4a4d2fa590d2098f6c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4890,7 +4890,7 @@ dependencies = [
 [[package]]
 name = "pallet-block-reward"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1-1#35d9de02a325a2811c538628d6f3c697471680e7"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1#3f835421fc765dad6ef45b4a4d2fa590d2098f6c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4930,7 +4930,7 @@ dependencies = [
 [[package]]
 name = "pallet-lo-authority-list"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1-1#35d9de02a325a2811c538628d6f3c697471680e7"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1#3f835421fc765dad6ef45b4a4d2fa590d2098f6c"
 dependencies = [
  "bs58 0.5.0",
  "frame-benchmarking",
@@ -4950,7 +4950,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-loc"
 version = "0.4.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1-1#35d9de02a325a2811c538628d6f3c697471680e7"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1#3f835421fc765dad6ef45b4a4d2fa590d2098f6c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4969,7 +4969,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vault"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1-1#35d9de02a325a2811c538628d6f3c697471680e7"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1#3f835421fc765dad6ef45b4a4d2fa590d2098f6c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4986,7 +4986,7 @@ dependencies = [
 [[package]]
 name = "pallet-logion-vote"
 version = "0.1.0"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1-1#35d9de02a325a2811c538628d6f3c697471680e7"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1#3f835421fc765dad6ef45b4a4d2fa590d2098f6c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -5169,7 +5169,7 @@ dependencies = [
 [[package]]
 name = "pallet-verified-recovery"
 version = "0.1.1"
-source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1-1#35d9de02a325a2811c538628d6f3c697471680e7"
+source = "git+https://github.com/logion-network/logion-pallets?tag=v0.2.1#3f835421fc765dad6ef45b4a4d2fa590d2098f6c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",

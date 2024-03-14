@@ -45,7 +45,7 @@ sp-timestamp = { git = "https://github.com/paritytech/polkadot-sdk.git", tag = "
 sp-inherents = { git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.8.0" }
 sp-keyring = { git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.8.0" }
 frame-system = { git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.8.0" }
-pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  tag = "v0.2.1-1" }
+pallet-lo-authority-list = { git = "https://github.com/logion-network/logion-pallets", default-features = false,  tag = "v0.2.1" }
 pallet-transaction-payment = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.8.0" }
 
 # These dependencies are used for the node's RPCs
