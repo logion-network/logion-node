@@ -1,3 +1,10 @@
+# ⚠️ Migration notice ⚠️
+
+On the 22nd of April 2024, the Logion solochain was stopped and all data were migrated to the parachain. At that time,
+both runtimes were equivalent feature-wise. Ongoing development continues on the parachain's runtime:
+
+https://github.com/logion-network/logion-collator
+
 # Logion node
 
 This project exposes the Logion network's nodes.
